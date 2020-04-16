@@ -1,10 +1,17 @@
 Quick Start
 ========================
 
-First you need to checkout RIOT:
+Install pyserial. With Debian:
 
-    git submodule init
-    git submodule update
+    # apt-get install python-serial
+
+This is required by the default RIOT terminal (pyterm). The terminal is the
+user interface you use to interact with the boards, through USB.
+
+Now checkout RIOT:
+
+    $ git submodule init
+    $ git submodule update
 
 Then you can work on any of the programs within the project. Each subdirectory
 (except RIOT) is a program.
@@ -27,10 +34,23 @@ Cheatsheet:
     make flash BOARD=waspmote-pro
 
     # Flash the application to the board connected to the given port
-    make flash BOARD=waspmote-pro PORT=/dev/ttyXXX
+    make flash BOARD=waspmote-pro PORT=/dev/ttyUSB0
 
     # Run the terminal
-    make term BOARD=waspmote-pro
+    make term BOARD=waspmote-pro PORT=/dev/ttyUSB0
+
+You can pass options to the make program, other than BOARD:
+
+    # Port the mote is connected to, default is /dev/ttyACM0
+    PORT=/dev/ttyUSB0
+
+    # Baudrate of the USB port, default is 9600
+    BAUD=115200
+
+Notes:
+
+- To run the terminal (make term) you need to install pyserial. With Debian:
+  apt-get install python-serial
 
 
 Optional: direnv
