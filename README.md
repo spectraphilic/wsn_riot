@@ -1,30 +1,56 @@
-Quick Start
+Prerequisites
 ========================
 
-Install pyserial. With Debian:
+Install pyserial system wide. This is required for pyterm to work; pyterm is
+the terminal program included in RIOT. The terminal is the program you use
+to interact with the application flashed to the board.
 
-    # apt-get install python-serial
+With Debian or Ubuntu:
 
-This is required by the default RIOT terminal (pyterm). The terminal is the
-user interface you use to interact with the boards, through USB.
+    apt-get install python-serial
+
+
+Optional: direnv
+------------------------
+
+This is optional, but recommended: [direnv](https://direnv.net/) allows to
+export environment variables as you enter a directory, and unload them as you
+leave.
+
+Install direnv in Debian or Ubuntu:
+
+    apt-get install direnv
+
+Enable direnv:
+
+    direnv allow
+
+This project includes a `.envrc` file in the root directory. It adds
+`./bin/native/` to the `PATH`. For example, this way you can just type
+`wsn-test.elf` instead of `./bin/native/wsn-test.elf` (after entering the
+`apps/test` application directory).
+
+
+Quick Start
+========================
 
 Now checkout RIOT:
 
     $ git submodule init
     $ git submodule update
 
-Then you can work on any of the programs within the project. Each subdirectory
-(except RIOT) is a program.
+Then you can work on any of the applications within the project. Each
+subdirectory within the `apps` subdirectory is an application.
 
 Cheatsheet:
 
-    # Change to the program of your choice. e.g.
-    cd test
+    # Change to the application of your choice. e.g.
+    cd apps/test
 
     # Build for the native target
     make
 
-    # Run the program
+    # Run the application
     ./bin/native/wsn-test.elf
 
     # Build for the waspmote board
@@ -39,34 +65,13 @@ Cheatsheet:
     # Run the terminal
     make term BOARD=waspmote-pro PORT=/dev/ttyUSB0
 
-You can pass options to the make program, other than BOARD:
+You can pass options to the make command, other than BOARD:
 
     # Port the mote is connected to, default is /dev/ttyACM0
     PORT=/dev/ttyUSB0
 
     # Baudrate of the USB port, default is 9600
     BAUD=115200
-
-Notes:
-
-- To run the terminal (make term) you need to install pyserial. With Debian:
-  apt-get install python-serial
-
-
-Optional: direnv
-========================
-
-This is optional, but recommended: [direnv](https://direnv.net/) allows to
-export environment variables as you enter the directory, and unload them as you
-leave.
-
-This is very handy, and this project includes a `.envrc` file so, after
-building the native target, you can just type `uio-wsn.elf` instead of
-`./bin/native/uio-wsn.elf`.
-
-If using Debian or Ubuntu just type `apt-get install direnv` to install it.
-Then within the root of the project type `direnv allow` (it will prompt you
-to do so anyway).
 
 
 ATmega toolchain: Gentoo
