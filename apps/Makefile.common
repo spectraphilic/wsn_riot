@@ -1,5 +1,5 @@
-# name of your application
-APPLICATION = wsn-test
+# name of your application (same as directory name)
+APPLICATION = $(shell basename $(CURDIR))
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -15,10 +15,5 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Standard modules (included in RIOT)
-
-# Project modules
-USEMODULE += hello
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/hello
-
-include $(RIOTBASE)/Makefile.include
+# Include directory for project modules (external from RIOT's point-of-view)
+INCLUDES += -I$(CURDIR)/../../modules/include

@@ -27,8 +27,8 @@ Enable direnv:
 
 This project includes a `.envrc` file in the root directory. It adds
 `./bin/native/` to the `PATH`. For example, this way you can just type
-`wsn-test.elf` instead of `./bin/native/wsn-test.elf` (after entering the
-`apps/test` application directory).
+`test-ext-module.elf` instead of `./bin/native/test-ext-module.elf` (after
+entering the `apps/test-ext-module` application directory).
 
 
 Quick Start
@@ -45,13 +45,13 @@ subdirectory within the `apps` subdirectory is an application.
 Cheatsheet:
 
     # Change to the application of your choice. e.g.
-    cd apps/test
+    cd apps/test-ext-module
 
     # Build for the native target
     make
 
     # Run the application
-    ./bin/native/wsn-test.elf
+    ./bin/native/test-ext-module.elf
 
     # Build for the waspmote board
     make BOARD=waspmote-pro
@@ -74,6 +74,19 @@ You can pass options to the make command, other than BOARD:
     BAUD=115200
 
 
+ATmega toolchain: Debian
+========================
+
+Install required software:
+
+    apt-get install avr-libc gcc-avr avrdude
+
+Links:
+
+- <https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega#atmel-avr-toolchain>
+- <https://github.com/RIOT-OS/RIOT/issues/7109#issuecomment-305089485>
+
+
 ATmega toolchain: Gentoo
 ========================
 
@@ -86,13 +99,3 @@ Just install crossdev and build the toolchain:
     crossdev -S -t avr
 
 Then `make BOARD=waspmote-pro` should work.
-
-
-ATmega toolchain: Debian
-========================
-
-See <https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega#atmel-avr-toolchain>
-
-Installing gcc-avr *may* be enough.
-
-TODO
