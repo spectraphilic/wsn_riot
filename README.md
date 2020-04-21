@@ -81,6 +81,13 @@ Install required software:
 
     apt-get install avr-libc gcc-avr avrdude
 
+Verify:
+
+    $ avr-gcc --version
+    $ avr-g++ --version
+
+We need avr-g++ for C++, and we need C++ for Arduino programs.
+
 Links:
 
 - <https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega#atmel-avr-toolchain>
@@ -96,6 +103,36 @@ If using Gentoo Linux distribution, this is pretty easy. As described in
 Just install crossdev and build the toolchain:
 
     emerge crossdev
-    crossdev -S -t avr
+    USE="-openmp -hardened -sanitize -vtv" crossdev -S -t avr
+
+The USE flags are required to build avr-g++
 
 Then `make BOARD=waspmote-pro` should work.
+
+
+ARM toolchain
+=====================
+
+Debian:
+
+    apt-get install gcc-arm-none-eabi
+
+Gentoo:
+
+    crossdev -S -t arm-none-eabi
+
+
+Boards
+=====================
+
+List of boards we have, with CPU and board from RIOT:
+
+- Waspmote v12 (atmega1281/waspmote-pro)
+- Waspmote v15 (atmega1281/UNSUPPORTED)
+- Arduino Nano (atmega328p/arduino-nano)
+- Adafruit Feather M0 (???/feather-m0)
+
+Some boards don't support Arduino, including native, e.g.:
+
+    $ make BOARD=waspmote-pro
+    There are unsatisfied feature requirements: arduino
