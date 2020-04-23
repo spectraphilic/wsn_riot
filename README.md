@@ -136,3 +136,18 @@ Some boards don't support Arduino, including native, e.g.:
 
     $ make BOARD=waspmote-pro
     There are unsatisfied feature requirements: arduino
+
+
+TODO
+=====================
+
+Always check open issues and pull requests, what we need may be already there.
+
+- Add support for Waspmote v15
+- Fix timer issue with the Waspmote. It seems to sleep forever.
+- Add arduino feature to waspmote-pro, and to any other board we need
+
+Caveats:
+
+- To exit the shell type "^D" then "ENTER". To implement an "exit" command we
+  would need to modify RIOT.
