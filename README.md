@@ -13,28 +13,28 @@ Ubuntu 20.04 Receipe
 ----------------------
 1. Install Ubunut 20.04
 2. do a system update 
-
+```sh
     sudo apt-get update
     sudo apt-get upgrade
-
+```
 3. Install the ARM toolchain, git, pip3 and pyserial
-
+```sh
     sudo apt install gcc-arm-none-eabi
     sudo apt-get install python-pip3
     sudo pip3 install pyserial
-    
+```
 4. Clone the RIOT repository
-
+```sh
     git clone https://github.com/RIOT-OS/RIOT.git
-
+```
 
 5. Test compiling in Native of Board mode an example:
-
+```sh
     cd RIOT/example/default
     make all
     make all term    # open RIOT program in a terminal
     make all BOARD=remote-revb flash term     # flash and open RIOT app. in a terminal. Example here with the Zolertia Re-mote Rev B board
-
+```
 Optional: direnv
 ------------------------
 
