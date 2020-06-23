@@ -5,10 +5,35 @@ Install pyserial system wide. This is required for pyterm to work; pyterm is
 the terminal program included in RIOT. The terminal is the program you use
 to interact with the application flashed to the board.
 
-With Debian or Ubuntu:
+With Debian or Ubuntu :
 
     apt-get install python-serial
 
+Ubuntu 20.04 Receipe
+----------------------
+1. Install Ubunut 20.04
+2. do a system update 
+
+    sudo apt-get update
+    sudo apt-get upgrade
+
+3. Install the ARM toolchain, git, pip3 and pyserial
+
+    sudo apt install gcc-arm-none-eabi
+    sudo apt-get install python-pip3
+    sudo pip3 install pyserial
+    
+4. Clone the RIOT repository
+
+    git clone https://github.com/RIOT-OS/RIOT.git
+
+
+5. Test compiling in Native of Board mode an example:
+
+    cd RIOT/example/default
+    make all
+    make all term    # open RIOT program in a terminal
+    make all BOARD=remote-revb flash term     # flash and open RIOT app. in a terminal. Example here with the Zolertia Re-mote Rev B board
 
 Optional: direnv
 ------------------------
@@ -131,6 +156,7 @@ List of boards we have, with CPU and board from RIOT:
 - Waspmote v15 (atmega1281/UNSUPPORTED)
 - Arduino Nano (atmega328p/arduino-nano)
 - Adafruit Feather M0 (???/feather-m0)
+- Zolertia Re-mote M3
 
 Some boards don't support Arduino, including native, e.g.:
 
