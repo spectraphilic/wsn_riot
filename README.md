@@ -1,68 +1,28 @@
-Prerequisites
-========================
-
-Install pyserial system wide. This is required for pyterm to work; pyterm is
-the terminal program included in RIOT. The terminal is the program you use
-to interact with the application flashed to the board.
-
-With Debian or Ubuntu :
-
-    apt-get install python-serial
-
-Ubuntu 20.04 Receipe
-----------------------
-1. Install Ubunut 20.04
-2. do a system update 
-```sh
-    sudo apt-get update
-    sudo apt-get upgrade
-```
-3. Install the ARM toolchain, git, pip3 and pyserial
-```sh
-    sudo apt install gcc-arm-none-eabi
-    sudo apt-get install python-pip3
-    sudo pip3 install pyserial
-```
-4. Clone the RIOT repository
-```sh
-    git clone https://github.com/RIOT-OS/RIOT.git
-```
-
-5. Test compiling in Native of Board mode an example:
-```sh
-    cd RIOT/example/default
-    make all
-    make all term    # open RIOT program in a terminal
-    make all BOARD=remote-revb flash term     # flash and open RIOT app. in a terminal. Example here with the Zolertia Re-mote Rev B board
-```
-Optional: direnv
-------------------------
-
-This is optional, but recommended: [direnv](https://direnv.net/) allows to
-export environment variables as you enter a directory, and unload them as you
-leave.
-
-Install direnv in Debian or Ubuntu:
-
-    apt-get install direnv
-
-Enable direnv:
-
-    direnv allow
-
-This project includes a `.envrc` file in the root directory. It adds
-`./bin/native/` to the `PATH`. For example, this way you can just type
-`test-ext-module.elf` instead of `./bin/native/test-ext-module.elf` (after
-entering the `apps/test-ext-module` application directory).
-
-
 Quick Start
 ========================
 
-Now checkout RIOT:
+Install requirements, for Debian or Debian derivatives:
+
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt install gcc-multilib g++-multilib     # Native port
+    sudo apt install avr-libc gcc-avr avrdude      # AVR
+    sudo apt install gcc-arm-none-eabi             # ARM
+    sudo apt install python3-serial                # To use the terminal
+
+Checkout RIOT:
 
     $ git submodule init
     $ git submodule update
+
+Try some examples from RIOT:
+
+    cd RIOT/examples/default/
+
+    make all         # Build for the native target
+    make all term    # Open RIOT program in a terminal
+    make all BOARD=remote-revb flash term     # flash and open RIOT app. in a terminal.
+                                              # Example here with the Zolertia Re-mote Rev B board
 
 Then you can work on any of the applications within the project. Each
 subdirectory within the `apps` subdirectory is an application.
@@ -99,19 +59,53 @@ You can pass options to the make command, other than BOARD:
     BAUD=115200
 
 
-ATmega toolchain: Debian
+RIOT
 ========================
 
-Install required software:
+RIOT is included in this repository, as a submodule:
 
-    apt-get install avr-libc gcc-avr avrdude
+    $ git submodule init
+    $ git submodule update
+
+Now you need to install a cross toolchain for every target architecture.
+
+Toolchain: Native
+========================
+
+This allows running a RIOT program as a native Linux process, useful for rapid
+development.
+
+Debian:
+
+    $ sudo apt install gcc-multilib g++-multilib
+
+Test:
+
+    $ cd RIOT/examples/default/
+    $ make
+
+
+Toolchain: AVR
+========================
+
+Debian:
+
+    $ sudo apt install avr-libc gcc-avr avrdude
+
+Gentoo (the USE flags are required to build avr-g++):
+
+    $ sudo emerge crossdev
+    $ USE="-openmp -hardened -sanitize -vtv" crossdev -S -t avr
 
 Verify:
 
     $ avr-gcc --version
     $ avr-g++ --version
 
-We need avr-g++ for C++, and we need C++ for Arduino programs.
+Test:
+
+    $ cd RIOT/examples/default/
+    $ make BOARD=waspmote-pro
 
 Links:
 
@@ -119,32 +113,82 @@ Links:
 - <https://github.com/RIOT-OS/RIOT/issues/7109#issuecomment-305089485>
 
 
-ATmega toolchain: Gentoo
+Toolchain: ARM
 ========================
-
-If using Gentoo Linux distribution, this is pretty easy. As described in
-<https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega#custom-toolchain-via-crossdev-gentoo-only>
-
-Just install crossdev and build the toolchain:
-
-    emerge crossdev
-    USE="-openmp -hardened -sanitize -vtv" crossdev -S -t avr
-
-The USE flags are required to build avr-g++
-
-Then `make BOARD=waspmote-pro` should work.
-
-
-ARM toolchain
-=====================
 
 Debian:
 
-    apt-get install gcc-arm-none-eabi
+    $ sudo apt install gcc-arm-none-eabi
 
-Gentoo:
+Verify:
 
-    crossdev -S -t arm-none-eabi
+    $ arm-none-eabi-gcc --version
+    arm-none-eabi-gcc (GNU Arm Embedded Toolchain 9-2020-q2-update) 9.3.1 20200408 (release)
+    [...]
+
+Test:
+
+    $ cd RIOT/examples/default/
+
+
+ARM from upstream
+------------------------
+
+Alternatively you can install the ARM toolchain from upstream. This works
+regardless of the Linux distribution. And is also the path to follow for
+other systems (e.g. Windows).
+
+Download the toolchain from
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
+Unpack, for example:
+
+    $ mkdir -p ~/opt
+    $ cd ~/opt
+    $ tar xjf gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2
+
+Add the toolchain binary path to your PATH environment variaable. Edit ``~/.bashrc``:
+
+    export PATH="$HOME/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:$PATH"
+
+Exit the terminal and open a new one, so this change takes effect. Then verify:
+
+    $ arm-none-eabi-gcc --version
+    arm-none-eabi-gcc (GNU Arm Embedded Toolchain 9-2020-q2-update) 9.3.1 20200408 (release)
+    [...]
+
+
+The terminal program
+========================
+
+Install pyserial system wide. This is required for pyterm to work; pyterm is
+the terminal program included in RIOT. The terminal is the program you use
+to interact with the application flashed to the board.
+
+With Debian or Ubuntu :
+
+    apt-get install python3-serial
+
+
+Optional: direnv
+========================
+
+This is optional, but recommended: [direnv](https://direnv.net/) allows to
+export environment variables as you enter a directory, and unload them as you
+leave.
+
+Install direnv in Debian or Ubuntu:
+
+    apt-get install direnv
+
+Enable direnv:
+
+    direnv allow
+
+This project includes a `.envrc` file in the root directory. It adds
+`./bin/native/` to the `PATH`. For example, this way you can just type
+`test-ext-module.elf` instead of `./bin/native/test-ext-module.elf` (after
+entering the `apps/test-ext-module` application directory).
 
 
 Boards
