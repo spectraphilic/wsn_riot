@@ -45,17 +45,16 @@ const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    char buffer[SHELL_DEFAULT_BUFSIZE]; // 128
-
     // Boot
     puts("*** UiO WSN v2 ***");
     printf("Board=%s MCU=%s\n", RIOT_BOARD, RIOT_MCU);
 
     // Shell
-    shell_run_once(shell_commands, buffer, SHELL_DEFAULT_BUFSIZE);
+    char buffer[SHELL_DEFAULT_BUFSIZE]; // 128
+//  shell_run_once(shell_commands, buffer, SHELL_DEFAULT_BUFSIZE);
 
     // Main loop
-    uint32_t i = 0;
+    unsigned int i = 0;
     while (1) {
       puts("Sleep...");
       xtimer_sleep(SLEEP);
