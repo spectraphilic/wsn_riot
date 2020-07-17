@@ -38,14 +38,13 @@ Cheatsheet:
     # Run the application
     ./bin/native/test-ext-module.elf
 
-    # Build for the waspmote board
+    # Build for the waspmote-pro board
     make BOARD=waspmote-pro
 
-    # Flash the application to the board
-    make flash BOARD=waspmote-pro
-
-    # Flash the application to the board connected to the given port
-    make flash BOARD=waspmote-pro PORT=/dev/ttyUSB0
+    # Flash the application to the waspmote-pro board
+    # We have to specify the PORT since the default is ttyACM0
+    # We have to pass -F to avoid "Invalid device signature." error
+    make BOARD=waspmote-pro PORT=/dev/ttyUSB0 FFLAGS_EXTRA="-F" flash
 
     # Run the terminal
     make term BOARD=waspmote-pro PORT=/dev/ttyUSB0
@@ -55,8 +54,17 @@ You can pass options to the make command, other than BOARD:
     # Port the mote is connected to, default is /dev/ttyACM0
     PORT=/dev/ttyUSB0
 
+    # Extra arguments for avrdude
+    FFLAGS_EXTRA="-F"
+
     # Baudrate of the USB port, default is 9600
     BAUD=115200
+
+If you get some error flashing like:
+
+    avrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x31
+
+Try unplugging and plugging again the USB cable.
 
 
 RIOT
