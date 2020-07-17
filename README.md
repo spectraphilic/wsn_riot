@@ -42,17 +42,16 @@ Cheatsheet:
     make BOARD=waspmote-pro
 
     # Flash the application to the waspmote-pro board
-    # We have to specify the PORT since the default is ttyACM0
     # We have to pass -F to avoid "Invalid device signature." error
-    make BOARD=waspmote-pro PORT=/dev/ttyUSB0 FFLAGS_EXTRA="-F" flash
+    make BOARD=waspmote-pro FFLAGS_EXTRA="-F" flash
 
     # Run the terminal
-    make term BOARD=waspmote-pro PORT=/dev/ttyUSB0
+    make BOARD=waspmote-pro BOOTLOADER_BAUD=115200 term
 
 You can pass options to the make command, other than BOARD:
 
     # Port the mote is connected to, default is /dev/ttyACM0
-    PORT=/dev/ttyUSB0
+    PORT=/dev/ttyUSB1
 
     # Extra arguments for avrdude
     FFLAGS_EXTRA="-F"
