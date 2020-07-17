@@ -36,3 +36,9 @@ Type '/exit' to exit.
 > /exit
 2020-07-16 13:04:45,468 # Exiting Pyterm
 ``` 
+
+The table below summarizes what works and what doesn't:
+
+                remote-revb    waspmote-pro
+    i2c_scan            YES             YES
+    rtc                 YES              NO
