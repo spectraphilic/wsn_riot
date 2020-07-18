@@ -3,7 +3,7 @@
 
 #include "periph/i2c.h"
 #include "shell.h"
-#include "xtimer.h"
+#include "delay.h"
 
 
 static int acc(int argc, char **argv) {
@@ -40,7 +40,7 @@ static int acc(int argc, char **argv) {
         printf("i2c_write_reg error=%d\n", error);
         goto exit;
     }
-    xtimer_usleep(21000U);
+    delay(21);
 
     error = i2c_write_reg(dev, addr, CTRL_REG4, 0, flags); // 2G
     if (error) {
