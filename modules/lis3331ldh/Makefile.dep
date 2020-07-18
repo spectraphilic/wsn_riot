@@ -1,0 +1,5 @@
+USEMODULE += periph_i2c
+
+# Project modules
+USEMODULE += delay
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay

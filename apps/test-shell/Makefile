@@ -7,7 +7,7 @@ USEMODULE += i2c_scan
 USEMODULE += periph_rtc
 
 # Project modules
-USEMODULE += delay
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay
+USEMODULE += lis3331ldh
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/lis3331ldh
 
 include $(RIOTBASE)/Makefile.include
