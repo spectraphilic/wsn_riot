@@ -10,7 +10,7 @@
 
 
 static int acc(int argc, char **argv) {
-    const i2c_t dev = 0;
+    const i2c_t dev = I2C_DEV(0);
     int error;
 
     // Registers
@@ -23,7 +23,6 @@ static int acc(int argc, char **argv) {
     assert(argv); // Avoids warning
 
     // Acquire
-    //i2c_init(dev);
     error = i2c_acquire(dev);
     if (error)
     {
@@ -46,6 +45,7 @@ static int acc(int argc, char **argv) {
 }
 
 
+/*
 static int echo(int argc, char **argv) {
     for (int i=0; i < argc; i++) {
         printf("argv[%d]=%s\n", i, argv[i]);
@@ -53,10 +53,10 @@ static int echo(int argc, char **argv) {
 
     return 0;
 }
+*/
 
 const shell_command_t shell_commands[] = {
     {"acc", "accelerometer", acc},
-    {"echo", "prints given arguments", echo},
     { NULL, NULL, NULL }
 };
 

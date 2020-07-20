@@ -198,21 +198,29 @@ This project includes a `.envrc` file in the root directory. It adds
 entering the `apps/test-ext-module` application directory).
 
 
-Boards
+Hardware
 =====================
 
-List of boards we have, with CPU and board from RIOT:
+The table below summarizes the board we have and their main features:
 
-- Waspmote v12 (atmega1281/waspmote-pro)
-- Waspmote v15 (atmega1281/UNSUPPORTED)
-- Arduino Nano (atmega328p/arduino-nano)
-- Adafruit Feather M0 (???/feather-m0)
-- Zolertia Re-mote M3
+                          RIOT CPU/board            RTC
+    Waspmote v12          atmega1281/waspmote-pro   DS3231SN
+    Waspmote v15          atmega1281/waspmote-pro   DS1337C
+    Arduino Nano          atmega328p/arduino-nano   ?
+    Adafruit Feather M0   ???/feather-m0            ?
+    Zolertia Re-mote M3   ???/remote-revb           ?
 
-Some boards don't support Arduino, including native, e.g.:
+
+Arduino
+====================
+
+Most boards support Arduino, including native, e.g.:
 
     $ make BOARD=waspmote-pro
     There are unsatisfied feature requirements: arduino
+
+Possibly it's not worth adding Arduino support because it will be too much
+work, and not as good as going native.
 
 
 TODO
@@ -220,9 +228,7 @@ TODO
 
 Always check open issues and pull requests, what we need may be already there.
 
-- Add support for Waspmote v15
-- Fix timer issue with the Waspmote. It seems to sleep forever.
-- Add arduino feature to waspmote-pro, and to any other board we need
+- Fix xtimer with the Waspmote.
 
 Caveats:
 

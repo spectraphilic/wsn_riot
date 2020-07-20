@@ -8,7 +8,7 @@ const uint16_t ADDRESS = 0x19;
 const uint16_t WHO_AM_I = 0x0F;
 const uint16_t CTRL_REG1 = 0x20;
 const uint16_t CTRL_REG4 = 0x23;
-const uint8_t flags = I2C_REG16; //I2C_ADDR10;
+const uint8_t flags = 0;
 
 
 int lis3331ldh_init(i2c_t dev)
@@ -22,7 +22,7 @@ int lis3331ldh_init(i2c_t dev)
         DEBUG("[lis3331ldh] error powering on: %d\n", error);
         return -1;
     }
-    delay(21);
+    //delay(21);
 
     // Configure
     error = i2c_write_reg(dev, ADDRESS, CTRL_REG4, 0, flags); // 2G
