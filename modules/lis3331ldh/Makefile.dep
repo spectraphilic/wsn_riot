@@ -1,5 +1,6 @@
+#USEMODULE += periph_gpio
 USEMODULE += periph_i2c
 
 # Project modules
-USEMODULE += delay
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay
+#USEMODULE += delay
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay

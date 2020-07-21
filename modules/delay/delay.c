@@ -1,22 +1,12 @@
-#include "xtimer.h"
+#include "ztimer.h"
 
 unsigned long millis(void)
 {
-    return xtimer_now_usec64() / US_PER_MS;
+    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
+    return now;
 }
 
 void delay(unsigned long ms)
 {
-#ifdef WASPMOTE_PINMAP_H
-    unsigned long start = millis();
-    while (millis() - start < ms)
-    {
-        if(millis() < start)
-        {
-            start = millis();
-        }
-    }
-#else
-    xtimer_usleep(ms * US_PER_MS);
-#endif
+    ztimer_sleep(ZTIMER_MSEC, ms);
 }

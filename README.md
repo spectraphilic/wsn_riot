@@ -21,7 +21,7 @@ Try some examples from RIOT:
 
     make all         # Build for the native target
     make all term    # Open RIOT program in a terminal
-    make all BOARD=remote-revb flash term     # flash and open RIOT app. in a terminal.
+    make BOARD=remote-revb all flash term     # flash and open RIOT app. in a terminal.
                                               # Example here with the Zolertia Re-mote Rev B board
 
 Then you can work on any of the applications within the project. Each

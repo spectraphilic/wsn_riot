@@ -4,7 +4,7 @@ include ../Makefile.common
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += i2c_scan
-USEMODULE += periph_rtc
+#USEMODULE += periph_rtc
 
 # Project modules
 USEMODULE += lis3331ldh

@@ -4,12 +4,13 @@
 // RIOT
 #include "periph/i2c.h"
 #include "shell.h"
+//#include "ztimer.h"
 
 // WSN
 #include "lis3331ldh.h"
 
 
-static int acc(int argc, char **argv) {
+static int cmd_acc(int argc, char **argv) {
     const i2c_t dev = I2C_DEV(0);
     int error = 0;
 
@@ -55,6 +56,19 @@ exit:
 
 
 /*
+static int cmd_timer(int argc, char **argv) {
+    assert(argc);
+    assert(argv);
+
+    printf("now = %lu\n", ztimer_now(ZTIMER_MSEC));
+    ztimer_sleep(ZTIMER_MSEC, 5000);
+    printf("now = %lu\n", ztimer_now(ZTIMER_MSEC));
+
+    return 0;
+}
+*/
+
+/*
 static int echo(int argc, char **argv) {
     for (int i=0; i < argc; i++) {
         printf("argv[%d]=%s\n", i, argv[i]);
@@ -65,7 +79,8 @@ static int echo(int argc, char **argv) {
 */
 
 const shell_command_t shell_commands[] = {
-    {"acc", "accelerometer", acc},
+    {"acc", "accelerometer", cmd_acc},
+    //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };
 
