@@ -198,19 +198,6 @@ This project includes a `.envrc` file in the root directory. It adds
 entering the `apps/test-ext-module` application directory).
 
 
-Hardware
-=====================
-
-The table below summarizes the board we have and their main features:
-
-                          RIOT CPU/board            RTC
-    Waspmote v12          atmega1281/waspmote-pro   DS3231SN
-    Waspmote v15          atmega1281/waspmote-pro   DS1337C
-    Arduino Nano          atmega328p/arduino-nano   ?
-    Adafruit Feather M0   ???/feather-m0            ?
-    Zolertia Re-mote M3   ???/remote-revb           ?
-
-
 Arduino
 ====================
 
