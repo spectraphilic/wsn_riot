@@ -56,8 +56,8 @@ exit:
 }
 
 static int cmd_bme(int argc, char **argv) {
-    const bmx280_t dev;
-    const bmx280_params_t sens_param;
+    bmx280_t* dev;
+    const bmx280_params_t * sens_param;
     int error = 0;
 
     // Registers
