@@ -8,6 +8,7 @@
 
 // WSN
 #include "lis3331ldh.h"
+#include "bmx280.h"
 
 
 static int cmd_acc(int argc, char **argv) {
@@ -54,6 +55,39 @@ exit:
     return error;
 }
 
+static int cmd_bme(int argc, char **argv) {
+    const bmx280_t dev;
+    const bmx280_params_t sens_param;
+    int error = 0;
+
+    // Registers
+
+    // Arguments
+    if (argc != 1) {
+        printf("unexpected number of arguments: %d\n", argc);
+        return -1;
+    }
+
+    // Initialize
+    error = bmx280_init(dev, sens_param);
+    if (error) {
+        printf("bme280 check error\n");
+        goto exit;
+    }
+
+    // Read
+    int16_t temperature, humidity, pressure;
+    temperature = bmx280_read_temperature(dev);
+    humidity = bme280_read_humidity(dev);
+    pressure = bmx280_read_pressure(dev);
+
+    printf("bme280 temperature=%d humidity=%d pressure=%d\n", temperature, humidity, pressure);
+
+exit:
+
+    return error;
+}
+
 
 /*
 static int cmd_timer(int argc, char **argv) {
@@ -80,6 +114,7 @@ static int echo(int argc, char **argv) {
 
 const shell_command_t shell_commands[] = {
     {"acc", "accelerometer", cmd_acc},
+    {"bme", "BME_280", cmd_bme},
     //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };
