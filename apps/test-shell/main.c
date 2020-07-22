@@ -67,6 +67,7 @@ static int cmd_bme(int argc, char **argv) {
         printf("unexpected number of arguments: %d\n", argc);
         return -1;
     }
+    assert(argv); // Avoids warning
 
     // Initialize
     error = bmx280_init(dev, sens_param);
