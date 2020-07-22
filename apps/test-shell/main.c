@@ -9,6 +9,8 @@
 // WSN
 #include "lis3331ldh.h"
 #include "bmx280.h"
+#include "bmx280_params.h"
+
 
 
 static int cmd_acc(int argc, char **argv) {
@@ -56,8 +58,8 @@ exit:
 }
 
 static int cmd_bme(int argc, char **argv) {
-    bmx280_t* dev;
-    const bmx280_params_t * sens_param;
+    bmx280_t dev;
+    //const bmx280_params_t * sens_param;
     int error = 0;
 
     // Registers
@@ -70,19 +72,25 @@ static int cmd_bme(int argc, char **argv) {
     assert(argv); // Avoids warning
 
     // Initialize
-    error = bmx280_init(dev, sens_param);
-    if (error) {
-        printf("bme280 check error\n");
-        goto exit;
+    switch (bmx280_init(&dev, &bmx280_params[0])) {
+        case BMX280_ERR_BUS:
+            puts("[Error] Something went wrong when using the I2C bus");
+            goto exit;
+        case BMX280_ERR_NODEV:
+            puts("[Error] Unable to communicate with any BMX280 device");
+            goto exit;
+        default:
+            /* all good -> do nothing */
+            break;
     }
 
     // Read
     int16_t temperature, humidity, pressure;
-    temperature = bmx280_read_temperature(dev);
-    humidity = bme280_read_humidity(dev);
-    pressure = bmx280_read_pressure(dev);
+    temperature = bmx280_read_temperature(&dev);
+    humidity = bme280_read_humidity(&dev);
+    pressure = bmx280_read_pressure(&dev);
 
-    printf("bme280 temperature=%d humidity=%d pressure=%d\n", temperature, humidity, pressure);
+    printf("bme280 temperature=%d humidity=%d pressure=%u\n", temperature, humidity, pressure);
 
 exit:
 
