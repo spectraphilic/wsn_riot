@@ -6,11 +6,12 @@
 #include "shell.h"
 //#include "ztimer.h"
 
-// WSN
+// WSN Sensors
 #include "lis3331ldh.h"
 #include "bmx280.h"
 #include "bmx280_params.h"
-
+#include "sht3x.h"
+#include "sht3x_params.h"
 
 
 static int cmd_acc(int argc, char **argv) {
@@ -85,17 +86,65 @@ static int cmd_bme(int argc, char **argv) {
     }
 
     // Read
-    int16_t temperature, humidity, pressure;
+    int16_t temperature;
+    uint16_t humidity;
+    uint32_t pressure;
     temperature = bmx280_read_temperature(&dev);
     humidity = bme280_read_humidity(&dev);
     pressure = bmx280_read_pressure(&dev);
 
-    printf("bme280 temperature=%d humidity=%d pressure=%u\n", temperature, humidity, pressure);
+    printf("bme280 temperature=%d humidity=%u pressure=%lu\n", temperature, humidity, pressure);
 
 exit:
 
     return error;
 }
+
+
+static int cmd_sht(int argc, char **argv) {
+    sht3x_dev_t dev;
+    int res;
+
+    int error = 0;
+
+    // Registers
+
+    // Arguments
+    if (argc != 1) {
+        printf("unexpected number of arguments: %d\n", argc);
+        return -1;
+    }
+    assert(argv); // Avoids warning
+
+    if ((res = sht3x_init(&dev, &sht3x_params[0])) != SHT3X_OK) {
+        puts("Initialization failed\n");
+        goto exit;
+    }
+    else {
+        puts("Initialization successful\n");
+    }
+    printf("\n+--------Starting Measurements--------+\n");
+
+    // Read
+    int16_t temp, hum;
+    if ((res = sht3x_read(&dev, &temp, &hum)) == SHT3X_OK) {
+            printf("Temperature [°C]: %d.%d\n"
+                   "Relative Humidity [%%]: %d.%d\n"
+                   "+-------------------------------------+\n",
+                   temp / 100, temp % 100,
+                   hum / 100, hum % 100);
+    }
+    else {
+            printf("Could not read data from sensor, error %d\n", res);
+    }
+
+exit:
+
+    return error;
+}
+
+
+
 
 
 /*
@@ -124,6 +173,7 @@ static int echo(int argc, char **argv) {
 const shell_command_t shell_commands[] = {
     {"acc", "accelerometer", cmd_acc},
     {"bme", "BME_280", cmd_bme},
+    {"sht", "SHT31", cmd_sht},
     //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };

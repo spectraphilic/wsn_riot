@@ -11,6 +11,8 @@ USEMODULE += lis3331ldh
 EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/lis3331ldh
 
 USEMODULE += bme280_i2c
+USEMODULE += sht3x
+
 # I2C address specification
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
 CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
