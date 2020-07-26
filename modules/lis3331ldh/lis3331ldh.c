@@ -1,7 +1,6 @@
 #include "debug.h"
 #include "periph/i2c.h"
-
-#include "delay.h"
+#include "ztimer.h"
 
 
 const uint16_t ADDRESS = 0x19;
@@ -29,7 +28,7 @@ int lis3331ldh_init(i2c_t dev)
         DEBUG("[lis3331ldh] error powering on: %d\n", error);
         return error;
     }
-    //delay(21);
+    //ztimer_sleep(ZTIMER_MSEC, 21);
 
     // Configure
     error = i2c_write_reg(dev, ADDRESS, CTRL_REG4, 0, flags); // 2G

@@ -2,10 +2,10 @@ include ../Makefile.common
 
 # System modules
 USEMODULE += shell
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # Project modules
-#USEMODULE += delay
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay
+#USEMODULE += progmem
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/progmem
 
 include $(RIOTBASE)/Makefile.include

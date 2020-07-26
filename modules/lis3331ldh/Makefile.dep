@@ -1,6 +1,7 @@
 #USEMODULE += periph_gpio
 USEMODULE += periph_i2c
+#USEMODULE += ztimer
 
 # Project modules
-#USEMODULE += delay
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/delay
+#USEMODULE += progmem
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/progmem
