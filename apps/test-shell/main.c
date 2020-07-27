@@ -3,6 +3,7 @@
 
 // RIOT
 #include "periph/i2c.h"
+//#include "progmem.h"
 #include "shell.h"
 //#include "ztimer.h"
 
@@ -161,19 +162,23 @@ static int cmd_timer(int argc, char **argv) {
 */
 
 /*
-static int echo(int argc, char **argv) {
+static int cmd_echo(int argc, char **argv) {
     for (int i=0; i < argc; i++) {
         printf("argv[%d]=%s\n", i, argv[i]);
     }
+
+    printf("%S\n", PSTR("YES"));
+    printf("%S\n", PSTR("0123456789"));
 
     return 0;
 }
 */
 
 const shell_command_t shell_commands[] = {
-    //{"acc", "accelerometer", cmd_acc},
-    {"bme", "read BME_280", cmd_bme},
-    {"sht", "read SHT31", cmd_sht},
+    {"acc", "accelerometer", cmd_acc},
+    {"bme", "BME_280", cmd_bme},
+    //{"echo", "echo", cmd_echo},
+    {"sht", "SHT31", cmd_sht},
     //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };

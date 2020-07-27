@@ -215,7 +215,7 @@ TODO
 
 Always check open issues and pull requests, what we need may be already there.
 
-- Fix xtimer with the Waspmote.
+- Fix ztimer with the Waspmote. First fix `RIOT/tests/periph_timer`.
 
 Caveats:
 

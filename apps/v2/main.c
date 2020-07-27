@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 
-#define SLEEP 3
+#define SLEEP 3000000L
 
 
 /*
  * Utilities. Eventually these will be moved to modules.
  */
 void info(const char* msg) {
-    uint32_t now = xtimer_now_usec(); // miliseconds
+    ztimer_now_t now = ztimer_now(ZTIMER_USEC);
     printf("%15.6f %s\n", ((float)now) / 1000000, msg);
 }
 
@@ -57,7 +57,7 @@ int main(void)
     unsigned int i = 0;
     while (1) {
       puts("Sleep...");
-      xtimer_sleep(SLEEP);
+      ztimer_sleep(ZTIMER_USEC, SLEEP);
       puts("Awake!");
       snprintf(buffer, sizeof(buffer), "Loop=%u", i);
       info(buffer);

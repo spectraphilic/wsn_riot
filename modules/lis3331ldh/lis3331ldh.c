@@ -1,7 +1,9 @@
 #include "debug.h"
+//#include "periph/gpio.h"
 #include "periph/i2c.h"
+#include "ztimer.h"
 
-#include "delay.h"
+//#include "waspmote_pinmap.h"
 
 
 const uint16_t ADDRESS = 0x19;
@@ -23,13 +25,21 @@ int lis3331ldh_init(i2c_t dev)
     int error;
     uint8_t data;
 
+    // Set 3v3 on
+//  error = gpio_init(SENS_PW_3V3, GPIO_OUT);
+//  if (error) {
+//      DEBUG("[lis3331ldh] error powering on 3v3: %d\n", error);
+//      return -1;
+//  }
+//  gpio_set(SENS_PW_3V3);
+
     // Power on
     error = i2c_write_reg(dev, ADDRESS, CTRL_REG1, 39, flags);
     if (error) {
         DEBUG("[lis3331ldh] error powering on: %d\n", error);
         return error;
     }
-    //delay(21);
+    //ztimer_sleep(ZTIMER_MSEC, 21);
 
     // Configure
     error = i2c_write_reg(dev, ADDRESS, CTRL_REG4, 0, flags); // 2G
@@ -37,6 +47,14 @@ int lis3331ldh_init(i2c_t dev)
         DEBUG("[lis3331ldh] error configuring: %d\n", error);
         return error;
     }
+
+    // set the interruption line down
+//  error = gpio_init(MUX_RX, GPIO_OUT);
+//  if (error) {
+//      DEBUG("[lis3331ldh] error disabling interrupt: %d\n", error);
+//      return -1;
+//  }
+//  gpio_clear(MUX_RX);
 
     // Check status
     error = i2c_read_reg(dev, ADDRESS, WHO_AM_I, &data, flags);
