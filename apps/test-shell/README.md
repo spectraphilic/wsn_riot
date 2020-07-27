@@ -42,6 +42,6 @@ The table below summarizes what works and what doesn't:
                 remote-revb    waspmote-pro
     i2c_scan            YES             YES
     rtc                 YES              NO
-    acc					 NO 			YES
-    bme280			PARTIAL 	 NOT TESTED
-    SHT32				 NO 	 NOT TESTED
+    acc			  NOT AVAIL 			YES
+    bme280			    YES 	 NOT TESTED
+    SHT32				YES 	 NOT TESTED

@@ -7,7 +7,10 @@ USEMODULE += i2c_scan
 #USEMODULE += periph_rtc
 
 # RIOT Drivers
-USEMODULE += bme280_i2c
+DRIVER ?= bme280_i2c
+USEMODULE += fmt
+USEMODULE += $(DRIVER)
+
 USEMODULE += sht3x
 
 # Project modules
