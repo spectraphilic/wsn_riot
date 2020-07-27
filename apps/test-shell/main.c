@@ -171,9 +171,9 @@ static int echo(int argc, char **argv) {
 */
 
 const shell_command_t shell_commands[] = {
-    {"acc", "accelerometer", cmd_acc},
-    {"bme", "BME_280", cmd_bme},
-    {"sht", "SHT31", cmd_sht},
+    //{"acc", "accelerometer", cmd_acc},
+    {"bme", "read BME_280", cmd_bme},
+    {"sht", "read SHT31", cmd_sht},
     //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };
