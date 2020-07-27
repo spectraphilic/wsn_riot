@@ -40,7 +40,7 @@ Type '/exit' to exit.
 The table below summarizes what works and what doesn't:
 
     | Device |      remote-revb  |  waspmote-pro|
-    | --- | --- | --- |
+    |---|---|---|
     |i2c_scan  |           YES    |         YES|
     |rtc    |             YES      |        NO|
     |acc		|	  NOT AVAIL 		|	YES|
