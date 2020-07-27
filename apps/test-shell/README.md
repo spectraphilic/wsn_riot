@@ -45,3 +45,4 @@ The table below summarizes what works and what doesn't:
     acc			  NOT AVAIL 			YES
     bme280			    YES 	 NOT TESTED
     SHT32				YES 	 NOT TESTED
+    DS18B20		 NOT TESTED		 NOT TESTED
