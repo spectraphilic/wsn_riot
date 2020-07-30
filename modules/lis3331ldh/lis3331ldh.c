@@ -1,7 +1,7 @@
 #include "debug.h"
 //#include "periph/gpio.h"
 #include "periph/i2c.h"
-#include "ztimer.h"
+//#include "ztimer.h"
 
 //#include "waspmote_pinmap.h"
 

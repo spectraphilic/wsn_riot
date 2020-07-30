@@ -248,9 +248,6 @@ exit:
 }
 
 
-
-
-
 /*
 static int cmd_timer(int argc, char **argv) {
     assert(argc);
