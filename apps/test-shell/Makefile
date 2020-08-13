@@ -1,11 +1,14 @@
 include ../Makefile.common
 
 #------ System modules --------------
+USEMODULE += fmt
+USEMODULE += i2c_scan
+#USEMODULE += periph_rtc
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += i2c_scan
-USEMODULE += fmt
-#USEMODULE += periph_rtc
+
+USEMODULE += fatfs_vfs
+USEMODULE += mtd_sdcard
 
 
 #=====================================
