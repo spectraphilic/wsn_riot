@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 // RIOT
-//#include "progmem.h"
 #include "shell.h"
 //#include "ztimer.h"
 
@@ -36,9 +35,6 @@ static int cmd_echo(int argc, char **argv) {
     for (int i=0; i < argc; i++) {
         printf("argv[%d]=%s\n", i, argv[i]);
     }
-
-    printf("%S\n", PSTR("YES"));
-    printf("%S\n", PSTR("0123456789"));
 
     return 0;
 }

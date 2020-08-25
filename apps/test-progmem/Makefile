@@ -1,7 +1,7 @@
 include ../Makefile.common
 
 # Project modules
-USEMODULE += delay
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/delay
+USEMODULE += progmem
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/progmem
 
 include $(RIOTBASE)/Makefile.include
