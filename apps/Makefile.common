@@ -19,4 +19,5 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 # Include directory for project modules (external from RIOT's point-of-view)
-INCLUDES += -I$(CURDIR)/../../modules/include
+INCLUDES += -I$(CURDIR)/../../drivers/include
+INCLUDES += -I$(CURDIR)/../../sys/include

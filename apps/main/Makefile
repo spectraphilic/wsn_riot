@@ -6,6 +6,6 @@ USEMODULE += ztimer_usec
 
 # Project modules
 #USEMODULE += progmem
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/progmem
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/progmem
 
 include $(RIOTBASE)/Makefile.include

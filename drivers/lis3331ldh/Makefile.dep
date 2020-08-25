@@ -4,4 +4,4 @@ USEMODULE += periph_i2c
 
 # Project modules
 #USEMODULE += progmem
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../modules/progmem
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/progmem
