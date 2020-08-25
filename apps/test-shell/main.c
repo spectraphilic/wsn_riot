@@ -11,9 +11,6 @@
 #include "mtd.h"
 #include "vfs.h"
 
-#include "ds18.h"
-#include "ds18_params.h"
-
 
 extern int cmd_acc(int argc, char **argv);
 extern int cmd_bme(int argc, char **argv);
