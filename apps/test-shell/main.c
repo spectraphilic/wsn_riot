@@ -15,6 +15,7 @@ extern int cmd_acc(int argc, char **argv);
 extern int cmd_bme(int argc, char **argv);
 extern int cmd_sht(int argc, char **argv);
 extern int cmd_ds18b20(int argc, char **argv);
+extern int cmd_var(int argc, char **argv);
 
 
 /*
@@ -91,6 +92,7 @@ const shell_command_t shell_commands[] = {
     {"acc", "accelerometer", cmd_acc},
     {"bme", "read BME_280", cmd_bme},
     {"sht", "read SHT31", cmd_sht},
+    {"var", "var [NAME [VALUE]] - type 'var' to list the variable names", cmd_var},
     //{"ds18", "read DS18B20", cmd_ds18b20},
     //{"echo", "echo", cmd_echo},
     //{"timer", "test the timer (ztimer)", cmd_timer},

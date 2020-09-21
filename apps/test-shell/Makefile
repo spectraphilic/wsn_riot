@@ -28,8 +28,9 @@ USEMODULE += ds18
 #------ Project modules ---------------
 USEMODULE += lis3331ldh
 EXTERNAL_MODULE_DIRS += $(CURDIR)/../../drivers/lis3331ldh
-#USEMODULE += progmem
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/progmem
+
+USEMODULE += settings
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings
 
 
 #======================================
