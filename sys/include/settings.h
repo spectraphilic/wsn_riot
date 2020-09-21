@@ -24,9 +24,9 @@ struct Settings {
     wan_type_t wan_type;
 };
 
-struct Settings settings = {
-    .log_level = LOG_DEBUG,
-    .wan_type = WAN_DISABLED,
-};
+int settings_save(void);
+int settings_load(void);
+
+extern struct Settings settings;
 
 #endif

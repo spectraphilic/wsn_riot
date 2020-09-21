@@ -1,9 +1,9 @@
 // Standard Library
-#include "stdio.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 
 // RIOT
-#include "fmt.h"
+#include <fmt.h>
 
 // Project
 #include "settings.h"
@@ -51,7 +51,7 @@ static void get(int8_t idx) {
 }
 
 
-static void set(int8_t idx, const char *value) {
+static int set(int8_t idx, const char *value) {
     switch (idx) {
         case 0:
             settings.log_level = (log_level_t) scn_u32_dec(value, 1);
@@ -60,6 +60,13 @@ static void set(int8_t idx, const char *value) {
             settings.wan_type = (wan_type_t) scn_u32_dec(value, 1);
             break;
     }
+
+    int error = settings_save();
+    if (error < 0) {
+        printf("Error saving the settings file");
+    }
+
+    return error;
 }
 
 
