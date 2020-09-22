@@ -41,7 +41,7 @@ extern int cmd_var(int argc, char **argv) {
         // Get
         int idx = settings_index(argv[1]);
         error = get(idx);
-    } else if (argc == 2) {
+    } else if (argc == 3) {
         // Set
         error = settings_set(argv[1], argv[2]);
         if (error) {
@@ -54,7 +54,7 @@ extern int cmd_var(int argc, char **argv) {
             return error;
         }
     } else {
-        printf("unexpected number of arguments: %d\n", argc);
+        printf("Unexpected number of arguments: %d\n", argc);
         return -1;
     }
 

@@ -118,6 +118,7 @@ int main(void)
     } else {
         printf("SD card mounted\n");
         settings_load();
+        printf("Settings loaded\n");
     }
 
     // Run the shell
