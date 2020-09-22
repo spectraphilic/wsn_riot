@@ -59,6 +59,9 @@ You can pass options to the make command, other than BOARD:
     # Log level (LOG_INFO by default)
     LOG_LEVEL=LOG_DEBUG
 
+    # Use modules changes behaviour
+    USEMODULE=log_color
+
 If you get some error flashing like:
 
     avrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x31

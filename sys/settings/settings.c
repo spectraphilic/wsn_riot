@@ -29,7 +29,7 @@ int settings_index(const char *name)
         }
     }
 
-    LOG_ERROR("Unexpected settings name: %s", name);
+    LOG_WARNING("Unexpected settings name: %s\n", name);
     return -1;
 }
 
@@ -46,7 +46,7 @@ int settings_set(const char *name, const char *value)
         case 0:
             value_u32 = scn_u32_dec(value, 1);
             if (value_u32 >= WAN_LEN) {
-                LOG_ERROR("Unexpected value %s = %s", name, value);
+                LOG_WARNING("Unexpected value %s = %s\n", name, value);
                 return -1;
             }
             settings.wan_type = (wan_type_t) value_u32;
@@ -61,7 +61,7 @@ int settings_save(void)
 {
     FILE *fp = fopen("/settings.txt", "w");
     if (fp == NULL) {
-        LOG_ERROR("Failed to open settings.txt");
+        LOG_ERROR("Failed to open settings.txt\n");
         return -1;
     }
 
@@ -70,7 +70,7 @@ int settings_save(void)
 
     error = fclose(fp);
     if (error) {
-        LOG_ERROR("Failed to close settings.txt");
+        LOG_ERROR("Failed to close settings.txt\n");
     }
     return error;
 }
@@ -80,7 +80,7 @@ int settings_load(void)
 {
     FILE *fp = fopen("/settings.txt", "r");
     if (fp == NULL) {
-        LOG_ERROR("Failed to open settings.txt");
+        LOG_ERROR("Failed to open settings.txt\n");
         return -1;
     }
 
@@ -93,7 +93,7 @@ int settings_load(void)
 
     error = fclose(fp);
     if (error) {
-        LOG_ERROR("Failed to close settings.txt");
+        LOG_ERROR("Failed to close settings.txt\n");
     }
     return error;
 }

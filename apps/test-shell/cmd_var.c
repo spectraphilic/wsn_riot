@@ -47,7 +47,7 @@ extern int cmd_var(int argc, char **argv) {
             return error;
         }
     } else {
-        LOG_ERROR("Unexpected number of arguments: %d\n", argc);
+        LOG_WARNING("Unexpected number of arguments: %d\n", argc);
         return -1;
     }
 

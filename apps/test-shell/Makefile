@@ -3,6 +3,7 @@ include ../Makefile.common
 #------ System modules --------------
 USEMODULE += fmt
 USEMODULE += i2c_scan
+USEMODULE += log
 #USEMODULE += periph_rtc
 USEMODULE += shell
 USEMODULE += shell_commands
