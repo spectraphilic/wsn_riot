@@ -27,26 +27,23 @@ Try some examples from RIOT:
 Then you can work on any of the applications within the project. Each
 subdirectory within the `apps` subdirectory is an application.
 
-Cheatsheet:
-
-    # Change to the application of your choice. e.g.
-    cd apps/test-ext-module
+Cheatsheet (from the project's root directory):
 
     # Build for the native target
-    make
+    make -C apps/test-ext-module
 
     # Run the application
-    ./bin/native/test-ext-module.elf
+    ./apps/test-ext-module/bin/native/test-ext-module.elf
 
     # Build for the waspmote-pro board
-    make BOARD=waspmote-pro
+    BOARD=waspmote-pro make -C apps/test-ext-module
 
     # Flash the application to the waspmote-pro board
     # We have to pass -F to avoid "Invalid device signature." error
-    make BOARD=waspmote-pro FFLAGS_EXTRA="-F" flash
+    BOARD=waspmote-pro FFLAGS_EXTRA="-F" make -C apps/test-ext-module flash
 
     # Run the terminal
-    make BOARD=waspmote-pro BOOTLOADER_BAUD=115200 term
+    BOARD=waspmote-pro BOOTLOADER_BAUD=115200 make -C apps/test-ext-module term
 
 You can pass options to the make command, other than BOARD:
 
@@ -58,6 +55,9 @@ You can pass options to the make command, other than BOARD:
 
     # Baudrate of the USB port, default is 9600
     BAUD=115200
+
+    # Log level (LOG_INFO by default)
+    LOG_LEVEL=LOG_DEBUG
 
 If you get some error flashing like:
 

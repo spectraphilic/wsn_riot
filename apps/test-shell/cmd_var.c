@@ -2,14 +2,13 @@
 #include <stdio.h>
 
 // Riot
-#include <fmt.h>
+#include <log.h>
 
 // Project
 #include "settings.h"
 
 
 const char * const help[] = {
-    "0=off 1=fatal 2=error 3=warn 4=info 5=debug 6=trace", // log.level
     "0=disabled 1=4g 2=iridium", // wan.type
 };
 
@@ -17,13 +16,9 @@ const char * const help[] = {
 static int get(int8_t idx) {
     switch (idx) {
         case 0:
-            printf("%d\n", settings.log_level);
-            return 0;
-        case 1:
             printf("%d\n", settings.wan_type);
             return 0;
         default:
-            print_str("Unexpected variable\n");
             return -1;
     }
 }
@@ -45,16 +40,14 @@ extern int cmd_var(int argc, char **argv) {
         // Set
         error = settings_set(argv[1], argv[2]);
         if (error) {
-            print_str("Unexpected variable\n");
             return error;
         }
         error = settings_save();
         if (error) {
-            printf("Error saving the settings file");
             return error;
         }
     } else {
-        printf("Unexpected number of arguments: %d\n", argc);
+        LOG_ERROR("Unexpected number of arguments: %d\n", argc);
         return -1;
     }
 

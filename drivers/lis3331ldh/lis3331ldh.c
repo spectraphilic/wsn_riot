@@ -1,9 +1,10 @@
-#include "debug.h"
-//#include "periph/gpio.h"
-#include "periph/i2c.h"
-//#include "ztimer.h"
+#include <debug.h>
+#include <log.h>
+//#include <periph/gpio.h>
+#include <periph/i2c.h>
+//#include <ztimer.h>
 
-//#include "waspmote_pinmap.h"
+//#include <waspmote_pinmap.h>
 
 
 const uint16_t ADDRESS = 0x19;
@@ -62,7 +63,7 @@ int lis3331ldh_init(i2c_t dev)
         DEBUG("[lis3331ldh] error reading register: %d\n", error);
         return error;
     } else if (data != 0x32) {
-        printf("acc unexpected data=%u\n", data);
+        LOG_ERROR("acc unexpected data=%u\n", data);
         return -1;
     }
 

@@ -1,6 +1,10 @@
+// Standard
 #include <stdio.h>
-#include "shell.h"
-#include "ztimer.h"
+
+// Riot
+#include <log.h>
+#include <shell.h>
+#include <ztimer.h>
 
 
 #define SLEEP 3000000L
@@ -45,9 +49,7 @@ const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    // Boot
-    puts("*** UiO WSN v2 ***");
-    printf("Board=%s MCU=%s\n", RIOT_BOARD, RIOT_MCU);
+    LOG_INFO("app=main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
 
     // Shell
     char buffer[SHELL_DEFAULT_BUFSIZE]; // 128

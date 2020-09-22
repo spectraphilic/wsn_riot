@@ -4,18 +4,17 @@
 
 // Riot
 #include <fmt.h>
+#include <log.h>
 
 // Project
 #include "settings.h"
 
 
 struct Settings settings = {
-    .log_level = LOG_DEBUG,
     .wan_type = WAN_DISABLED,
 };
 
 const char * const settings_names[] = {
-    "log.level",
     "wan.type",
 };
 
@@ -30,43 +29,58 @@ int settings_index(const char *name)
         }
     }
 
+    LOG_ERROR("Unexpected settings name: %s", name);
     return -1;
 }
 
 
-int settings_set(const char *name, const char *value) {
+int settings_set(const char *name, const char *value)
+{
     int idx = settings_index(name);
-    switch (idx) {
-        case 0:
-            settings.log_level = (log_level_t) scn_u32_dec(value, 1);
-            return 0;
-        case 1:
-            settings.wan_type = (wan_type_t) scn_u32_dec(value, 1);
-            return 0;
+    if (idx < 0) {
+        return idx;
     }
 
-    return -1;
+    switch (idx) {
+        uint32_t value_u32;
+        case 0:
+            value_u32 = scn_u32_dec(value, 1);
+            if (value_u32 >= WAN_LEN) {
+                LOG_ERROR("Unexpected value %s = %s", name, value);
+                return -1;
+            }
+            settings.wan_type = (wan_type_t) value_u32;
+            break;
+    }
+
+    return 0;
 }
 
 
-int settings_save(void) {
+int settings_save(void)
+{
     FILE *fp = fopen("/settings.txt", "w");
     if (fp == NULL) {
+        LOG_ERROR("Failed to open settings.txt");
         return -1;
     }
 
     int error;
-    fprintf(fp, "log.level = %d\n", settings.log_level);
     fprintf(fp, "wan.type = %d\n", settings.wan_type);
 
     error = fclose(fp);
+    if (error) {
+        LOG_ERROR("Failed to close settings.txt");
+    }
     return error;
 }
 
 
-int settings_load(void) {
+int settings_load(void)
+{
     FILE *fp = fopen("/settings.txt", "r");
     if (fp == NULL) {
+        LOG_ERROR("Failed to open settings.txt");
         return -1;
     }
 
@@ -78,5 +92,8 @@ int settings_load(void) {
     }
 
     error = fclose(fp);
+    if (error) {
+        LOG_ERROR("Failed to close settings.txt");
+    }
     return error;
 }

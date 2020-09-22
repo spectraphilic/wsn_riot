@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// RIOT
+// Riot
+#include <log.h>
 #include <shell.h>
-//#include "ztimer.h"
+//#include <ztimer.h>
 
 #include <fs/fatfs.h>
 #include <mtd.h>
@@ -107,18 +108,17 @@ const shell_command_t shell_commands[] = {
 int main(void)
 {
     // Print some info
-    puts("app: test-shell");
-    printf("Board=%s MCU=%s\n", RIOT_BOARD, RIOT_MCU);
+    LOG_INFO("app=test-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
 
     // Mount the SD card
     fatfs_mtd_devs[fs_desc.vol_idx] = MTD_0;
     int error = vfs_mount(&mountp);
     if (error) {
-        printf("Error mounting SD card\n");
+        LOG_ERROR("Error mounting SD card\n");
     } else {
-        printf("SD card mounted\n");
+        LOG_INFO("SD card mounted\n");
         settings_load();
-        printf("Settings loaded\n");
+        LOG_INFO("Settings loaded\n");
     }
 
     // Run the shell
