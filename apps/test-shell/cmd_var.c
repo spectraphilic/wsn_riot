@@ -1,103 +1,62 @@
 // Standard Library
 #include <stdio.h>
-#include <string.h>
 
-// RIOT
+// Riot
 #include <fmt.h>
 
 // Project
 #include "settings.h"
 
 
-struct Option {
-    char *name;
-    char *help;
+const char * const help[] = {
+    "0=off 1=fatal 2=error 3=warn 4=info 5=debug 6=trace", // log.level
+    "0=disabled 1=4g 2=iridium", // wan.type
 };
 
-struct Option options[] = {
-    {
-        .name = "log.level",
-        .help = "0=off 1=fatal 2=error 3=warn 4=info 5=debug 6=trace",
-    },
-    {
-        .name = "wan.type",
-        .help = "0=disabled 1=4g 2=iridium",
-    }
-};
 
-static const size_t len = sizeof options / sizeof options[0];
-
-static int8_t index(const char *name)
-{
-    for (size_t i=0; i < len; i++) {
-        if (strcmp(name, options[i].name) == 0) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-
-static void get(int8_t idx) {
+static int get(int8_t idx) {
     switch (idx) {
         case 0:
             printf("%d\n", settings.log_level);
-            break;
+            return 0;
         case 1:
             printf("%d\n", settings.wan_type);
-            break;
+            return 0;
+        default:
+            print_str("Unexpected variable\n");
+            return -1;
     }
-}
-
-
-static int set(int8_t idx, const char *value) {
-    switch (idx) {
-        case 0:
-            settings.log_level = (log_level_t) scn_u32_dec(value, 1);
-            break;
-        case 1:
-            settings.wan_type = (wan_type_t) scn_u32_dec(value, 1);
-            break;
-    }
-
-    int error = settings_save();
-    if (error < 0) {
-        printf("Error saving the settings file");
-    }
-
-    return error;
 }
 
 
 extern int cmd_var(int argc, char **argv) {
-    // Arguments
-    if (argc > 3) {
+    int error = 0;
+
+    if (argc == 1) {
+        // Help
+        for (size_t i=0; i < settings_len; i++) {
+            printf("%s %s\n", settings_names[i], help[i]);
+        }
+    } else if (argc == 2) {
+        // Get
+        int idx = settings_index(argv[1]);
+        error = get(idx);
+    } else if (argc == 2) {
+        // Set
+        error = settings_set(argv[1], argv[2]);
+        if (error) {
+            print_str("Unexpected variable\n");
+            return error;
+        }
+        error = settings_save();
+        if (error) {
+            printf("Error saving the settings file");
+            return error;
+        }
+    } else {
         printf("unexpected number of arguments: %d\n", argc);
         return -1;
     }
 
-    // Print help
-    if (argc == 1) {
-        for (size_t i=0; i < len; i++) {
-            printf("%s %s\n", options[i].name, options[i].help);
-        }
-        return 0;
-    }
-
-    // Find option
-    char *name = argv[1];
-    int8_t idx = index(name);
-    if (idx == -1) {
-        print_str("Unexpected variable\n");
-        return -1;
-    }
-
-    if (argc == 2) {
-        get(idx);
-    } else {
-        set(idx, argv[2]);
-    }
-
-    return 0;
+    return error;
 }

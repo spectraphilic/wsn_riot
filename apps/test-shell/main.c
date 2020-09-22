@@ -1,14 +1,18 @@
+// Standard
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // RIOT
-#include "shell.h"
+#include <shell.h>
 //#include "ztimer.h"
 
-#include "fs/fatfs.h"
-#include "mtd.h"
-#include "vfs.h"
+#include <fs/fatfs.h>
+#include <mtd.h>
+#include <vfs.h>
+
+// Project
+#include "settings.h"
 
 
 extern int cmd_acc(int argc, char **argv);
@@ -113,6 +117,7 @@ int main(void)
         printf("Error mounting SD card\n");
     } else {
         printf("SD card mounted\n");
+        settings_load();
     }
 
     // Run the shell
