@@ -8,22 +8,23 @@
 
 // Riot
 #include <fmt.h>
+#include <ztimer.h>
 
 
 static inline const char* loglevel2str(unsigned level) {
     switch (level) {
         case LOG_NONE:
-            return "[NONE   ] ";
+            return "NONE    ";
         case LOG_ERROR:
-            return "[ERROR  ] ";
+            return "ERROR   ";
         case LOG_WARNING:
-            return "[WARNING] ";
+            return "WARNING ";
         case LOG_INFO:
-            return "[INFO   ] ";
+            return "INFO    ";
         case LOG_DEBUG:
-            return "[DEBUG  ] ";
+            return "DEBUG   ";
         case LOG_ALL:
-            return "[ALL    ] ";
+            return "ALL     ";
         default:
             return "";
     }
@@ -35,8 +36,10 @@ static inline void log_write(unsigned level, const char *format, ...) {
     char buffer[size];
 
     // Timestamp + Level
-    //sprintf(buffer, "%lu %s ", millis(), loglevel2str(level));
-    sprintf(buffer, "%s", loglevel2str(level));
+    ztimer_now_t now = ztimer_now(ZTIMER_USEC);
+    unsigned seconds = now / 1000000;
+    unsigned ms = (now / 1000) % 1000;
+    sprintf(buffer, "%u.%03u %s", seconds, ms, loglevel2str(level));
 
     // + Message
     size_t len = strlen(buffer);

@@ -12,6 +12,7 @@ int cmd_cat(int argc, char **argv) {
         return -1;
     }
 
+    // Open
     char *name = argv[1];
     FILE *fp = fopen(name, "r");
     if (fp == NULL) {
@@ -19,6 +20,7 @@ int cmd_cat(int argc, char **argv) {
         return -1;
     }
 
+    // Cat
     int c = fgetc(fp);
     while (! feof(fp)) {
         printf("%c", c);
@@ -26,14 +28,7 @@ int cmd_cat(int argc, char **argv) {
     }
     fflush(stdout);
 
-/*
-    size_t size = 255;
-    char buffer[size];
-    while (fgets(buffer, bufferLength, filePointer)) {
-        print_str(buffer);
-    }
-*/
-
+    // Close
     fclose(fp);
     return 0;
 }
