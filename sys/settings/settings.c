@@ -1,4 +1,5 @@
 // Standard
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -61,7 +62,7 @@ int settings_save(void)
 {
     FILE *fp = fopen("/settings.txt", "w");
     if (fp == NULL) {
-        LOG_ERROR("Failed to open settings.txt\n");
+        LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
         return -1;
     }
 
@@ -80,7 +81,7 @@ int settings_load(void)
 {
     FILE *fp = fopen("/settings.txt", "r");
     if (fp == NULL) {
-        LOG_ERROR("Failed to open settings.txt\n");
+        LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
         return -1;
     }
 

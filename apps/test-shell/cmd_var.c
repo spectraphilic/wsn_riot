@@ -24,7 +24,7 @@ static int get(int8_t idx) {
 }
 
 
-extern int cmd_var(int argc, char **argv) {
+int cmd_var(int argc, char **argv) {
     int error = 0;
 
     if (argc == 1) {
