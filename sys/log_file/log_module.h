@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 
+// Posix
+#include <fcntl.h>
+#include <unistd.h>
+
 // Riot
 #include <fmt.h>
 #include <ztimer.h>
@@ -52,10 +56,10 @@ static inline void log_write(unsigned level, const char *format, ...) {
     print_str(buffer);
 
     // Print to file
-    FILE *fp = fopen("/log2.txt", "a"); // TODO Rename to log.txt
-    if (fp) {
-        fputs(buffer, fp);
-        fclose(fp);
+    int fd = open("/log2.txt", O_APPEND | O_CREAT); // TODO Rename to log.txt
+    if (fd >= 0) {
+        write(fd, buffer, strlen(buffer));
+        close(fd);
     }
 }
 

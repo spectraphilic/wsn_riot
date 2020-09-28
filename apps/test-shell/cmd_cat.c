@@ -1,6 +1,9 @@
 // Standard
 #include <errno.h>
-#include <stdio.h>
+
+// Posix
+#include <fcntl.h>
+#include <unistd.h>
 
 // Project
 #include "log.h"
@@ -14,21 +17,22 @@ int cmd_cat(int argc, char **argv) {
 
     // Open
     char *name = argv[1];
-    FILE *fp = fopen(name, "r");
-    if (fp == NULL) {
+    int fd = open(name, O_RDONLY);
+    if (fd < 0) {
         LOG_ERROR("Failed to open %s errno=%d\n", name, errno);
         return -1;
     }
 
     // Cat
-    int c = fgetc(fp);
-    while (! feof(fp)) {
-        printf("%c", c);
-        c = fgetc(fp);
+    char c;
+    ssize_t n;
+    while ((n = read(fd, &c, 1)) > 0) {
+        putchar(c);
     }
-    fflush(stdout);
+
+    int error = (n < 0);
 
     // Close
-    fclose(fp);
-    return 0;
+    error = close(fd);
+    return error;
 }

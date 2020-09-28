@@ -218,7 +218,8 @@ TODO
 
 Always check open issues and pull requests, what we need may be already there.
 
-- Fix ztimer with the Waspmote. First fix `RIOT/tests/periph_timer`.
+- move dprintf/dgets to helper module for reuse
+- waspmote-pro: try power saving tests
 
 Caveats:
 

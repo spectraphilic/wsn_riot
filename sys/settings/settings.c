@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 
+// Posix
+#include <fcntl.h>
+#include <unistd.h>
+
 // Riot
 #include <fmt.h>
 #include <log.h>
@@ -20,6 +24,53 @@ const char * const settings_names[] = {
 };
 
 const size_t settings_len = sizeof settings_names / sizeof settings_names[0];
+
+
+// TODO Move to a new module sys/compat
+static int dprintf(int fd, const char *format, ...)
+{
+    int size = 255;
+    char buffer[size];
+
+    va_list args;
+    va_start(args, format);
+    int n = vsnprintf(buffer, size, format, args);
+    va_end(args);
+
+    if (n < 0) {
+        return -1;
+    }
+
+    if (n > size - 1) { // XXX
+        return -1;
+    }
+
+    return write(fd, buffer, n);
+}
+
+
+static char* dgets(int fd, char *str, int num)
+{
+    char c;
+    int i;
+    for (i = 0; i < num; i++) {
+        ssize_t n = read(fd, &c, 1);
+        if (n < 0) {
+            return NULL;
+        } else if (n == 0) {
+            break;
+        }
+
+        str[i] = c;
+        if (c == '\n') {
+            i++;
+            break;
+        }
+    }
+
+    str[i] = '\0';
+    return str;
+}
 
 
 int settings_index(const char *name)
@@ -60,16 +111,16 @@ int settings_set(const char *name, const char *value)
 
 int settings_save(void)
 {
-    FILE *fp = fopen("/settings.txt", "w");
-    if (fp == NULL) {
+    int fd = open("/settings.txt", O_WRONLY | O_CREAT);
+    if (fd < 0) {
         LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
         return -1;
     }
 
     int error;
-    fprintf(fp, "wan.type = %d\n", settings.wan_type);
+    dprintf(fd, "wan.type = %d\n", settings.wan_type);
 
-    error = fclose(fp);
+    error = close(fd);
     if (error) {
         LOG_ERROR("Failed to close settings.txt\n");
     }
@@ -79,20 +130,25 @@ int settings_save(void)
 
 int settings_load(void)
 {
-    FILE *fp = fopen("/settings.txt", "r");
-    if (fp == NULL) {
+    int fd = open("/settings.txt", O_RDONLY);
+    if (fd < 0) {
         LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
         return -1;
     }
 
-    int error;
+    char buffer[255];
     char name[20];
     char value[20];
-    while (fscanf(fp,"%s = %s", name, value) == 2) {
-        settings_set(name, value);
+    while (dgets(fd, buffer, sizeof(buffer) - 1) != NULL) {
+        if (buffer[0] == '\0') { // EOF
+            break;
+        }
+        if (sscanf(buffer, "%s = %s", name, value) == 2) {
+            settings_set(name, value);
+        }
     }
 
-    error = fclose(fp);
+    int error = close(fd);
     if (error) {
         LOG_ERROR("Failed to close settings.txt\n");
     }
