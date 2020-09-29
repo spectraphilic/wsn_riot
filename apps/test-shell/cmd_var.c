@@ -30,7 +30,7 @@ int cmd_var(int argc, char **argv) {
     if (argc == 1) {
         // Help
         for (size_t i=0; i < settings_len; i++) {
-            printf("%s %s\n", settings_names[i], help[i]);
+            printf("%s %s\n", settings_name(i), help[i]);
         }
     } else if (argc == 2) {
         // Get

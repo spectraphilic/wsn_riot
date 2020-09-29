@@ -201,6 +201,18 @@ This project includes a `.envrc` file in the root directory. It adds
 entering the `apps/test-ext-module` application directory).
 
 
+Documentation
+====================
+
+Our API is documented using doxygen. Just run doxygen from the root directory
+of the project:
+
+    doxygen
+
+And then open your browser at the proper location,
+``file:///[...]/wsn_riot/doc/html/index.html``
+
+
 Arduino
 ====================
 

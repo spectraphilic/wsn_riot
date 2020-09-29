@@ -33,6 +33,11 @@ int settings_index(const char *name)
     return -1;
 }
 
+const char *settings_name(size_t index)
+{
+    return settings_names[index];
+}
+
 
 int settings_set(const char *name, const char *value)
 {
