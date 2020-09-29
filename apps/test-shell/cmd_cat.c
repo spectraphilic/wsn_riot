@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 // Project
+#include <triage.h>
 #include "log.h"
 
 
@@ -19,7 +20,9 @@ int cmd_cat(int argc, char **argv) {
     char *name = argv[1];
     int fd = open(name, O_RDONLY);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s errno=%d\n", name, errno);
+        char err[16];
+        errno_string(errno, err, sizeof(err));
+        LOG_ERROR("Failed to open %s (%s)\n", name, err);
         return -1;
     }
 

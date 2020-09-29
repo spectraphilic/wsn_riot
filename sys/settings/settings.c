@@ -1,17 +1,12 @@
 // Standard
 #include <errno.h>
-#include <stdio.h>
-#include <string.h>
-
-// Posix
-#include <fcntl.h>
-#include <unistd.h>
 
 // Riot
 #include <fmt.h>
 #include <log.h>
 
 // Project
+#include <triage.h>
 #include "settings.h"
 
 
@@ -24,53 +19,6 @@ const char * const settings_names[] = {
 };
 
 const size_t settings_len = sizeof settings_names / sizeof settings_names[0];
-
-
-// TODO Move to a new module sys/compat
-static int dprintf(int fd, const char *format, ...)
-{
-    int size = 255;
-    char buffer[size];
-
-    va_list args;
-    va_start(args, format);
-    int n = vsnprintf(buffer, size, format, args);
-    va_end(args);
-
-    if (n < 0) {
-        return -1;
-    }
-
-    if (n > size - 1) { // XXX
-        return -1;
-    }
-
-    return write(fd, buffer, n);
-}
-
-
-static char* dgets(int fd, char *str, int num)
-{
-    char c;
-    int i;
-    for (i = 0; i < num; i++) {
-        ssize_t n = read(fd, &c, 1);
-        if (n < 0) {
-            return NULL;
-        } else if (n == 0) {
-            break;
-        }
-
-        str[i] = c;
-        if (c == '\n') {
-            i++;
-            break;
-        }
-    }
-
-    str[i] = '\0';
-    return str;
-}
 
 
 int settings_index(const char *name)
@@ -111,9 +59,13 @@ int settings_set(const char *name, const char *value)
 
 int settings_save(void)
 {
-    int fd = open("/settings.txt", O_WRONLY | O_CREAT);
+    const char *filename = "/settings.txt";
+
+    int fd = open(filename, O_WRONLY | O_CREAT);
     if (fd < 0) {
-        LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
+        char err[16];
+        errno_string(errno, err, sizeof(err));
+        LOG_ERROR("Failed to open %s (%s)\n", filename, err);
         return -1;
     }
 
@@ -122,7 +74,7 @@ int settings_save(void)
 
     error = close(fd);
     if (error) {
-        LOG_ERROR("Failed to close settings.txt\n");
+        LOG_ERROR("Failed to close %s\n", filename);
     }
     return error;
 }
@@ -130,9 +82,13 @@ int settings_save(void)
 
 int settings_load(void)
 {
-    int fd = open("/settings.txt", O_RDONLY);
+    const char *filename = "/settings.txt";
+
+    int fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        LOG_ERROR("Failed to open settings.txt errno=%d\n", errno);
+        char err[16];
+        errno_string(errno, err, sizeof(err));
+        LOG_ERROR("Failed to open %s (%s)\n", filename, err);
         return -1;
     }
 
@@ -150,7 +106,7 @@ int settings_load(void)
 
     int error = close(fd);
     if (error) {
-        LOG_ERROR("Failed to close settings.txt\n");
+        LOG_ERROR("Failed to close %s\n", filename);
     }
     return error;
 }
