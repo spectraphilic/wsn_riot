@@ -5,6 +5,8 @@
  * Where configuration is a pre-defined set of variables.
  *
  * @{
+ *
+ * @file
  */
 
 #ifndef SETTINGS_H
@@ -34,11 +36,21 @@ struct Settings {
  * variables minus one.
  *
  * This can be used to associate information to a variable, using an array.
+ *
+ * @param[in]   name    name of the configuration variable
+ *
+ * @return      >=0     index number of the configuration variable
+ * @return      <0      indicates an error
  */
 int settings_index(const char *name);
 
 /**
  * @brief Return the name of the variable for the given index number
+ *
+ * @param[in]   index   index number of the configuration variable
+ *
+ * @return              name of the configuration variable
+ * @return      NULL    if index out of range
  */
 const char *settings_name(size_t index);
 
@@ -51,16 +63,28 @@ const char *settings_name(size_t index);
  *
  * It also possible to simply set the value directly in the global settings,
  * and then call settings_save.
+ *
+ * @param[in]   name    name of the configuration variable
+ * @param[in]   value   new value for the configuration variable
+ *
+ * @return      0       on success
+ * @return      <0      if unknown variable name
  */
 int settings_set(const char *name, const char *value);
 
 /**
  * @brief Save configuration to file
+ *
+ * @return      0       on success
+ * @return      <0      if error
  */
 int settings_save(void);
 
 /**
  * @brief Load configuration from file
+ *
+ * @return      0       on success
+ * @return      <0      if error
  */
 int settings_load(void);
 
@@ -68,7 +92,7 @@ int settings_load(void);
 /**
  * @brief Global that keeps the configuration in memory
  *
- * Use it directrly for reading or writing:
+ * Use it directrly for reading:
  *
  *     if (settings.wan_type == WAN_4G) {
  *

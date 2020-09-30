@@ -35,6 +35,9 @@ int settings_index(const char *name)
 
 const char *settings_name(size_t index)
 {
+    if (index >= settings_len) {
+        return NULL;
+    }
     return settings_names[index];
 }
 
