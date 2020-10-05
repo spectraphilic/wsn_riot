@@ -10,19 +10,31 @@ Install requirements, for Debian or Debian derivatives:
     sudo apt install gcc-arm-none-eabi             # ARM
     sudo apt install python3-serial                # To use the terminal
 
-Checkout RIOT:
+Checkout RIOT. It's included as a Git submodule, so you don't need to clone
+manually, just initialize and update the submodules:
 
     $ git submodule init
     $ git submodule update
 
-Try some examples from RIOT:
+Try some examples from RIOT. There are a number of examples and tests within
+RIOT:
 
-    cd RIOT/examples/default/
+    cd RIOT/
+    make -C examples/default             # Build 'examples/default' for the native target
+    make -C examples/default term        # Run the program and open a terminal
+    make -C examples/default all term    # Do both in 1 step: build and run in a terminal
 
-    make all         # Build for the native target
-    make all term    # Open RIOT program in a terminal
-    make BOARD=remote-revb all flash term     # flash and open RIOT app. in a terminal.
-                                              # Example here with the Zolertia Re-mote Rev B board
+You can try the programs with a board as well, then there's an extra step,
+flashing:
+
+    # Build, flash and open RIOT app. in a terminal.
+    # Example here with the Zolertia Re-mote Rev B board
+    BOARD=remote-revb make -C examples/default all flash term
+
+Most RIOT tests have a test target, if the test doesn't end with a traceback
+then it was a success. For example:
+
+    BOARD=remote-revb make -C tests/periph_rtt all flash test
 
 Then you can work on any of the applications within the project. Each
 subdirectory within the `apps` subdirectory is an application.
@@ -30,20 +42,20 @@ subdirectory within the `apps` subdirectory is an application.
 Cheatsheet (from the project's root directory):
 
     # Build for the native target
-    make -C apps/test-ext-module
+    make -C apps/main
 
     # Run the application
-    ./apps/test-ext-module/bin/native/test-ext-module.elf
+    make -C apps/main term
 
     # Build for the waspmote-pro board
-    BOARD=waspmote-pro make -C apps/test-ext-module
+    BOARD=waspmote-pro make -C apps/main
 
     # Flash the application to the waspmote-pro board
     # We have to pass -F to avoid "Invalid device signature." error
-    BOARD=waspmote-pro FFLAGS_EXTRA="-F" make -C apps/test-ext-module flash
+    BOARD=waspmote-pro FFLAGS_EXTRA="-F" make -C apps/main flash
 
     # Run the terminal
-    BOARD=waspmote-pro BOOTLOADER_BAUD=115200 make -C apps/test-ext-module term
+    BOARD=waspmote-pro BOOTLOADER_BAUD=115200 make -C apps/main term
 
 You can pass options to the make command, other than BOARD:
 
@@ -195,10 +207,8 @@ Enable direnv:
 
     direnv allow
 
-This project includes a `.envrc` file in the root directory. It adds
-`./bin/native/` to the `PATH`. For example, this way you can just type
-`test-ext-module.elf` instead of `./bin/native/test-ext-module.elf` (after
-entering the `apps/test-ext-module` application directory).
+This project includes a `.envrc` file in the root directory, it defines the
+default port to be `/dev/ttyUSB0`
 
 
 Documentation

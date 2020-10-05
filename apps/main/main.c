@@ -3,67 +3,30 @@
 
 // Riot
 #include <log.h>
-#include <shell.h>
 #include <ztimer.h>
 
 
-#define SLEEP 3000000L
+#define SLEEP 5L * 1000000L // 5 seconds
 
 
-/*
- * Utilities. Eventually these will be moved to modules.
- */
-void info(const char* msg) {
-    ztimer_now_t now = ztimer_now(ZTIMER_USEC);
-    printf("%15.6f %s\n", ((float)now) / 1000000, msg);
+static void callback(void *arg)
+{
+   LOG_INFO(arg);
 }
-
-
-/*
- * Shell custom commands
- */
-
-static int echo(int argc, char **argv) {
-    for (int i=0; i < argc; i++) {
-        printf("argv[%d]=%s\n", i, argv[i]);
-    }
-
-    return 0;
-}
-
-static int exit_shell(int argc, char **argv) {
-    /* Suppress compiler errors */
-    (void)argc;
-    (void)argv;
-
-    printf("bye\n");
-    return 1;
-}
-
-const shell_command_t shell_commands[] = {
-    {"echo", "prints given arguments", echo},
-    {"exit", "exit the shell (doesn't work, to exit type ^D ENTER)", exit_shell},
-    { NULL, NULL, NULL }
-};
 
 
 int main(void)
 {
     LOG_INFO("app=main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
+    LOG_INFO("This program loops forever, sleeping for 5s in every loop.");
 
-    // Shell
-    char buffer[SHELL_DEFAULT_BUFSIZE]; // 128
-//  shell_run_once(shell_commands, buffer, SHELL_DEFAULT_BUFSIZE);
+    ztimer_t timeout = { .callback=callback, .arg="Hello ztimer!\n" };
+    ztimer_set(ZTIMER_USEC, &timeout, 2000000);
 
     // Main loop
-    unsigned int i = 0;
-    while (1) {
-      puts("Sleep...");
-      ztimer_sleep(ZTIMER_USEC, SLEEP);
-      puts("Awake!");
-      snprintf(buffer, sizeof(buffer), "Loop=%u", i);
-      info(buffer);
-      i += 1;
+    for (unsigned int i=0; ; i++) {
+        LOG_INFO("Loop=%u\n", i);
+        ztimer_sleep(ZTIMER_USEC, SLEEP);
     }
 
     return 0;
