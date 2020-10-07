@@ -8,9 +8,6 @@ USEMODULE += log
 USEMODULE += shell
 USEMODULE += shell_commands
 
-USEMODULE += fatfs_vfs
-USEMODULE += mtd_sdcard
-
 
 #=====================================
 #----- RIOT Native Drivers -----------
