@@ -18,21 +18,6 @@ extern int cmd_ds18b20(int argc, char **argv);
 extern int cmd_var(int argc, char **argv);
 
 
-/*
-static int cmd_echo(int argc, char **argv) {
-    for (int i=0; i < argc; i++) {
-        printf("argv[%d]=%s\n", i, argv[i]);
-    }
-
-    return 0;
-}
-*/
-
-
-/*
- * Main
- */
-
 const shell_command_t shell_commands[] = {
     {"acc", "accelerometer", cmd_acc},
     {"bme", "read BME_280", cmd_bme},
@@ -40,7 +25,6 @@ const shell_command_t shell_commands[] = {
     {"sht", "read SHT31", cmd_sht},
     {"var", "var [NAME [VALUE]] - type 'var' to list the variable names", cmd_var},
     //{"ds18", "read DS18B20", cmd_ds18b20},
-    //{"echo", "echo", cmd_echo},
     { NULL, NULL, NULL }
 };
 
@@ -48,7 +32,7 @@ const shell_command_t shell_commands[] = {
 int main(void)
 {
     // Boot
-    LOG_INFO("app=test-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
+    LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
     wsn_boot();
 
     // Run the shell

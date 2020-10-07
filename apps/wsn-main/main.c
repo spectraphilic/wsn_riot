@@ -18,7 +18,7 @@ static void callback(void *arg)
 int main(void)
 {
     // Boot
-    LOG_INFO("app=main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
+    LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("This program loops forever, sleeping for 5s in every loop.");
     wsn_boot();
 
