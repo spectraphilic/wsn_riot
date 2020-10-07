@@ -51,8 +51,7 @@ Cheatsheet (from the project's root directory):
     BOARD=waspmote-pro make -C apps/wsn-main
 
     # Flash the application to the waspmote-pro board
-    # We have to pass -F to avoid "Invalid device signature." error
-    BOARD=waspmote-pro FFLAGS_EXTRA="-F" make -C apps/wsn-main flash
+    BOARD=waspmote-pro make -C apps/wsn-main flash
 
     # Run the terminal
     BOARD=waspmote-pro BOOTLOADER_BAUD=115200 make -C apps/wsn-main term
@@ -61,9 +60,6 @@ You can pass options to the make command, other than BOARD:
 
     # Port the mote is connected to, default is /dev/ttyACM0
     PORT=/dev/ttyUSB1
-
-    # Extra arguments for avrdude
-    FFLAGS_EXTRA="-F"
 
     # Baudrate of the USB port, default is 9600
     BAUD=115200

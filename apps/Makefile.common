@@ -21,3 +21,9 @@ QUIET ?= 1
 # Include directory for project modules (external from RIOT's point-of-view)
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
+
+# This is to avoid "Invalid device signature" error, applies to other AVR
+# boards as well. Should be done in RIOT.
+ifeq (waspmote-pro, $(BOARD))
+  FFLAGS_EXTRA = -F
+endif
