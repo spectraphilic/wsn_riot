@@ -1,16 +1,13 @@
 // Standard
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // Riot
 #include <log.h>
 #include <shell.h>
-//#include <ztimer.h>
 
 // Project
-#include "settings.h"
-#include "triage.h"
+#include "wsn.h"
 
 
 extern int cmd_acc(int argc, char **argv);
@@ -20,19 +17,6 @@ extern int cmd_sht(int argc, char **argv);
 extern int cmd_ds18b20(int argc, char **argv);
 extern int cmd_var(int argc, char **argv);
 
-
-/*
-static int cmd_timer(int argc, char **argv) {
-    assert(argc);
-    assert(argv);
-
-    printf("now = %lu\n", ztimer_now(ZTIMER_MSEC));
-    ztimer_sleep(ZTIMER_MSEC, 5000);
-    printf("now = %lu\n", ztimer_now(ZTIMER_MSEC));
-
-    return 0;
-}
-*/
 
 /*
 static int cmd_echo(int argc, char **argv) {
@@ -57,21 +41,15 @@ const shell_command_t shell_commands[] = {
     {"var", "var [NAME [VALUE]] - type 'var' to list the variable names", cmd_var},
     //{"ds18", "read DS18B20", cmd_ds18b20},
     //{"echo", "echo", cmd_echo},
-    //{"timer", "test the timer (ztimer)", cmd_timer},
     { NULL, NULL, NULL }
 };
 
 
 int main(void)
 {
-    // Print some info
+    // Boot
     LOG_INFO("app=test-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
-
-    // Mount the SD card
-    if (mount_sd() == 0) {
-        settings_load();
-        LOG_INFO("Settings loaded\n");
-    }
+    wsn_boot();
 
     // Run the shell
     char buffer[SHELL_DEFAULT_BUFSIZE]; // 128

@@ -1,0 +1,9 @@
+USEMODULE += fatfs_vfs
+USEMODULE += mtd_sdcard
+
+#------ Project system modules ---------------
+USEMODULE += log_file
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/log_file
+
+USEMODULE += settings
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings

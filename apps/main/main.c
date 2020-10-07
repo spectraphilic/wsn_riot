@@ -1,13 +1,9 @@
-// Standard
-#include <stdio.h>
-
 // Riot
 #include <log.h>
 #include <ztimer.h>
 
 // Riot
-#include "settings.h"
-#include "triage.h"
+#include "wsn.h"
 
 
 #define SLEEP 5L * 1000000L // 5 seconds
@@ -21,14 +17,10 @@ static void callback(void *arg)
 
 int main(void)
 {
+    // Boot
     LOG_INFO("app=main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("This program loops forever, sleeping for 5s in every loop.");
-
-    // Mount the SD card
-    if (mount_sd() == 0) {
-        settings_load();
-        LOG_INFO("Settings loaded\n");
-    }
+    wsn_boot();
 
     ztimer_t timeout = { .callback=callback, .arg="Hello ztimer!\n" };
     ztimer_set(ZTIMER_USEC, &timeout, 2000000);

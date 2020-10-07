@@ -1,4 +1,0 @@
-USEMODULE += log
-
-USEMODULE += fatfs_vfs
-USEMODULE += mtd_sdcard

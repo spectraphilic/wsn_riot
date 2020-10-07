@@ -3,7 +3,6 @@ include ../Makefile.common
 #------ System modules --------------
 USEMODULE += fmt
 USEMODULE += i2c_scan
-USEMODULE += log
 #USEMODULE += periph_rtc
 USEMODULE += shell
 USEMODULE += shell_commands
@@ -28,12 +27,8 @@ USEMODULE += lis3331ldh
 EXTERNAL_MODULE_DIRS += $(CURDIR)/../../drivers/lis3331ldh
 
 #------ Project system modules ---------------
-USEMODULE += log_file
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/log_file
-
-USEMODULE += settings
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings
-
+USEMODULE += wsn
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/wsn
 
 #======================================
 #------ Custom Settings ---------------

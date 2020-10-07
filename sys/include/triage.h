@@ -78,17 +78,5 @@ int dprintf(int fd, const char *format, ...);
 char* dgets(int fd, char *str, int num);
 
 
-/**
- * @brief Mount the SD card
- *
- * This is to avoid boilerplate. It mounts the FAT filesystem in SD card at the
- * root directory.
- *
- * @return      0 on success
- * @return      < 0 on error
- */
-int mount_sd(void);
-
-
 #endif
 /** @} */

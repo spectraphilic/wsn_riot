@@ -4,13 +4,7 @@ include ../Makefile.common
 USEMODULE += ztimer_usec
 
 # Project modules
-USEMODULE += log_file
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/log_file
-
-USEMODULE += settings
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings
-
-USEMODULE += triage
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/triage
+USEMODULE += wsn
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/wsn
 
 include $(RIOTBASE)/Makefile.include
