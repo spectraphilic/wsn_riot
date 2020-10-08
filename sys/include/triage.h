@@ -78,5 +78,25 @@ int dprintf(int fd, const char *format, ...);
 char* dgets(int fd, char *str, int num);
 
 
+/**
+ * @brief Read from file description but do not change file offset
+ *
+ * Reads up to count bytes from file descriptor fd at offset offset (from the
+ * start of the file) into the buffer starting at buf.  The file offset is not
+ * changed.
+ *
+ * @param[in]   fd      file descriptor
+ * @param[out]  buf     pointer to a buffer where the data will be stored
+ * @param[in]   count   maximum number of bytes to read
+ * @param[in]   offset  offset to read at
+ *
+ * @return      > 0 number of bytes read
+ * @return      = 0 end of file
+ * @return      < 0 if error
+ */
+
+ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+
+
 #endif
 /** @} */

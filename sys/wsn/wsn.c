@@ -7,6 +7,7 @@
 
 // Project
 #include "settings.h"
+#include "triage.h"
 
 
 /* Configure MTD device for SD card if none is provided */
@@ -48,7 +49,9 @@ void wsn_boot(void)
 
     int error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("Error mounting SD card\n");
+        char err[16];
+        errno_string(error, err, sizeof(err));
+        LOG_ERROR("Error mounting SD card: %s\n", err);
     } else {
         LOG_INFO("SD card mounted\n");
         settings_load();

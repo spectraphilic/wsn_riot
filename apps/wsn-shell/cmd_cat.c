@@ -6,18 +6,20 @@
 #include <unistd.h>
 
 // Project
+#include <log.h>
 #include <triage.h>
-#include "log.h"
 
 
-int cmd_cat(int argc, char **argv) {
+int cmd_cat(int argc, char **argv)
+{
     if (argc != 2) {
         LOG_WARNING("Unexpected number of arguments: %d\n", argc);
         return -1;
     }
 
-    // Open
     char *name = argv[1];
+
+    // Open
     int fd = open(name, O_RDONLY);
     if (fd < 0) {
         char err[16];

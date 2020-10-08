@@ -1,11 +1,5 @@
-// Standard
 #include <errno.h>
-#include <stdarg.h>
-#include <stddef.h>
 #include <stdio.h>
-
-// Posix
-#include <unistd.h>
 
 
 /* Macro used by errno_string to expand errno labels to string and print it */
@@ -40,6 +34,8 @@ int errno_string(int err, char *buf, size_t buflen)
         _case_snprintf_errno_name(ENAMETOOLONG);
         _case_snprintf_errno_name(EPERM);
 
+        _case_snprintf_errno_name(ENODEV);
+
         default:
             res = snprintf(buf, buflen, "%d", err);
             break;
@@ -51,49 +47,3 @@ int errno_string(int err, char *buf, size_t buflen)
     return len;
 }
 #undef _case_snprintf_errno_name
-
-
-int dprintf(int fd, const char *format, ...)
-{
-    int size = 255;
-    char buffer[size];
-
-    va_list args;
-    va_start(args, format);
-    int n = vsnprintf(buffer, size, format, args);
-    va_end(args);
-
-    if (n < 0) {
-        return -1;
-    }
-
-    if (n > size - 1) { // XXX
-        return -1;
-    }
-
-    return write(fd, buffer, n);
-}
-
-
-char* dgets(int fd, char *str, int num)
-{
-    char c;
-    int i;
-    for (i = 0; i < num; i++) {
-        ssize_t n = read(fd, &c, 1);
-        if (n < 0) {
-            return NULL;
-        } else if (n == 0) {
-            break;
-        }
-
-        str[i] = c;
-        if (c == '\n') {
-            i++;
-            break;
-        }
-    }
-
-    str[i] = '\0';
-    return str;
-}
