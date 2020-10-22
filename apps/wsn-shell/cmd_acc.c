@@ -1,3 +1,5 @@
+#ifdef MODULE_LIS3331LDH
+
 // RIOT
 #include "periph/i2c.h"
 
@@ -48,3 +50,5 @@ exit:
     i2c_release(dev);
     return error;
 }
+
+#endif

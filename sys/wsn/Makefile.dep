@@ -7,3 +7,6 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/log_file
 
 USEMODULE += settings
 EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings
+
+USEMODULE += triage
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/triage

@@ -1,3 +1,5 @@
+#ifdef MODULE_SHT3X
+
 #define SHT3X_PARAM_I2C_ADDR    (SHT3X_I2C_ADDR_1)
 #define SHT3X_PARAM_MODE        (SHT3X_SINGLE_SHOT)
 #define SHT3X_PARAM_REPEAT      (SHT3X_MEDIUM)
@@ -46,3 +48,5 @@ exit:
 
     return error;
 }
+
+#endif

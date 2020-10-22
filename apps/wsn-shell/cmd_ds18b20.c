@@ -1,3 +1,5 @@
+#ifdef MODULE_DS18
+
 #include "ds18.h"
 #include "ds18_params.h"
 
@@ -50,3 +52,5 @@ exit:
     return error;
 }
 */
+
+#endif

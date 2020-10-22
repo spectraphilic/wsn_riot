@@ -19,7 +19,14 @@
  * Mounts the FAT filesystem in SD card at the root directory. Loads the
  * dynamic configuration from the settings file.
  */
-int wsn_boot(void);
+void wsn_boot(void);
+
+/**
+ * @brief Mount filesystem
+ *
+ * Mounts the FAT filesystem in SD card at the root directory.
+ */
+int wsn_mount(void);
 
 
 #endif

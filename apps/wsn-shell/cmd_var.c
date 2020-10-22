@@ -1,3 +1,5 @@
+#ifdef MODULE_SETTINGS
+
 // Standard Library
 #include <stdio.h>
 
@@ -53,3 +55,5 @@ int cmd_var(int argc, char **argv) {
 
     return error;
 }
+
+#endif

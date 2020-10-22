@@ -1,3 +1,5 @@
+#ifdef MODULE_BME280_I2C
+
 // RIOT
 #include "fmt.h"
 
@@ -89,3 +91,5 @@ exit:
 
     return error;
 }
+
+#endif
