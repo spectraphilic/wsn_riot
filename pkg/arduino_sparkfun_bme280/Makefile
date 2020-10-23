@@ -1,8 +1,13 @@
 PKG_NAME    = arduino_sparkfun_bme280
-PKG_URL     = https://github.com/sparkfun/SparkFun_BME280_Arduino_Library/archive/v2.0.8
-PKG_VERSION = v2.0.8
+PKG_VERSION = 2.0.8
 PKG_EXT     = zip
 PKG_LICENSE = MIT
+
+PKG_SRC_NAME = SparkFun_BME280_Arduino_Library
+PKG_URL      = https://github.com/sparkfun/$(PKG_SRC_NAME)/archive/v$(PKG_VERSION).zip
+PKG_ZIPFILE  = $(PKGDIRBASE)/$(PKG_SRC_NAME)-v$(PKG_VERSION).$(PKG_EXT)
+PKG_SOURCE_DIR = $(PKGDIRBASE)/$(PKG_SRC_NAME)-$(PKG_VERSION)
+PKG_TARGET_DIR = $(PKGDIRBASE)/$(PKG_NAME)
 
 ifneq ($(RIOTBASE),)
 include $(RIOTBASE)/Makefile.base
@@ -10,35 +15,29 @@ endif
 
 .PHONY: all clean patch distclean
 
-prepare: $(PKG_SOURCE_DIR)/
+CFLAGS += -DARDUINO=200
 
-all:
-	$(MAKE) -C $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
-#	$(MAKE) -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+prepare: $(PKG_TARGET_DIR)
 
-patch: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
-	# Dependancy might be changed accordingly though we think the Makefile
-	# will be the first thing you want to change
-	#
-	# Here might not happen anything besides dependancy checks
+all: patch
+	"$(MAKE)" -C $(PKG_TARGET_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
-$(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/
-	# Here you apply your patch.
-	cd $< && patch ../patch.txt
+patch:
+	# PATCH
+	cd $(PKG_TARGET_DIR)/src && patch --forward < $(CURDIR)/patches/math.patch || true
 
-$(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
-	# Here you unpack the file.
-	# This example assumes the common pattern that the archive contains its data in a subfolder with the same name as itself.
-	$(Q)$(UNZIP_HERE) $<
+$(PKG_TARGET_DIR): $(PKG_ZIPFILE)
+	# UNPACK
+	$(Q)$(UNZIP_HERE) -D -d $(PKGDIRBASE) $<
+	mv $(PKG_SOURCE_DIR) $(PKG_TARGET_DIR)
 
-$(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
-	# Get PKG_VERSION of package from PKG_URL
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
+$(PKG_ZIPFILE):
+	# DOWNLOAD
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
 	# Reset package to checkout state.
-	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) && \
-		$(MAKE) $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
+	rm -rf $(PKG_TARGET_DIR) $(PKG_SOURCE_DIR) && $(MAKE) $(PKG_TARGET_DIR)
 
 distclean::
-	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
+	rm -rf $(PKG_TARGET_DIR) $(PKG_SOURCE_DIR) $(PKG_ZIPFILE)
