@@ -13,6 +13,8 @@
 #ifndef TRIAGE_H
 #define TRIAGE_H
 
+#include <sys/types.h>
+
 /**
  * @brief Print short name for the given error number
  *

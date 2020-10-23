@@ -1,3 +1,5 @@
+#ifdef MODULE_VFS
+
 // Standard
 #include <errno.h>
 #include <stdio.h>
@@ -80,3 +82,5 @@ int cmd_tail(int argc, char **argv)
     error = close(fd);
     return error;
 }
+
+#endif

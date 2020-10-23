@@ -11,8 +11,7 @@ USEMODULE += shell_commands
 #=====================================
 #----- RIOT Native Drivers -----------
 # BME280 (I2C)
-DRIVER ?= bme280_i2c
-USEMODULE += $(DRIVER)
+USEMODULE += bme280_i2c
 
 # SHT31 (I2C)
 USEMODULE += sht3x

@@ -1,3 +1,5 @@
+#ifdef MODULE_VFS
+
 // Standard
 #include <errno.h>
 
@@ -41,3 +43,5 @@ int cmd_cat(int argc, char **argv)
     error = close(fd);
     return error;
 }
+
+#endif

@@ -1,4 +1,4 @@
-#ifdef MODULE_VFS
+#ifdef MODULE_FATFS_VFS
 
 // RIOT
 #include <board.h> /* MTD_0 should be defined in board.h */

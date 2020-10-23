@@ -26,11 +26,15 @@ const shell_command_t shell_commands[] = {
 #ifdef MODULE_BME280_I2C
     {"bme", "read BME_280", cmd_bme},
 #endif
+#ifdef MODULE_VFS
     {"cat", "print contents of given filename", cmd_cat},
+#endif
 #ifdef MODULE_SHT3X
     {"sht", "read SHT31", cmd_sht},
 #endif
+#ifdef MODULE_VFS
     {"tail", "print the last N lines of given filename", cmd_tail},
+#endif
 #ifdef MODULE_SETTINGS
     {"var", "var [NAME [VALUE]] - type 'var' to list the variable names", cmd_var},
 #endif
@@ -45,7 +49,9 @@ int main(void)
 {
     // Boot
     LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
+#ifdef MODULE_WSN
     wsn_boot();
+#endif
 
     // Run the shell
     char buffer[SHELL_DEFAULT_BUFSIZE]; // 128

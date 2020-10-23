@@ -1,5 +1,10 @@
 // Standard
 #include <errno.h>
+#include <string.h>
+
+// Posix
+#include <fcntl.h>
+#include <unistd.h>
 
 // Riot
 #include <fmt.h>

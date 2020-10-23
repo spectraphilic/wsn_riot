@@ -27,3 +27,7 @@ INCLUDES += -I$(CURDIR)/../../sys/include
 ifeq (waspmote-pro, $(BOARD))
   FFLAGS_EXTRA = -F
 endif
+
+#ifeq (atmega328p, $(CPU))
+#  CFLAGS += -mcall-prologues
+#endif

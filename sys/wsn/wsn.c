@@ -8,7 +8,7 @@
 
 void wsn_boot(void)
 {
-#ifdef MODULE_VFS
+#ifdef MODULE_FATFS_VFS
     if (wsn_mount() == 0) {
 #ifdef MODULE_SETTINGS
         settings_load();
