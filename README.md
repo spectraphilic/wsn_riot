@@ -64,7 +64,7 @@ You can pass options to the make command, other than BOARD:
     # Baudrate of the USB port, default is 9600
     BAUD=115200
 
-    # Log level (LOG_INFO by default)
+    # Log level: LOG_NONE, LOG_ERROR, LOG_WARNING, LOG_INFO (default), LOG_DEBUG, LOG_ALL
     LOG_LEVEL=LOG_DEBUG
 
     # Use modules changes behaviour

@@ -4,9 +4,6 @@ APPLICATION = $(shell basename $(CURDIR))
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
-# By default waspmote-pro uses ttyACM0 by default, but we usually have ttyUSB0
-PORT = /dev/ttyUSB0
-
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
@@ -22,12 +19,15 @@ QUIET ?= 1
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
 
-# This is to avoid "Invalid device signature" error, applies to other AVR
-# boards as well. Should be done in RIOT.
 ifeq (waspmote-pro, $(BOARD))
+  # This is to avoid "Invalid device signature" error, applies to other AVR
+  # boards as well. Should be done in RIOT.
   FFLAGS_EXTRA = -F
-endif
+  # By default waspmote-pro uses ttyACM0 but we usually have ttyUSB0
+  PORT ?= /dev/ttyUSB0
 
-#ifeq (atmega328p, $(CPU))
-#  CFLAGS += -mcall-prologues
-#endif
+else ifeq (arduino-uno, $(BOARD))
+  # Reduce program memory usage
+  CFLAGS += -mcall-prologues
+
+endif
