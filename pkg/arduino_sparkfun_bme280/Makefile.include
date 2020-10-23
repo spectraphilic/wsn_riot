@@ -1,0 +1,4 @@
+#INCLUDES += -I$(PKGDIRBASE)/arduino_sparkfun_bme280
+#INCLUDES += -I$(RIOTPKG)/arduino_sparkfun_bme280/Adafruit_Sensor
+
+CXXEXFLAGS += -std=c++11
