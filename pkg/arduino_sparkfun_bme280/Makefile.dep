@@ -1,6 +1,2 @@
-FEATURES_REQUIRED += periph_i2c
-FEATURES_REQUIRED += periph_spi
-
 USEMODULE += arduino
-USEMODULE += cpp11-compat
 USEMODULE += periph_i2c
