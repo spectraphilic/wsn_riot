@@ -1,7 +1,9 @@
 #ifdef MODULE_BME280_I2C
 
 // RIOT
-#include "fmt.h"
+#include <fmt.h>
+#include <periph/gpio.h>
+#include <ztimer.h>
 
 // WSN
 #include "bmx280.h"
@@ -9,12 +11,6 @@
 
 
 int cmd_bme(int argc, char **argv) {
-    bmx280_t dev;
-    //const bmx280_params_t * sens_param;
-    int error = 0;
-
-    // Registers
-
     // Arguments
     if (argc != 1) {
         printf("unexpected number of arguments: %d\n", argc);
@@ -22,7 +18,23 @@ int cmd_bme(int argc, char **argv) {
     }
     assert(argv); // Avoids warning
 
+    //const bmx280_params_t * sens_param;
+    int error = 0;
+
+#ifdef CPU_ATMEGA1281
+    // This should be ifdef BOARD_WASPMOTE_PRO but it doesn't work: open issue?
+    // Switch on 3v3
+    error = gpio_init(SENS_PW_3V3, GPIO_OUT);
+    if (error) {
+        printf("[Error %d] Failed to switch on 3v3\n", error);
+        return -1;
+    }
+    gpio_set(SENS_PW_3V3);
+    ztimer_sleep(ZTIMER_USEC, 100000);
+#endif
+
     // Initialize
+    bmx280_t dev;
     switch (bmx280_init(&dev, &bmx280_params[0])) {
         case BMX280_ERR_BUS:
             puts("[Error] Something went wrong when using the I2C bus");
@@ -88,6 +100,10 @@ int cmd_bme(int argc, char **argv) {
     //printf("bme280 temperature=%d humidity=%u pressure=%lu\n", temperature, humidity, pressure);
 
 exit:
+
+#ifdef CPU_ATMEGA1281
+    gpio_clear(SENS_PW_3V3);
+#endif
 
     return error;
 }

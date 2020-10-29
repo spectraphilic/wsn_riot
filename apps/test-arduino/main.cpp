@@ -10,8 +10,18 @@ BME280 mySensor;
 
 int main(void)
 {
+    int error = 0;
+
     Serial.begin(9600);
     Serial.println("Read samples from Sparkfun's BME280 at 0x77 I2C address");
+
+#ifdef CPU_ATMEGA1281
+    // This should be ifdef BOARD_WASPMOTE_PRO but it doesn't work: open issue?
+    // Switch on 3v3
+    pinMode(26, OUTPUT);
+    digitalWrite(26, HIGH);
+    delay(100);
+#endif
 
     Wire.begin();
 
@@ -22,7 +32,8 @@ int main(void)
 
     if (mySensor.beginI2C() == false) {
         Serial.println("Sensor 0x77 connect failed");
-        return -1;
+        error = -1;
+        goto exit;
     }
 
     while (1) {
@@ -43,5 +54,11 @@ int main(void)
         delay(3000);
     }
 
-    return 0;
+exit:
+
+#ifdef CPU_ATMEGA1281
+    digitalWrite(26, LOW);
+#endif
+
+    return error;
 }

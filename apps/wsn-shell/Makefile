@@ -17,13 +17,13 @@ USEMODULE += bme280_i2c
 USEMODULE += sht3x
 
 # DS18B20 (1-WIRE)
-USEMODULE += ds18
+#USEMODULE += ds18
 
 
 #======================================
 #------ Project drivers ---------------
-USEMODULE += lis3331ldh
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../drivers/lis3331ldh
+#USEMODULE += lis3331ldh
+#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../drivers/lis3331ldh
 
 #------ Project system modules ---------------
 USEMODULE += wsn
