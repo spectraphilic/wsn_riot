@@ -8,6 +8,7 @@
 
 // Riot
 #include <fmt.h>
+#include <kernel_defines.h>
 #include <log.h>
 
 // Project
@@ -23,7 +24,7 @@ const char * const settings_names[] = {
     "wan.type",
 };
 
-const size_t settings_len = sizeof settings_names / sizeof settings_names[0];
+const size_t settings_len = ARRAY_SIZE(settings_names);
 
 
 int settings_index(const char *name)
