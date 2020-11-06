@@ -1,7 +1,11 @@
 include ../Makefile.common
 
 # System modules
-USEMODULE += ztimer_usec
+USEMODULE += saul_default
+USEMODULE += ztimer_msec
+
+# Drivers
+USEMODULE += bme280_i2c
 
 # Project modules
 USEMODULE += wsn
