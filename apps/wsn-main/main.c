@@ -3,6 +3,7 @@
 // Riot
 #include <board.h>
 #include <log.h>
+#include <nanocbor/nanocbor.h>
 #include <saul_reg.h>
 #include <timex.h>
 #include <ztimer.h>
@@ -19,116 +20,87 @@
 #define TICKS_PER_SEC US_PER_SEC
 #endif
 
-#define SLEEP 5 * TICKS_PER_SEC // 5 seconds
+#define SLEEP 15 // seconds
 
 
-static void print_value(phydat_t *data, uint8_t dim)
+void test_utils_interactive_sync(void)
 {
-    if (data == NULL || dim > PHYDAT_DIM) {
-        puts("Unable to display data object");
-        return;
-    }
+    char c = '\0'; /* Print help on first loop */
+    do {
+        if (c == 'r') {
+            /* This one should have a different case than the help message
+             * otherwise we match it when using 'expect' */
+            puts("READY");
+        }
+        else if (c != '\n' && c != '\r') {
+            puts("Help: Press s to start test, r to print it is ready");
+        }
+        c = getchar();
+    } while (c != 's');
 
-    if (data->unit == UNIT_TIME) {
-        assert(dim == 3);
-        printf("%02d:%02d:%02d", data->val[2], data->val[1], data->val[0]);
-        return;
-    }
-    if (data->unit == UNIT_DATE) {
-        assert(dim == 3);
-        printf("%04d-%02d-%02d", data->val[2], data->val[1], data->val[0]);
-        return;
-    }
-
-    for (uint8_t i = 0; i < dim; i++) {
-        char scale_prefix;
-
-        switch (data->unit) {
-            case UNIT_UNDEF:
-            case UNIT_NONE:
-            case UNIT_M2:
-            case UNIT_M3:
-            case UNIT_PERCENT:
-            case UNIT_TEMP_C:
-            case UNIT_TEMP_F:
-            case UNIT_DBM:
-                /* no string conversion */
-                scale_prefix = '\0';
-                break;
-            default:
-                scale_prefix = phydat_prefix_from_scale(data->scale);
-        }
-
-        if (dim > 1) {
-            printf("[%u] ", (unsigned int)i);
-        }
-        else {
-            printf("    ");
-        }
-        if (scale_prefix) {
-            printf("%11d %c", (int)data->val[i], scale_prefix);
-        }
-        else if (data->scale == 0) {
-            printf("%11d ", (int)data->val[i]);
-        }
-        else if ((data->scale > -6) && (data->scale < 0)) {
-            char num[9];
-            size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
-            assert(len < 9);
-            num[len] = '\0';
-            printf("%11s ", num);
-        }
-        else {
-            char num[12];
-            snprintf(num, sizeof(num), "%ie%i", (int)data->val[i], (int)data->scale);
-            printf("%11s ", num);
-        }
-
-        printf("%s", phydat_unit_to_str(data->unit));
-    }
+    puts("START");
 }
 
-
-static void read_dev(saul_reg_t *dev)
-{
-    int dim;
-    phydat_t res;
-
-    dim = saul_reg_read(dev, &res);
-    if (dim <= 0) {
-        printf("ERROR");
-    } else {
-        print_value(&res, dim);
-    }
-
-    printf("\n");
-}
 
 
 int main(void)
 {
+    uint8_t buffer[128];
+    nanocbor_encoder_t enc;
+    phydat_t res;
+
     LED0_ON;
+    test_utils_interactive_sync();
 
     // Boot
     wsn_boot();
     LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
-    LOG_INFO("This program loops forever, sleeping for 5s in every loop.");
+    LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", SLEEP);
 
     // Main loop
     for (unsigned int loop=0; ; loop++) {
         LOG_INFO("Loop=%u\n", loop);
 
+        // Read sensors and fill buffer
+        nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
+        nanocbor_fmt_array_indefinite(&enc);
+
         saul_reg_t *dev = saul_reg;
         int i = 0;
         while (dev) {
-            printf("#%i\t%s\t%s\t", i++, saul_class_to_str(dev->driver->type), dev->name);
-            read_dev(dev);
+            printf("%02i: %s\t%s ", i, dev->name, saul_class_to_str(dev->driver->type));
+            int dim = saul_reg_read(dev, &res);
+            if (dim <= 0) {
+                printf("ERROR\n");
+            } else {
+                nanocbor_fmt_uint(&enc, i);
+                for (int j=0; j < dim; j++) {
+                    int value = res.val[j];
+                    printf("%d ", value);
+                    nanocbor_fmt_int(&enc, value);
+                }
+                printf("unit=%s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
+            }
+
+            // Next
             dev = dev->next;
+            i++;
         }
 
+        nanocbor_fmt_end_indefinite(&enc);
+        size_t required = nanocbor_encoded_len(&enc);
+        assert(required);
+
+        printf("CBOR = ");
+        for (size_t k=0; k < required; k++) {
+            printf("%02x", buffer[k]);
+        }
+        printf("\n");
+
+        // Done
         LOG_INFO("Loop=%u DONE\n", loop);
         LED0_OFF;
-        ztimer_sleep(ZTIMER, SLEEP);
+        ztimer_sleep(ZTIMER, SLEEP * TICKS_PER_SEC);
         LED0_ON;
     }
 

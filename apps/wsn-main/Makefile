@@ -3,6 +3,7 @@ include ../Makefile.common
 # System modules
 USEMODULE += saul_default
 USEMODULE += ztimer_msec
+USEPKG += nanocbor
 
 # Drivers
 USEMODULE += bme280_i2c
