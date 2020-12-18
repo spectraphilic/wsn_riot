@@ -100,5 +100,12 @@ char* dgets(int fd, char *str, int num);
 ssize_t pread(int fd, void *buf, size_t count, off_t offset);
 
 
+/**
+ * @brief Press s to test, r to print it is ready
+ *
+ */
+void test_utils_interactive_sync(void);
+
+
 #endif
 /** @} */
