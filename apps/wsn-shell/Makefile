@@ -17,7 +17,7 @@ USEMODULE += shell_commands
 USEMODULE += bme280_i2c
 
 # SHT31 (I2C)
-USEMODULE += sht3x
+#USEMODULE += sht3x
 
 # DS18B20 (1-WIRE)
 #USEMODULE += ds18

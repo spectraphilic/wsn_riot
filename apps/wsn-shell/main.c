@@ -1,4 +1,5 @@
 // Standard
+#include <board.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,6 +8,7 @@
 #include <shell.h>
 
 // Project
+#include "triage.h"
 #include "wsn.h"
 
 
@@ -47,11 +49,14 @@ const shell_command_t shell_commands[] = {
 
 int main(void)
 {
+    LED0_ON;
+    test_utils_interactive_sync();
+
     // Boot
-    LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
 #ifdef MODULE_WSN
     wsn_boot();
 #endif
+    LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
 
     // Run the shell
     char buffer[SHELL_DEFAULT_BUFSIZE]; // 128

@@ -1,5 +1,11 @@
+# Storage
 USEMODULE += fatfs_vfs
 USEMODULE += mtd_sdcard
+
+# Networking
+USEMODULE += auto_init_gnrc_netif
+USEMODULE += gnrc_netdev_default
+
 
 #------ Project system modules ---------------
 USEMODULE += log_file
