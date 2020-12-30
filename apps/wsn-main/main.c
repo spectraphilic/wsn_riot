@@ -17,14 +17,14 @@
 
 
 #ifdef MODULE_ZTIMER_MSEC
-#define ZTIMER ZTIMER_MSEC
-#define TICKS_PER_SEC MS_PER_SEC
+    #define ZTIMER ZTIMER_MSEC
+    #define TICKS_PER_SEC MS_PER_SEC
 #else
-#define ZTIMER ZTIMER_USEC
-#define TICKS_PER_SEC US_PER_SEC
+    #define ZTIMER ZTIMER_USEC
+    #define TICKS_PER_SEC US_PER_SEC
 #endif
 
-#define SLEEP 30 // seconds
+#define SLEEP 5 // seconds
 
 
 static int send(uint8_t *data, size_t size) {
@@ -93,26 +93,45 @@ int main(void)
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
         nanocbor_fmt_array_indefinite(&enc);
 
+        // Timestamp
+        ztimer_now_t now = ztimer_now(ZTIMER);
+        nanocbor_fmt_uint(&enc, 0);
+        nanocbor_fmt_uint(&enc, now / TICKS_PER_SEC);
+
         saul_reg_t *dev = saul_reg;
-        int i = 0;
         while (dev) {
-            printf("%02i: %s\t%s ", i, dev->name, saul_class_to_str(dev->driver->type));
+            // TODO Support 2 BME280 sensors at addresses 0x76 and 0x77
+            uint8_t type = dev->driver->type;
+            printf(
+                "- %-15s %3d %-15s ",
+                dev->name,
+                type, // uint8_t
+                saul_class_to_str(type)
+            );
+
+            // White list
+            if (type != 130 && type != 131 && type != 137) {
+                dev = dev->next;
+                printf("Not in the whitelist\n");
+                continue;
+            }
+
+            // Read and add to CBOR
             int dim = saul_reg_read(dev, &res);
             if (dim <= 0) {
                 printf("ERROR\n");
             } else {
-                nanocbor_fmt_uint(&enc, i);
+                nanocbor_fmt_uint(&enc, type);
                 for (int j=0; j < dim; j++) {
                     int value = res.val[j];
-                    printf("%d ", value);
+                    printf("%6d ", value);
                     nanocbor_fmt_int(&enc, value);
                 }
-                printf("unit=%s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
+                printf("unit=%-2s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
             }
 
             // Next
             dev = dev->next;
-            i++;
         }
 
         nanocbor_fmt_end_indefinite(&enc);
