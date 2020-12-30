@@ -12,4 +12,6 @@ USEMODULE += bme280_i2c
 USEMODULE += wsn
 EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/wsn
 
+CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
+
 include $(RIOTBASE)/Makefile.include

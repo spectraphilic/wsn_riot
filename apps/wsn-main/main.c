@@ -24,6 +24,10 @@
     #define TICKS_PER_SEC US_PER_SEC
 #endif
 
+#ifndef NODE_ID
+    #define NODE_ID ""
+#endif
+
 #define SLEEP 5 // seconds
 
 
@@ -97,6 +101,18 @@ int main(void)
         ztimer_now_t now = ztimer_now(ZTIMER);
         nanocbor_fmt_uint(&enc, 0);
         nanocbor_fmt_uint(&enc, now / TICKS_PER_SEC);
+
+        // Serial number
+        nanocbor_fmt_uint(&enc, 1);
+        nanocbor_fmt_uint(&enc, cpuid);
+
+        // Name (Node Identifier)
+        nanocbor_fmt_uint(&enc, 2);
+        nanocbor_put_tstr(&enc, NODE_ID);
+
+        // Frame sequence number
+        nanocbor_fmt_uint(&enc, 3);
+        nanocbor_fmt_uint(&enc, loop);
 
         saul_reg_t *dev = saul_reg;
         while (dev) {

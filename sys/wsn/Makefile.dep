@@ -1,3 +1,5 @@
+FEATURES_REQUIRED = periph_cpuid
+
 # Storage
 USEMODULE += fatfs_vfs
 USEMODULE += mtd_sdcard

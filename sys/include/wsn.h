@@ -14,6 +14,11 @@
 #define WSN_H
 
 /**
+ * @brief Uniquely identifies the mote
+ */
+extern uint64_t cpuid;
+
+/**
  * @brief Code to run at boot
  *
  * Mounts the FAT filesystem in SD card at the root directory. Loads the
