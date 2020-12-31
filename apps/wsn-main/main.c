@@ -6,7 +6,9 @@
 #include <nanocbor/nanocbor.h>
 #include <net/netif.h>
 #include <net/gnrc/netif.h>
-#include "net/gnrc/netif/hdr.h"
+#include <net/gnrc/netif/hdr.h>
+#include <net/gnrc/netreg.h>
+#include <od.h>
 #include <saul_reg.h>
 #include <timex.h>
 #include <ztimer.h>
@@ -29,9 +31,13 @@
 #endif
 
 #define SLEEP 5 // seconds
+#define RCV_QUEUE_SIZE 8
+
+static unsigned int base_time = 0;
 
 
-static int send(uint8_t *data, size_t size) {
+static int send(const uint8_t *data, size_t size)
+{
     gnrc_pktsnip_t *pkt, *hdr;
     gnrc_netif_hdr_t *nethdr;
 
@@ -75,6 +81,119 @@ static int send(uint8_t *data, size_t size) {
 
 
 
+static void _dump_snip(gnrc_pktsnip_t *pkt)
+{
+    size_t hdr_len = 0;
+
+    switch (pkt->type) {
+        case GNRC_NETTYPE_NETIF:
+            printf("NETTYPE_NETIF (%i)\n", pkt->type);
+            if (IS_USED(MODULE_GNRC_NETIF_HDR)) {
+                gnrc_netif_hdr_print(pkt->data);
+                hdr_len = pkt->size;
+            }
+            break;
+        case GNRC_NETTYPE_UNDEF:
+            printf("NETTYPE_UNDEF (%i)\n", pkt->type);
+            printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
+            int n = sscanf((char*)pkt->data, "pong %u", &base_time);
+            if (n == 1) {
+                ztimer_now_t now = ztimer_now(ZTIMER);
+                base_time -= now / TICKS_PER_SEC;
+                printf("TIME %u\n", base_time);
+            }
+            break;
+        default:
+            printf("NETTYPE_UNKNOWN (%i)\n", pkt->type);
+            break;
+    }
+    if (hdr_len < pkt->size) {
+        size_t size = pkt->size - hdr_len;
+
+        od_hex_dump(((uint8_t *)pkt->data) + hdr_len, size, OD_WIDTH_DEFAULT);
+    }
+}
+
+static void _dump(gnrc_pktsnip_t *pkt)
+{
+    int snips = 0;
+    int size = 0;
+    gnrc_pktsnip_t *snip = pkt;
+
+    while (snip != NULL) {
+        printf("~~ SNIP %2i - size: %3u byte, type: ", snips,
+               (unsigned int)snip->size);
+        _dump_snip(snip);
+        ++snips;
+        size += snip->size;
+        snip = snip->next;
+    }
+
+    printf("~~ PKT    - %2i snips, total size: %3i byte\n", snips, size);
+    gnrc_pktbuf_release(pkt);
+}
+
+static void *_eventloop(void *arg)
+{
+    (void)arg;
+    msg_t msg, reply;
+    msg_t msg_queue[RCV_QUEUE_SIZE];
+
+    /* setup the message queue */
+    msg_init_queue(msg_queue, RCV_QUEUE_SIZE);
+
+    reply.content.value = (uint32_t)(-ENOTSUP);
+    reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
+
+    while (1) {
+        msg_receive(&msg);
+
+        switch (msg.type) {
+            case GNRC_NETAPI_MSG_TYPE_RCV:
+                puts("PKTDUMP: data received:");
+                _dump(msg.content.ptr);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_SND:
+                puts("PKTDUMP: data to send:");
+                _dump(msg.content.ptr);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_GET:
+            case GNRC_NETAPI_MSG_TYPE_SET:
+                msg_reply(&msg, &reply);
+                break;
+            default:
+                puts("PKTDUMP: received something unexpected");
+                break;
+        }
+    }
+
+    /* never reached */
+    return NULL;
+}
+
+kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
+static char _stack[THREAD_STACKSIZE_MAIN];
+static void connect_loop(void)
+{
+    gnrc_pktdump_pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN -1,
+                         THREAD_CREATE_STACKTEST,
+                         _eventloop, NULL, "pktdump");
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(
+        GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+
+    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
+
+    // Send ping messages to the gateway until it replies
+    const char msg[] = "ping";
+    const uint8_t size = strlen(msg);
+    while (base_time == 0) {
+        send((uint8_t*)msg, size);
+        LOG_INFO("%s\n", msg);
+        ztimer_sleep(ZTIMER, SLEEP * TICKS_PER_SEC);
+    }
+}
+
+
 int main(void)
 {
     uint8_t buffer[128];
@@ -89,6 +208,9 @@ int main(void)
     LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", SLEEP);
 
+    // Connect to gateway
+    connect_loop();
+
     // Main loop
     for (unsigned int loop=0; ; loop++) {
         LOG_INFO("Loop=%u\n", loop);
@@ -100,7 +222,7 @@ int main(void)
         // Timestamp
         ztimer_now_t now = ztimer_now(ZTIMER);
         nanocbor_fmt_uint(&enc, 0);
-        nanocbor_fmt_uint(&enc, now / TICKS_PER_SEC);
+        nanocbor_fmt_uint(&enc, base_time + now / TICKS_PER_SEC);
 
         // Serial number
         nanocbor_fmt_uint(&enc, 1);

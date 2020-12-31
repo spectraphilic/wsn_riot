@@ -1,6 +1,7 @@
 include ../Makefile.common
 
 # System modules
+USEMODULE += od
 USEMODULE += saul_default
 USEMODULE += ztimer_msec
 USEPKG += nanocbor
