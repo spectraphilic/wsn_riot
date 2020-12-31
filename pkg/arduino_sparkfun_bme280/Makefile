@@ -1,5 +1,5 @@
 PKG_NAME    = arduino_sparkfun_bme280
-PKG_VERSION = 2.0.8
+PKG_VERSION = 2.0.9
 PKG_EXT     = zip
 PKG_LICENSE = MIT
 
@@ -13,18 +13,14 @@ ifneq ($(RIOTBASE),)
 include $(RIOTBASE)/Makefile.base
 endif
 
-.PHONY: all clean patch distclean
+.PHONY: all clean distclean
 
 CFLAGS += -DARDUINO=200
 
 prepare: $(PKG_TARGET_DIR)
 
-all: patch
+all:
 	"$(MAKE)" -C $(PKG_TARGET_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
-
-patch:
-	# PATCH
-	cd $(PKG_TARGET_DIR)/src && patch --forward < $(CURDIR)/patches/math.patch || true
 
 $(PKG_TARGET_DIR): $(PKG_ZIPFILE)
 	# UNPACK
@@ -33,6 +29,7 @@ $(PKG_TARGET_DIR): $(PKG_ZIPFILE)
 
 $(PKG_ZIPFILE):
 	# DOWNLOAD
+	mkdir -p $(PKGDIRBASE)
 	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)
 
 clean::
