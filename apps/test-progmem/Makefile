@@ -1,7 +1,7 @@
 include ../Makefile.common
 
 # Project modules
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
 USEMODULE += progmem
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/progmem
 
 include $(RIOTBASE)/Makefile.include

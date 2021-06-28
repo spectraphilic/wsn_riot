@@ -15,7 +15,8 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Include directory for project modules (external from RIOT's point-of-view)
+# Where to find project modules (external from RIOT's point-of-view)
+EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
 

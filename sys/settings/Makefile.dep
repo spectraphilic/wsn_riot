@@ -1,5 +1,4 @@
 USEMODULE += vfs
 
-# Project system modules
+# Project modules
 USEMODULE += triage
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/triage

@@ -24,13 +24,11 @@ USEMODULE += bme280_i2c
 
 
 #======================================
-#------ Project drivers ---------------
+# Project drivers
 #USEMODULE += lis3331ldh
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../drivers/lis3331ldh
 
-#------ Project system modules ---------------
+# Project modules
 USEMODULE += wsn
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/wsn
 
 #======================================
 #------ Custom Settings ---------------

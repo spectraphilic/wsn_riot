@@ -11,7 +11,6 @@ USEMODULE += bme280_i2c
 
 # Project modules
 USEMODULE += wsn
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/wsn
 
 CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
 

@@ -9,12 +9,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netdev_default
 
 
-#------ Project system modules ---------------
+# Project modules
 USEMODULE += log_file
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/log_file
-
 USEMODULE += settings
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/settings
-
 USEMODULE += triage
-EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys/triage
