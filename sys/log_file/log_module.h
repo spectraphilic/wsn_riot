@@ -1,6 +1,12 @@
 #ifndef LOG_MODULE_H
 #define LOG_MODULE_H
 
+#ifdef __cplusplus
+/* restrict is a C99 keyword, not valid in C++, but GCC and Clang have the
+ * __restrict__ extension keyword which can be used instead */
+#define restrict __restrict__
+#endif
+
 // Standard
 #include <stdarg.h>
 #include <stdio.h>

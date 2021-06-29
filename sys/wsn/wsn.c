@@ -52,6 +52,7 @@ void wsn_boot(void)
     LOG_WARNING("Missing VFS module\n");
 #endif
 
+#ifdef MODULE_GNRC_NETIF
     /*
      * Network
      * https://riot-os.org/api/group__net__netopt.html
@@ -92,4 +93,5 @@ void wsn_boot(void)
 
         LOG_INFO("NETWORK id=%d addr=%s chan=%s nid=%s\n", id, hwaddr_str, channel_str, nid_str);
     }
+#endif
 }
