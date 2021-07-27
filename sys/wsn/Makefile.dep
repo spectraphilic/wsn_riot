@@ -1,4 +1,4 @@
-FEATURES_REQUIRED = periph_cpuid
+FEATURES_REQUIRED += periph_cpuid
 
 # Storage
 USEMODULE += fatfs_vfs

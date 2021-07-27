@@ -1,24 +1,16 @@
 // Standard
-#include <board.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // Riot
+#include <board.h>
 #include <log.h>
 #include <shell.h>
 
 // Project
-#include "triage.h"
-#include "wsn.h"
-
-
-extern int cmd_acc(int argc, char **argv);
-extern int cmd_bme(int argc, char **argv);
-extern int cmd_cat(int argc, char **argv);
-extern int cmd_ds18b20(int argc, char **argv);
-extern int cmd_sht(int argc, char **argv);
-extern int cmd_tail(int argc, char **argv);
-extern int cmd_var(int argc, char **argv);
+#include <wsn.h>
+#include "commands.h"
+#include "commands.hpp"
 
 
 const shell_command_t shell_commands[] = {
@@ -33,6 +25,9 @@ const shell_command_t shell_commands[] = {
 #endif
 #ifdef MODULE_SHT3X
     {"sht", "read SHT31", cmd_sht},
+#endif
+#ifdef MODULE_ARDUINO_SDI_12
+    {"sdi", "send SDI-12 commands", cmd_sdi},
 #endif
 #ifdef MODULE_VFS
     {"tail", "print the last N lines of given filename", cmd_tail},
@@ -50,7 +45,6 @@ const shell_command_t shell_commands[] = {
 int main(void)
 {
     LED0_ON;
-    test_utils_interactive_sync();
 
     // Boot
 #ifdef MODULE_WSN

@@ -1,7 +1,3 @@
 #USEMODULE += periph_gpio
 USEMODULE += periph_i2c
 #USEMODULE += ztimer
-
-# Project modules
-#EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
-#USEMODULE += progmem

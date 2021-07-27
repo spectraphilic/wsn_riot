@@ -13,6 +13,10 @@
 #ifndef WSN_H
 #define WSN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Uniquely identifies the mote
  */
@@ -33,5 +37,8 @@ void wsn_boot(void);
  */
 int wsn_mount(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
