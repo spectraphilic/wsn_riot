@@ -7,8 +7,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// Project
+// RIOT
 #include <log.h>
+
+// Project
 #include <triage.h>
 
 
