@@ -1,6 +1,7 @@
 include ../Makefile.common
 
 FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += periph_gpio_irq
 
 #------ System modules --------------
 USEMODULE += fmt

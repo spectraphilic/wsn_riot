@@ -176,6 +176,16 @@ Exit the terminal and open a new one, so this change takes effect. Then verify:
     [...]
 
 
+Arduino zero
+------------------------
+
+To flash programs to the Arduino zero install openocd,
+see ``https://api.riot-os.org/group__boards__arduino-zero.html``
+
+The board has 2 USB ports: the programming port and the native port.
+Use the programming port, the one close to the supply connector.
+
+
 The terminal program
 ========================
 
