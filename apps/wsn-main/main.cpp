@@ -33,7 +33,11 @@
 #define SLEEP 5 // seconds
 #define RCV_QUEUE_SIZE 8
 
-static unsigned int base_time = 0;
+#ifndef BASETIME
+    #define BASETIME 0
+#endif
+
+static unsigned int base_time = BASETIME;
 
 
 static int send(const uint8_t *data, size_t size)
@@ -84,19 +88,20 @@ static int send(const uint8_t *data, size_t size)
 static void _dump_snip(gnrc_pktsnip_t *pkt)
 {
     size_t hdr_len = 0;
+    int n;
 
     switch (pkt->type) {
         case GNRC_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
             if (IS_USED(MODULE_GNRC_NETIF_HDR)) {
-                gnrc_netif_hdr_print(pkt->data);
+                gnrc_netif_hdr_print((gnrc_netif_hdr_t*) pkt->data);
                 hdr_len = pkt->size;
             }
             break;
         case GNRC_NETTYPE_UNDEF:
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
-            int n = sscanf((char*)pkt->data, "pong %u", &base_time);
+            n = sscanf((char*)pkt->data, "pong %u", &base_time);
             if (n == 1) {
                 ztimer_now_t now = ztimer_now(ZTIMER);
                 base_time -= now / TICKS_PER_SEC;
@@ -151,11 +156,11 @@ static void *_eventloop(void *arg)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 puts("PKTDUMP: data received:");
-                _dump(msg.content.ptr);
+                _dump((gnrc_pktsnip_t*) msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 puts("PKTDUMP: data to send:");
-                _dump(msg.content.ptr);
+                _dump((gnrc_pktsnip_t*) msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
             case GNRC_NETAPI_MSG_TYPE_SET:
@@ -207,6 +212,7 @@ int main(void)
     wsn_boot();
     LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", SLEEP);
+    LOG_INFO("basetime=%d\n", base_time);
 
     // Connect to gateway
     connect_loop();

@@ -1,8 +1,5 @@
 include ../Makefile.common
 
-FEATURES_REQUIRED += cpp
-FEATURES_REQUIRED += periph_gpio_irq
-
 #------ System modules --------------
 USEMODULE += fmt
 #USEMODULE += periph_rtc
@@ -12,8 +9,6 @@ USEMODULE += saul_default
 USEMODULE += i2c_scan
 USEMODULE += shell
 USEMODULE += shell_commands
-
-USEPKG += arduino_sdi_12
 
 #=====================================
 #----- RIOT Native Drivers -----------

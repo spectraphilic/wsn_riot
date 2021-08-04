@@ -7,7 +7,7 @@ USEMODULE += ztimer_msec
 USEPKG += nanocbor
 
 # Drivers
-USEMODULE += bme280_i2c
+#USEMODULE += bme280_i2c
 
 # Project modules
 USEMODULE += wsn

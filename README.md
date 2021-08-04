@@ -13,8 +13,8 @@ Install requirements, for Debian or Debian derivatives:
 Checkout RIOT. It's included as a Git submodule, so you don't need to clone
 manually, just initialize and update the submodules:
 
-    $ git submodule init
-    $ git submodule update
+    git submodule init
+    git submodule update
 
 Try some examples from RIOT. There are a number of examples and tests within
 RIOT:
@@ -70,6 +70,12 @@ You can pass options to the make command, other than BOARD:
     # Use modules changes behaviour
     USEMODULE=log_color
 
+You can pass *defines* as well, these are specific to the project:
+
+   # For wsn-main: if there's no network to grab the time, you can pass it to
+   # avoid the program from looping forever trying to get the time.
+   CFLAGS=-DBASETIME=`date +%s`
+
 If you get some error flashing like:
 
     avrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x31
@@ -77,13 +83,8 @@ If you get some error flashing like:
 Try unplugging and plugging again the USB cable.
 
 
-RIOT
+Toolchains
 ========================
-
-RIOT is included in this repository, as a submodule:
-
-    $ git submodule init
-    $ git submodule update
 
 Now you need to install a cross toolchain for every target architecture.
 

@@ -1,4 +1,11 @@
 FEATURES_REQUIRED += periph_cpuid
+USEMODULE += cpp11-compat
+USEMODULE += ztimer_sec
+
+# Sensors
+FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += periph_gpio_irq
+USEPKG += arduino_sdi_12
 
 # Storage
 USEMODULE += fatfs_vfs

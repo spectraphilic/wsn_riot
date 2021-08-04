@@ -37,6 +37,22 @@ void wsn_boot(void);
  */
 int wsn_mount(void);
 
+/**
+ * @brief Initialize the network
+ */
+int wsn_network_init(void);
+
+/**
+ * @brief Send an SDI-12 command and return answer
+ */
+int wsn_sdi_command(const char* cmd, char out[]);
+
+/**
+ * @brief Initialize the sensors
+ */
+int wsn_sensors_init(void);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -5,16 +5,13 @@
 
 // RIOT
 #include <log.h>
-#include <SDI12.h>
+
+// Project
+#include <wsn.h>
 
 
-#ifndef SDI12_DATA_PIN
-#define SDI12_DATA_PIN 13
-#endif
-
-
-int cmd_sdi(int argc, char **argv) {
-    SDI12 sdi12(SDI12_DATA_PIN);
+int cmd_sdi(int argc, char **argv)
+{
 
     // Arguments
     if (argc != 2) {
@@ -28,19 +25,11 @@ int cmd_sdi(int argc, char **argv) {
         return -1;
     }
 
-    // Begin
-    sdi12.begin();
-    delay(500);  // allow things to settle
-
     // Send command
-    sdi12.sendCommand(command);
-    printf("=> ");
-    delay(300);                  // wait a while for a response
-    while (sdi12.available())    // write the response to the screen
-        putchar((char) sdi12.read());
+    char out[100];
+    wsn_sdi_command(command, out);
+    printf("=> %s", out); // Output answer
 
-    // Done
-    sdi12.end();
     return 0;
 }
 
