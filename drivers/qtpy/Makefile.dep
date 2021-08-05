@@ -1,0 +1,7 @@
+FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += periph_gpio_irq
+
+USEMODULE += cpp11-compat
+USEMODULE += ztimer_sec
+
+USEPKG += arduino_sdi_12

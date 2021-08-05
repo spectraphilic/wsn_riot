@@ -1,11 +1,4 @@
 FEATURES_REQUIRED += periph_cpuid
-USEMODULE += cpp11-compat
-USEMODULE += ztimer_sec
-
-# Sensors
-FEATURES_REQUIRED += cpp
-FEATURES_REQUIRED += periph_gpio_irq
-USEPKG += arduino_sdi_12
 
 # Storage
 USEMODULE += fatfs_vfs
@@ -17,5 +10,6 @@ USEMODULE += gnrc_netdev_default
 
 # Project modules
 USEMODULE += log_file
+USEMODULE += qtpy
 USEMODULE += settings
 USEMODULE += triage

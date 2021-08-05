@@ -4,6 +4,7 @@
 
 // Project
 #include "settings.h"
+#include "qtpy.h"
 #include "wsn.h"
 
 
@@ -49,7 +50,9 @@ void wsn_boot(void)
     }
 
     // Sensors
-    //wsn_sensors_init();
+    if (IS_USED(MODULE_QTPY)) {
+        auto_init_qtpy();
+    }
 
     // Network
     if (IS_USED(MODULE_GNRC_NETIF)) {

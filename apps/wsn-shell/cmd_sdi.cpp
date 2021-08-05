@@ -7,7 +7,7 @@
 #include <log.h>
 
 // Project
-#include <wsn.h>
+#include <qtpy.h>
 
 
 int cmd_sdi(int argc, char **argv)
@@ -27,8 +27,12 @@ int cmd_sdi(int argc, char **argv)
 
     // Send command
     char out[100];
-    wsn_sdi_command(command, out);
-    printf("=> %s", out); // Output answer
+    qtpy_init(&dev, &qtpy_params[0]);
+    qtpy_send_raw(&dev, command, out);
+    qtpy_end(&dev);
+
+    // Print answer
+    printf("=> %s", out);
 
     return 0;
 }
