@@ -8,11 +8,11 @@
 
 // Project
 #include <qtpy.h>
+#include <qtpy_params.h>
 
 
 int cmd_sdi(int argc, char **argv)
 {
-
     // Arguments
     if (argc != 2) {
         LOG_WARNING("Unexpected number of arguments: %d\n", argc);
@@ -27,6 +27,7 @@ int cmd_sdi(int argc, char **argv)
 
     // Send command
     char out[100];
+    qtpy_t dev;
     qtpy_init(&dev, &qtpy_params[0]);
     qtpy_send_raw(&dev, command, out);
     qtpy_end(&dev);

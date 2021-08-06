@@ -22,6 +22,7 @@
 #define QTPY_H
 
 #include <stdint.h>
+#include <SDI12.h>
 
 /* Add header includes here */
 
@@ -42,7 +43,7 @@ typedef struct {
  */
 typedef struct {
     qtpy_params_t params;
-    //SDI12 sdi12;
+    SDI12 sdi12;
 } qtpy_t;
 
 /**
@@ -58,17 +59,17 @@ int qtpy_init(qtpy_t *dev, const qtpy_params_t *params);
 /**
  * @brief   Begin the connection
  */
-int qtpy_begin(const qtpy_t *dev);
+int qtpy_begin(qtpy_t *dev);
 
 /**
  * @brief   End the connection
  */
-int qtpy_end(const qtpy_t *dev);
+int qtpy_end(qtpy_t *dev);
 
 /**
  * @brief   Send a command and read the answer
  */
-int qtpy_send_raw(const qtpy_t *dev, const char *cmd, char out[]);
+int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[]);
 
 /**
  * @brief   Send a command to the configured address, read the answer
@@ -77,13 +78,13 @@ int qtpy_send_raw(const qtpy_t *dev, const char *cmd, char out[]);
  * mark. These will be added by the function: e.g. "I" will become "5I!" (if 5
  * is the sensor address).
  */
-int qtpy_send(const qtpy_t *dev, const char *cmd, char out[]);
+int qtpy_send(qtpy_t *dev, const char *cmd, char out[]);
 
 
 // TODO Document
-int qtpy_measure(const qtpy_t *dev, unsigned int *ttt, uint8_t number);
-int qtpy_data(const qtpy_t *dev, float values[], uint8_t n);
-int qtpy_bme_temp(const qtpy_t *dev, int *temp);
+int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number);
+int qtpy_data(qtpy_t *dev, float values[], uint8_t n);
+int qtpy_bme_temp(qtpy_t *dev, int *temp);
 void auto_init_qtpy(void);
 
 #ifdef __cplusplus

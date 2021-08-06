@@ -21,8 +21,6 @@
 #include <assert.h>
 #include <ztimer.h>
 
-#include <SDI12.h>
-
 #include "qtpy.h"
 #include "qtpy_constants.h"
 #include "qtpy_params.h"
@@ -30,32 +28,31 @@
 
 int qtpy_init(qtpy_t *dev, const qtpy_params_t *params)
 {
-    assert(dev && params);
+    if (!dev || !params)
+        return -EINVAL;
 
     dev->params = *params;
-
-    SDI12 sdi12(params->pin);
     qtpy_begin(dev);
-
     // TODO Send ack command a!
+    qtpy_end(dev);
 
     return 0;
 }
 
-int qtpy_begin(const qtpy_t *dev)
+int qtpy_begin(qtpy_t *dev)
 {
-    dev->sdi12.begin();
+    dev->sdi12.begin(dev->params.pin);
     ztimer_sleep(ZTIMER_MSEC, 500);
     return 0;
 }
 
-int qtpy_end(const qtpy_t *dev)
+int qtpy_end(qtpy_t *dev)
 {
     dev->sdi12.end();
     return 0;
 }
 
-int qtpy_send_raw(const qtpy_t *dev, const char *cmd, char out[])
+int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[])
 {
     // Send command
     dev->sdi12.clearBuffer();
@@ -64,8 +61,8 @@ int qtpy_send_raw(const qtpy_t *dev, const char *cmd, char out[])
 
     // Read answer
     int i = 0;
-    while (sdi12.available())
-        out[i++] = sdi12.read();
+    while (dev->sdi12.available())
+        out[i++] = dev->sdi12.read();
     out[i] = '\0';
 
     // TODO Skip garbage at the beginning, and \r\n at the end
@@ -73,14 +70,14 @@ int qtpy_send_raw(const qtpy_t *dev, const char *cmd, char out[])
     return 0;
 }
 
-int qtpy_send(const qtpy_t *dev, const char *cmd, char out[])
+int qtpy_send(qtpy_t *dev, const char *cmd, char out[])
 {
     char raw_command[100];
     snprintf(raw_command, sizeof(raw_command), "%d%s!", dev->params.address, cmd);
     return qtpy_send_raw(dev, raw_command, out);
 }
 
-int qtpy_measure(const qtpy_t *dev, unsigned int *ttt, uint8_t number)
+int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
 {
     size_t size = 5;
     char cmd[size];
@@ -103,7 +100,7 @@ int qtpy_measure(const qtpy_t *dev, unsigned int *ttt, uint8_t number)
     return nn;
 }
 
-int qtpy_data(const qtpy_t *dev, float values[], uint8_t n)
+int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
 {
     char command[3];
     uint8_t d = 0;
@@ -126,7 +123,7 @@ int qtpy_data(const qtpy_t *dev, float values[], uint8_t n)
     return i;
 }
 
-int qtpy_bme_temp(const qtpy_t *dev, int *temp)
+int qtpy_bme_temp(qtpy_t *dev, int *temp)
 {
     static int n;
     unsigned int ttt;

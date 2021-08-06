@@ -37,13 +37,12 @@ void wsn_boot(void)
     // Storage
     if (IS_USED(MODULE_FATFS_VFS)) {
         if (wsn_mount() == 0) {
-            #ifdef MODULE_SETTINGS
-                if (settings_load() == 0) {
+            if (IS_USED(MODULE_SETTNGS)) {
+                if (settings_load() == 0)
                     LOG_INFO("Settings loaded\n");
-                }
-            #else
+            } else {
                 LOG_WARNING("Missing settings module\n");
-            #endif
+            }
         }
     } else {
         LOG_WARNING("Missing VFS module\n");
