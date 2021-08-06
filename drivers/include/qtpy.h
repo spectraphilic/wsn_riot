@@ -84,7 +84,7 @@ int qtpy_send(qtpy_t *dev, const char *cmd, char out[]);
 // TODO Document
 int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number);
 int qtpy_data(qtpy_t *dev, float values[], uint8_t n);
-int qtpy_bme_temp(qtpy_t *dev, int *temp);
+int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press);
 void auto_init_qtpy(void);
 
 #ifdef __cplusplus

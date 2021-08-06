@@ -18,7 +18,8 @@
  * @}
  */
 
-#include <assert.h>
+#define ENABLE_DEBUG 1
+#include <debug.h>
 #include <ztimer.h>
 
 #include "qtpy.h"
@@ -54,6 +55,7 @@ int qtpy_end(qtpy_t *dev)
 
 int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[])
 {
+    DEBUG("SDI-12 Send %s\n", cmd);
     // Send command
     dev->sdi12.clearBuffer();
     dev->sdi12.sendCommand(cmd);
@@ -64,6 +66,7 @@ int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[])
     while (dev->sdi12.available())
         out[i++] = dev->sdi12.read();
     out[i] = '\0';
+    DEBUG("SDI-12 Read %s\n", out);
 
     // TODO Skip garbage at the beginning, and \r\n at the end
 
@@ -79,9 +82,8 @@ int qtpy_send(qtpy_t *dev, const char *cmd, char out[])
 
 int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
 {
-    size_t size = 5;
-    char cmd[size];
-    char out[100];
+    char cmd[5];
+    char out[20];
 
     if (number == 0) {
         qtpy_send(dev, "M", out);
@@ -93,8 +95,7 @@ int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
     // Parse response: atttn\r\n
     // Not standard, but we support atttnn\r\n as well
     unsigned int a, nn;
-    int count = sscanf(out, "%1u%3u%2u", &a, ttt, &nn);
-    if (count < 3)
+    if (sscanf(out, "%1u%3u%2u", &a, ttt, &nn) < 3)
         return -1;
 
     return nn;
@@ -123,11 +124,11 @@ int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
     return i;
 }
 
-int qtpy_bme_temp(qtpy_t *dev, int *temp)
+int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
 {
     static int n;
     unsigned int ttt;
-    float values[30];
+    float values[20];
 
     n = qtpy_measure(dev, &ttt, 1);
     if (n > 0) {
@@ -136,8 +137,8 @@ int qtpy_bme_temp(qtpy_t *dev, int *temp)
 
         if (qtpy_data(dev, values, n) == n) {
             *temp = values[0];
-            //float bme_h = values[1];
-            //float bme_p = values[2];
+            *hum = values[1];
+            *press = values[2];
             return 0;
         }
     }
