@@ -45,6 +45,7 @@ typedef struct {
     qtpy_params_t params;
     SDI12 sdi12;
     char out[80];
+    uint8_t idx;
 } qtpy_t;
 
 /**

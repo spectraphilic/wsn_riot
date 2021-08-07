@@ -46,7 +46,7 @@ int qtpy_init(qtpy_t *dev, const qtpy_params_t *params)
 int qtpy_begin(qtpy_t *dev)
 {
     dev->sdi12.begin(dev->params.pin);
-    ztimer_sleep(ZTIMER_MSEC, 200);
+    ztimer_sleep(ZTIMER_MSEC, 100);
     return 0;
 }
 
@@ -56,31 +56,50 @@ int qtpy_end(qtpy_t *dev)
     return 0;
 }
 
+static int __next(qtpy_t *dev, ztimer_now_t timeout)
+{
+    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
+
+    while ((ztimer_now(ZTIMER_MSEC) - now) < timeout) {
+        if (dev->sdi12.available()) {
+            char c = dev->sdi12.read();
+            dev->out[dev->idx] = c;
+            dev->idx ++;
+            return c;
+        }
+    }
+
+    return -1;
+}
+
 int qtpy_send_raw(qtpy_t *dev, const char *cmd)
 {
     // Send command
     DEBUG("SDI-12 Send %s\n", cmd);
     dev->sdi12.clearBuffer();
     dev->sdi12.sendCommand(cmd);
-    ztimer_sleep(ZTIMER_MSEC, 200);
 
-    // Wait for data
-    while (! dev->sdi12.available()) // FIXME Timeout, use sdi12.peekNextDigit ?
-        ztimer_sleep(ZTIMER_MSEC, 5);
+    // Read data
+    int status = 0;
+    dev->idx = 0;
 
-    // Read answer
-    int i = 0;
-    while (dev->sdi12.available()) {
-        char c = dev->sdi12.read();
-        //printf("CHAR %d\n", (int) c);
-        dev->out[i++] = c;
+    int c = __next(dev, 200); // Wait up to 200ms to get the first char
+    while (c != -1) {
+        // TODO Skip garbage at the beginning
+        if (status == 0 && c == '\r') {
+            status = 1;
+        } else if (status == 1 && c == '\n') {
+            dev->out[dev->idx - 2] = 0; // Don't keep \r\n
+            DEBUG("SDI-12 Read %s\n", dev->out);
+            return 0;
+        } else {
+            status = 0;
+        }
+
+        c = __next(dev, 50);
     }
-    dev->out[i] = '\0';
-    DEBUG("SDI-12 Read %s\n", dev->out);
 
-    // TODO Skip garbage at the beginning, and \r\n at the end
-
-    return 0;
+    return -1;
 }
 
 int qtpy_send(qtpy_t *dev, const char *cmd)
@@ -117,7 +136,7 @@ int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
 
     int i = 0;
     while (i < n) {
-        sprintf(command, "D%hhu", d);
+        sprintf(command, "D%d", d);
         qtpy_send(dev, command);
         if (strlen(dev->out) <= 1) // a\r\n
             return -1;

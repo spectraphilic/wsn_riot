@@ -244,34 +244,28 @@ int main(void)
 
         saul_reg_t *dev = saul_reg;
         while (dev) {
-            // TODO Support 2 BME280 sensors at addresses 0x76 and 0x77
             uint8_t type = dev->driver->type;
-            printf(
-                "- %-15s %3d %-15s ",
-                dev->name,
-                type, // uint8_t
-                saul_class_to_str(type)
-            );
+            if ((type & SAUL_CAT_MASK) == SAUL_CAT_SENSE) {
+                printf("- %-15s %3d %-15s ", dev->name, type, saul_class_to_str(type));
 
-            // White list
-            if (type != 130 && type != 131 && type != 137) {
-                dev = dev->next;
-                printf("Not in the whitelist\n");
-                continue;
-            }
-
-            // Read and add to CBOR
-            int dim = saul_reg_read(dev, &res);
-            if (dim <= 0) {
-                printf("ERROR\n");
-            } else {
-                nanocbor_fmt_uint(&enc, type);
-                for (int j=0; j < dim; j++) {
-                    int value = res.val[j];
-                    printf("%6d ", value);
-                    nanocbor_fmt_int(&enc, value);
+                uint8_t id = type & SAUL_ID_MASK;
+                if (id == SAUL_SENSE_ID_TEMP || id == SAUL_SENSE_ID_HUM || id == SAUL_SENSE_ID_PRESS) {
+                    // Read and add to CBOR
+                    int dim = saul_reg_read(dev, &res);
+                    if (dim <= 0) {
+                        printf("ERROR\n");
+                    } else {
+                        nanocbor_fmt_uint(&enc, type);
+                        for (int j=0; j < dim; j++) {
+                            int value = res.val[j];
+                            printf("%6d ", value);
+                            nanocbor_fmt_int(&enc, value);
+                        }
+                        printf("unit=%-2s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
+                    }
+                } else {
+                    printf("Not in the whitelist\n");
                 }
-                printf("unit=%-2s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
             }
 
             // Next
