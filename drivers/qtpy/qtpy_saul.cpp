@@ -23,6 +23,7 @@
 
 // RIOT
 #include <debug.h>
+#include <log.h>
 #include <phydat.h>
 #include <saul.h>
 #include <saul_reg.h>
@@ -132,9 +133,20 @@ void auto_init_qtpy(void)
 {
     DEBUG("Init sensor board\n");
 
-    qtpy_init(&qtpy_dev, &qtpy_params[0]);
+    switch (qtpy_init(&qtpy_dev, &qtpy_params[0])) {
+        case 0:
+            break;
+        case -EPROTO:
+            LOG_ERROR("[QTPY] Protocol error\n");
+            return;
+        default:
+            LOG_ERROR("[QTPY] Unexpected error %d\n");
+            return;
+    }
 
+#ifdef MODULE_AUTO_INIT_SAUL
     saul_reg_add(&bme_temp_reg);
     saul_reg_add(&bme_hum_reg);
     saul_reg_add(&bme_press_reg);
+#endif /* MODULE_AUTO_INIT_SAUL */
 }

@@ -35,7 +35,7 @@ extern "C" {
  */
 typedef struct {
     int8_t pin;
-    int8_t address;
+    char address;
 } qtpy_params_t;
 
 /**
@@ -44,6 +44,7 @@ typedef struct {
 typedef struct {
     qtpy_params_t params;
     SDI12 sdi12;
+    char out[80];
 } qtpy_t;
 
 /**
@@ -69,7 +70,7 @@ int qtpy_end(qtpy_t *dev);
 /**
  * @brief   Send a command and read the answer
  */
-int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[]);
+int qtpy_send_raw(qtpy_t *dev, const char *cmd);
 
 /**
  * @brief   Send a command to the configured address, read the answer
@@ -78,7 +79,7 @@ int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[]);
  * mark. These will be added by the function: e.g. "I" will become "5I!" (if 5
  * is the sensor address).
  */
-int qtpy_send(qtpy_t *dev, const char *cmd, char out[]);
+int qtpy_send(qtpy_t *dev, const char *cmd);
 
 
 // TODO Document

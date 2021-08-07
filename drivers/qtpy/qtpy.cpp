@@ -18,7 +18,7 @@
  * @}
  */
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include <debug.h>
 #include <ztimer.h>
 
@@ -34,8 +34,11 @@ int qtpy_init(qtpy_t *dev, const qtpy_params_t *params)
 
     dev->params = *params;
     qtpy_begin(dev);
-    // TODO Send ack command a!
-    qtpy_end(dev);
+
+    // Send ack command a!
+    qtpy_send(dev, "");
+    if (dev->out[0] != dev->params.address)
+        return -EPROTO;
 
     return 0;
 }
@@ -43,7 +46,7 @@ int qtpy_init(qtpy_t *dev, const qtpy_params_t *params)
 int qtpy_begin(qtpy_t *dev)
 {
     dev->sdi12.begin(dev->params.pin);
-    ztimer_sleep(ZTIMER_MSEC, 500);
+    ztimer_sleep(ZTIMER_MSEC, 200);
     return 0;
 }
 
@@ -53,49 +56,55 @@ int qtpy_end(qtpy_t *dev)
     return 0;
 }
 
-int qtpy_send_raw(qtpy_t *dev, const char *cmd, char out[])
+int qtpy_send_raw(qtpy_t *dev, const char *cmd)
 {
-    DEBUG("SDI-12 Send %s\n", cmd);
     // Send command
+    DEBUG("SDI-12 Send %s\n", cmd);
     dev->sdi12.clearBuffer();
     dev->sdi12.sendCommand(cmd);
-    ztimer_sleep(ZTIMER_MSEC, 300);
+    ztimer_sleep(ZTIMER_MSEC, 200);
+
+    // Wait for data
+    while (! dev->sdi12.available()) // FIXME Timeout, use sdi12.peekNextDigit ?
+        ztimer_sleep(ZTIMER_MSEC, 5);
 
     // Read answer
     int i = 0;
-    while (dev->sdi12.available())
-        out[i++] = dev->sdi12.read();
-    out[i] = '\0';
-    DEBUG("SDI-12 Read %s\n", out);
+    while (dev->sdi12.available()) {
+        char c = dev->sdi12.read();
+        //printf("CHAR %d\n", (int) c);
+        dev->out[i++] = c;
+    }
+    dev->out[i] = '\0';
+    DEBUG("SDI-12 Read %s\n", dev->out);
 
     // TODO Skip garbage at the beginning, and \r\n at the end
 
     return 0;
 }
 
-int qtpy_send(qtpy_t *dev, const char *cmd, char out[])
+int qtpy_send(qtpy_t *dev, const char *cmd)
 {
     char raw_command[100];
-    snprintf(raw_command, sizeof(raw_command), "%d%s!", dev->params.address, cmd);
-    return qtpy_send_raw(dev, raw_command, out);
+    snprintf(raw_command, sizeof(raw_command), "%c%s!", dev->params.address, cmd);
+    return qtpy_send_raw(dev, raw_command);
 }
 
 int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
 {
     char cmd[5];
-    char out[20];
 
     if (number == 0) {
-        qtpy_send(dev, "M", out);
+        qtpy_send(dev, "M");
     } else {
         snprintf(cmd, sizeof(cmd), "M%d", number);
-        qtpy_send(dev, cmd, out);
+        qtpy_send(dev, cmd);
     }
 
     // Parse response: atttn\r\n
     // Not standard, but we support atttnn\r\n as well
     unsigned int a, nn;
-    if (sscanf(out, "%1u%3u%2u", &a, ttt, &nn) < 3)
+    if (sscanf(dev->out, "%1u%3u%2u", &a, ttt, &nn) < 3)
         return -1;
 
     return nn;
@@ -105,16 +114,15 @@ int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
 {
     char command[3];
     uint8_t d = 0;
-    char out[100];
 
     int i = 0;
     while (i < n) {
         sprintf(command, "D%hhu", d);
-        qtpy_send(dev, command, out);
-        if (strlen(out) <= 1) // a\r\n
+        qtpy_send(dev, command);
+        if (strlen(dev->out) <= 1) // a\r\n
             return -1;
 
-        char *next = (char*) out + 1;
+        char *next = (char*) dev->out + 1;
         while (next[0] != '\0')
             values[i++] = strtod(next, &next);
 

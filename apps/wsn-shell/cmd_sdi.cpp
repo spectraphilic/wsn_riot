@@ -11,6 +11,8 @@
 #include <qtpy_params.h>
 
 
+extern qtpy_t qtpy_dev;
+
 int cmd_sdi(int argc, char **argv)
 {
     // Arguments
@@ -26,14 +28,12 @@ int cmd_sdi(int argc, char **argv)
     }
 
     // Send command
-    char out[100];
-    qtpy_t dev;
-    qtpy_init(&dev, &qtpy_params[0]);
-    qtpy_send_raw(&dev, command, out);
-    qtpy_end(&dev);
+    qtpy_begin(&qtpy_dev);
+    qtpy_send_raw(&qtpy_dev, command);
+    qtpy_end(&qtpy_dev);
 
     // Print answer
-    printf("=> %s", out);
+    printf("=> %s\n", qtpy_dev.out);
 
     return 0;
 }

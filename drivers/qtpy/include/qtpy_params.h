@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 #ifndef QTPY_PARAM_ADDRESS
-#define QTPY_PARAM_ADDRESS 5
+#define QTPY_PARAM_ADDRESS '5'
 #endif
 
 #ifndef QTPY_PARAMS
