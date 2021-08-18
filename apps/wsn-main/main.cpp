@@ -9,11 +9,12 @@
 #include <net/gnrc/netif/hdr.h>
 #include <net/gnrc/netreg.h>
 #include <od.h>
-#include <saul_reg.h>
+#include <phydat.h>
 #include <timex.h>
 #include <ztimer.h>
 
 // Project
+#include "sensors.h"
 #include "triage.h"
 #include "wsn.h"
 
@@ -30,7 +31,7 @@
     #define NODE_ID ""
 #endif
 
-#define SLEEP 5 // seconds
+#define SLEEP 10 // seconds
 #define RCV_QUEUE_SIZE 8
 
 #ifndef BASETIME
@@ -242,34 +243,19 @@ int main(void)
         nanocbor_fmt_uint(&enc, 3);
         nanocbor_fmt_uint(&enc, loop);
 
-        saul_reg_t *dev = saul_reg;
-        while (dev) {
-            uint8_t type = dev->driver->type;
-            if ((type & SAUL_CAT_MASK) == SAUL_CAT_SENSE) {
-                printf("- %-15s %3d %-15s ", dev->name, type, saul_class_to_str(type));
 
-                uint8_t id = type & SAUL_ID_MASK;
-                if (id == SAUL_SENSE_ID_TEMP || id == SAUL_SENSE_ID_HUM || id == SAUL_SENSE_ID_PRESS) {
-                    // Read and add to CBOR
-                    int dim = saul_reg_read(dev, &res);
-                    if (dim <= 0) {
-                        printf("ERROR\n");
-                    } else {
-                        nanocbor_fmt_uint(&enc, type);
-                        for (int j=0; j < dim; j++) {
-                            int value = res.val[j];
-                            printf("%6d ", value);
-                            nanocbor_fmt_int(&enc, value);
-                        }
-                        printf("unit=%-2s scale=%d\n", phydat_unit_to_str(res.unit), res.scale);
-                    }
-                } else {
-                    printf("Not in the whitelist\n");
-                }
-            }
+        sensor_t *sensor = sensors_list;
+        while (sensor) {
+            printf("%s:\n", sensor->name);
+            int state = 0;
+            do {
+                state = sensor->read(sensor->dev, state, &res);
+                int value = res.val[0];
+                printf("%6d unit=%-2s scale=%d\n", value, phydat_unit_to_str(res.unit), res.scale);
+                nanocbor_fmt_int(&enc, value);
+            } while (state >= 0);
 
-            // Next
-            dev = dev->next;
+            sensor = sensor->next;
         }
 
         nanocbor_fmt_end_indefinite(&enc);

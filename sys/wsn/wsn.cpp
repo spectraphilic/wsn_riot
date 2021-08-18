@@ -49,12 +49,10 @@ void wsn_boot(void)
     }
 
     // Sensors
-    if (IS_USED(MODULE_QTPY)) {
-        auto_init_qtpy();
-    }
+    if (IS_USED(MODULE_QTPY))
+        qtpy_init_auto();
 
     // Network
-    if (IS_USED(MODULE_GNRC_NETIF)) {
+    if (IS_USED(MODULE_GNRC_NETIF))
         wsn_network_init();
-    }
 }

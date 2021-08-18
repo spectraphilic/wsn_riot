@@ -22,6 +22,11 @@
 #include <debug.h>
 #include <ztimer.h>
 
+#include <math.h>
+#include <log.h>
+#include <phydat.h>
+#include "sensors.h"
+
 #include "qtpy.h"
 #include "qtpy_constants.h"
 #include "qtpy_params.h"
@@ -171,4 +176,69 @@ int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
     }
 
     return -1; // XXX
+}
+
+
+/*
+ * Register stuff
+ */
+
+qtpy_t qtpy_dev;
+
+int qtpy_bme280_read(const void *dev, int state, phydat_t *res) {
+    qtpy_t *qtpy = (qtpy_t*) dev;
+
+    static float temp, hum, press;
+    switch (state) {
+        case 0:
+            qtpy_begin(qtpy);
+            qtpy_bme280(qtpy, &temp, &hum, &press);
+            qtpy_end(qtpy);
+            res->val[0] = 210;
+            res->unit = UNIT_NONE;
+            res->scale = 0;
+            return 1;
+        case 1:
+            res->val[0] = round(temp * 100);
+            res->unit = UNIT_TEMP_C;
+            res->scale = -2;
+            return 2;
+        case 2:
+            res->val[0] = round(hum * 100);
+            res->unit = UNIT_PERCENT;
+            res->scale = -2;
+            return 3;
+        case 3:
+            res->val[0] = round(press);
+            res->unit = UNIT_PA;
+            res->scale = 0;
+            return -1;
+    }
+
+    return -1;
+}
+
+static sensor_t sensor_bme = {
+    .next = NULL,
+    .dev = &qtpy_dev,
+    .name = "BME280",
+    .read = &qtpy_bme280_read,
+};
+
+void qtpy_init_auto(void)
+{
+    DEBUG("Init sensor board\n");
+
+    switch (qtpy_init(&qtpy_dev, &qtpy_params[0])) {
+        case 0:
+            break;
+        case -EPROTO:
+            LOG_ERROR("[QTPY] Protocol error\n");
+            return;
+        default:
+            LOG_ERROR("[QTPY] Unexpected error %d\n");
+            return;
+    }
+
+    sensors_add(&sensor_bme);
 }

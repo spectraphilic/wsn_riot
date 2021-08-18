@@ -2,7 +2,7 @@ include ../Makefile.common
 
 # System modules
 USEMODULE += od
-USEMODULE += saul_default
+USEMODULE += phydat
 USEMODULE += ztimer_msec
 USEPKG += nanocbor
 
