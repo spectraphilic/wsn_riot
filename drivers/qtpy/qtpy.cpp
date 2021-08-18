@@ -114,7 +114,7 @@ int qtpy_send(qtpy_t *dev, const char *cmd)
     return qtpy_send_raw(dev, raw_command);
 }
 
-int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
+static int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
 {
     char cmd[5];
 
@@ -134,7 +134,7 @@ int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
     return nn;
 }
 
-int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
+static int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
 {
     char command[3];
     uint8_t d = 0;
@@ -156,47 +156,89 @@ int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
     return i;
 }
 
-int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
+
+static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
 {
     static int n;
     unsigned int ttt;
-    float values[20];
 
-    n = qtpy_measure(dev, &ttt, 1);
+    n = qtpy_measure(dev, &ttt, number);
     if (n > 0) {
         if (ttt > 0)
             ztimer_sleep(ZTIMER_SEC, ttt);
 
-        if (qtpy_data(dev, values, n) == n) {
-            *temp = values[0];
-            *hum = values[1];
-            *press = values[2];
+        if (qtpy_data(dev, values, n) == n)
             return 0;
-        }
     }
 
     return -1; // XXX
 }
 
-int qtpy_sht31(qtpy_t *dev, float *temp, float *hum)
+
+static int qtpy_as7341(qtpy_t *dev,
+                uint16_t *f1, uint16_t *f2, uint16_t *f3, uint16_t *f4,
+                uint16_t *f5, uint16_t *f6, uint16_t *f7, uint16_t *f8,
+                uint16_t *clear, uint16_t *nir)
 {
-    static int n;
-    unsigned int ttt;
     float values[20];
 
-    n = qtpy_measure(dev, &ttt, 4);
-    if (n > 0) {
-        if (ttt > 0)
-            ztimer_sleep(ZTIMER_SEC, ttt);
+    int error = qtpy_measure_data(dev, 0, values);
+    if (error)
+        return error;
 
-        if (qtpy_data(dev, values, n) == n) {
-            *temp = values[0];
-            *hum = values[1];
-            return 0;
-        }
-    }
+    *f1 = (uint16_t) values[0];
+    *f2 = (uint16_t) values[1];
+    *f3 = (uint16_t) values[2];
+    *f4 = (uint16_t) values[3];
+    *f5 = (uint16_t) values[4];
+    *f6 = (uint16_t) values[5];
+    *f7 = (uint16_t) values[6];
+    *f8 = (uint16_t) values[7];
+    *clear = (uint16_t) values[8];
+    *nir = (uint16_t) values[9];
 
-    return -1; // XXX
+    return 0;
+}
+
+static int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
+{
+    float values[20];
+
+    int error = qtpy_measure_data(dev, 1, values);
+    if (error)
+        return error;
+
+    *temp = values[0];
+    *hum = values[1];
+    *press = values[2];
+    return 0;
+}
+
+
+static int qtpy_mlx90614(qtpy_t *dev, float *object, float *ambient)
+{
+    float values[20];
+
+    int error = qtpy_measure_data(dev, 3, values);
+    if (error)
+        return error;
+
+    *object = values[0];
+    *ambient = values[1];
+    return 0;
+}
+
+static int qtpy_sht31(qtpy_t *dev, float *temp, float *hum)
+{
+    float values[20];
+
+    int error = qtpy_measure_data(dev, 4, values);
+    if (error)
+        return error;
+
+    *temp = values[0];
+    *hum = values[1];
+    return 0;
 }
 
 
@@ -206,79 +248,134 @@ int qtpy_sht31(qtpy_t *dev, float *temp, float *hum)
 
 qtpy_t qtpy_dev;
 
-static int sensor_bme280_read(const void *dev, int state, phydat_t *res) {
+static int sensor_qtpy_read(const void *dev, phydat_t *res) {
     qtpy_t *qtpy = (qtpy_t*) dev;
 
-    static float temp, hum, press;
+    static int state = 0;
+    static float values[3];
+    static uint16_t f1, f2, f3, f4, f5, f6, f7, f8, clear, nir;
+
     switch (state) {
+        // AS7341
         case 0:
             qtpy_begin(qtpy);
-            qtpy_bme280(qtpy, &temp, &hum, &press);
-            qtpy_end(qtpy);
+            qtpy_as7341(qtpy, &f1, &f2, &f3, &f4, &f5, &f6, &f7, &f8, &clear, &nir);
+            res->val[0] = 220;
+            res->unit = UNIT_NONE;
+            res->scale = 0;
+            break;
+        case 1:
+            res->val[0] = f1;
+            res->unit = UNIT_UNDEF;
+            res->scale = 0;
+            break;
+        case 2:
+            res->val[0] = f2;
+            break;
+        case 3:
+            res->val[0] = f3;
+            break;
+        case 4:
+            res->val[0] = f4;
+            break;
+        case 5:
+            res->val[0] = f5;
+            break;
+        case 6:
+            res->val[0] = f6;
+            break;
+        case 7:
+            res->val[0] = f7;
+            break;
+        case 8:
+            res->val[0] = f8;
+            break;
+        case 9:
+            res->val[0] = clear;
+            break;
+        case 10:
+            res->val[0] = nir;
+            break;
+        // BME280
+        case 11:
+            qtpy_bme280(qtpy, &values[0], &values[1], &values[2]); // temp, humidity, pressure
             res->val[0] = 210;
             res->unit = UNIT_NONE;
             res->scale = 0;
-            return 1;
-        case 1:
-            res->val[0] = round(temp * 100);
+            break;
+        case 12:
+            res->val[0] = round(values[0] * 100);
             res->unit = UNIT_TEMP_C;
             res->scale = -2;
-            return 2;
-        case 2:
-            res->val[0] = round(hum * 100);
+            break;
+        case 13:
+            res->val[0] = round(values[1] * 100);
             res->unit = UNIT_PERCENT;
             res->scale = -2;
-            return 3;
-        case 3:
-            res->val[0] = round(press);
+            break;
+        case 14:
+            res->val[0] = round(values[2]);
             res->unit = UNIT_PA;
             res->scale = 0;
-            return -1;
-    }
+            break;
+        // ICM20X TODO Doesn't work in the lagopus shield
 
-    return -1;
-}
+        // MLX90614
+        case 15:
+            qtpy_mlx90614(qtpy, &values[0], &values[1]); // object temperature, ambient temperature
+            res->val[0] = 211;
+            res->unit = UNIT_NONE;
+            res->scale = 0;
+            break;
+        case 16:
+            res->val[0] = round(values[0] * 100);
+            res->unit = UNIT_TEMP_C;
+            res->scale = -2;
+            break;
+        case 17:
+            res->val[0] = round(values[1] * 100);
+            res->unit = UNIT_TEMP_C;
+            res->scale = -2;
+            break;
 
-static int sensor_sht31_read(const void *dev, int state, phydat_t *res) {
-    qtpy_t *qtpy = (qtpy_t*) dev;
-
-    static float temp, hum;
-    switch (state) {
-        case 0:
-            qtpy_begin(qtpy);
-            qtpy_sht31(qtpy, &temp, &hum);
-            qtpy_end(qtpy);
+        // SHT31
+        case 18:
+            qtpy_sht31(qtpy, &values[0], &values[1]); // temperature, humidity
             res->val[0] = 219;
             res->unit = UNIT_NONE;
             res->scale = 0;
-            return 1;
-        case 1:
-            res->val[0] = round(temp * 100);
+            break;
+        case 19:
+            res->val[0] = round(values[0] * 100);
             res->unit = UNIT_TEMP_C;
             res->scale = -2;
-            return 2;
-        case 2:
-            res->val[0] = round(hum * 100);
+            break;
+        case 20:
+            res->val[0] = round(values[1] * 100);
             res->unit = UNIT_PERCENT;
             res->scale = -2;
-            return -1;
+            break;
+
+        // TMP1XX
+        // VCNL4040
+        // VEML7700
+        // VL53L1X
+
+        default:
+            state = 0;
+            qtpy_end(qtpy);
+            return 0;
     }
 
-    return -1;
+    state++;
+    return 1; // Continue
 }
 
-static sensor_t sensor_bme280 = {
+static sensor_t sensor_qtpy = {
     .next = NULL,
     .dev = &qtpy_dev,
-    .name = "BME280",
-    .read = &sensor_bme280_read,
-};
-
-static sensor_t sensor_sht31 = {
-    .next = NULL,
-    .dev = &qtpy_dev,
-    .name = "SHT31",
-    .read = &sensor_sht31_read,
+    .name = "QT Py",
+    .read = &sensor_qtpy_read,
 };
 
 void qtpy_init_auto(void)
@@ -296,6 +393,5 @@ void qtpy_init_auto(void)
             return;
     }
 
-    sensors_add(&sensor_bme280);
-    sensors_add(&sensor_sht31);
+    sensors_add(&sensor_qtpy);
 }

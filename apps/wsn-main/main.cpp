@@ -31,7 +31,7 @@
     #define NODE_ID ""
 #endif
 
-#define SLEEP 10 // seconds
+#define SLEEP 15 // seconds
 #define RCV_QUEUE_SIZE 8
 
 #ifndef BASETIME
@@ -247,14 +247,11 @@ int main(void)
         sensor_t *sensor = sensors_list;
         while (sensor) {
             printf("%s:\n", sensor->name);
-            int state = 0;
-            do {
-                state = sensor->read(sensor->dev, state, &res);
+            while (sensor->read(sensor->dev, &res)) {
                 int value = res.val[0];
                 printf("%6d unit=%-2s scale=%d\n", value, phydat_unit_to_str(res.unit), res.scale);
                 nanocbor_fmt_int(&enc, value);
-            } while (state >= 0);
-
+            }
             sensor = sensor->next;
         }
 

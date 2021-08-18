@@ -44,7 +44,7 @@ extern "C" {
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*sensor_read_t)(const void *dev, int state, phydat_t *res);
+typedef int(*sensor_read_t)(const void *dev, phydat_t *res);
 
 /**
  * @brief   Sensor registry entry
