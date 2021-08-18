@@ -178,6 +178,27 @@ int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
     return -1; // XXX
 }
 
+int qtpy_sht31(qtpy_t *dev, float *temp, float *hum)
+{
+    static int n;
+    unsigned int ttt;
+    float values[20];
+
+    n = qtpy_measure(dev, &ttt, 4);
+    if (n > 0) {
+        if (ttt > 0)
+            ztimer_sleep(ZTIMER_SEC, ttt);
+
+        if (qtpy_data(dev, values, n) == n) {
+            *temp = values[0];
+            *hum = values[1];
+            return 0;
+        }
+    }
+
+    return -1; // XXX
+}
+
 
 /*
  * Register stuff
@@ -185,7 +206,7 @@ int qtpy_bme280(qtpy_t *dev, float *temp, float *hum, float *press)
 
 qtpy_t qtpy_dev;
 
-int qtpy_bme280_read(const void *dev, int state, phydat_t *res) {
+static int sensor_bme280_read(const void *dev, int state, phydat_t *res) {
     qtpy_t *qtpy = (qtpy_t*) dev;
 
     static float temp, hum, press;
@@ -218,11 +239,46 @@ int qtpy_bme280_read(const void *dev, int state, phydat_t *res) {
     return -1;
 }
 
-static sensor_t sensor_bme = {
+static int sensor_sht31_read(const void *dev, int state, phydat_t *res) {
+    qtpy_t *qtpy = (qtpy_t*) dev;
+
+    static float temp, hum;
+    switch (state) {
+        case 0:
+            qtpy_begin(qtpy);
+            qtpy_sht31(qtpy, &temp, &hum);
+            qtpy_end(qtpy);
+            res->val[0] = 219;
+            res->unit = UNIT_NONE;
+            res->scale = 0;
+            return 1;
+        case 1:
+            res->val[0] = round(temp * 100);
+            res->unit = UNIT_TEMP_C;
+            res->scale = -2;
+            return 2;
+        case 2:
+            res->val[0] = round(hum * 100);
+            res->unit = UNIT_PERCENT;
+            res->scale = -2;
+            return -1;
+    }
+
+    return -1;
+}
+
+static sensor_t sensor_bme280 = {
     .next = NULL,
     .dev = &qtpy_dev,
     .name = "BME280",
-    .read = &qtpy_bme280_read,
+    .read = &sensor_bme280_read,
+};
+
+static sensor_t sensor_sht31 = {
+    .next = NULL,
+    .dev = &qtpy_dev,
+    .name = "SHT31",
+    .read = &sensor_sht31_read,
 };
 
 void qtpy_init_auto(void)
@@ -240,5 +296,6 @@ void qtpy_init_auto(void)
             return;
     }
 
-    sensors_add(&sensor_bme);
+    sensors_add(&sensor_bme280);
+    sensors_add(&sensor_sht31);
 }
