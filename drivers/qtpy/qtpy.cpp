@@ -340,14 +340,14 @@ static int sensor_qtpy_read(const void *ptr, phydat_t *res) {
             res->scale = 0;
             break;
         case 28:
-            res->val[0] = (uint16_t) values[0]; // lux
+            res->val[0] = round(values[0] * 100); // lux
             res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
+            res->scale = -2;
             break;
         case 29:
-            res->val[0] = (uint16_t) values[1]; // white
+            res->val[0] = round(values[1] * 100); // white
             res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
+            res->scale = -2;
             break;
         case 30:
             res->val[0] = (uint16_t) values[2]; // als
