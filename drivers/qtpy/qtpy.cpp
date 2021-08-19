@@ -25,6 +25,7 @@
 #include <math.h>
 #include <log.h>
 #include <phydat.h>
+#include "coroutine.h"
 #include "sensors.h"
 
 #include "qtpy.h"
@@ -168,7 +169,7 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
             ztimer_sleep(ZTIMER_SEC, ttt);
 
         if (qtpy_data(dev, values, n) == n)
-            return 0;
+            return n;
     }
 
     return -1; // XXX
@@ -182,195 +183,190 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
 qtpy_t qtpy_dev;
 
 static int sensor_qtpy_read(const void *ptr, phydat_t *res) {
+    static float values[20];
+    static int n = 0;
+    static int i;
+
     qtpy_t *dev = (qtpy_t*) ptr;
 
-    static int state = 0;
-    static float values[20];
+    scrBegin;
 
-    switch (state) {
-        // AS7341
-        case 0:
-            qtpy_begin(dev);
-            qtpy_measure_data(dev, 0, values); // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
-            res->val[0] = 220;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 1:
-            res->val[0] = (uint16_t) values[0]; // f1
-            res->unit = UNIT_UNDEF;
-            res->scale = 0;
-            break;
-        case 2:
-            res->val[0] = (uint16_t) values[1]; // f2
-            break;
-        case 3:
-            res->val[0] = (uint16_t) values[2]; // f3
-            break;
-        case 4:
-            res->val[0] = (uint16_t) values[3]; // f4
-            break;
-        case 5:
-            res->val[0] = (uint16_t) values[4]; // f5
-            break;
-        case 6:
-            res->val[0] = (uint16_t) values[5]; // f6
-            break;
-        case 7:
-            res->val[0] = (uint16_t) values[6]; // f7
-            break;
-        case 8:
-            res->val[0] = (uint16_t) values[7]; // f8
-            break;
-        case 9:
-            res->val[0] = (uint16_t) values[8]; // clear
-            break;
-        case 10:
-            res->val[0] = (uint16_t) values[9]; // nir
-            break;
+    // AS7341
+    qtpy_begin(dev);
+    qtpy_measure_data(dev, 0, values); // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
+    res->val[0] = 220;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
 
-        // BME280
-        case 11:
-            qtpy_measure_data(dev, 1, values); // aM1! : temp, humidity, pressure
-            res->val[0] = 210;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 12:
-            res->val[0] = round(values[0] * 100);
-            res->unit = UNIT_TEMP_C;
-            res->scale = -2;
-            break;
-        case 13:
-            res->val[0] = round(values[1] * 100);
-            res->unit = UNIT_PERCENT;
-            res->scale = -2;
-            break;
-        case 14:
-            res->val[0] = round(values[2]);
-            res->unit = UNIT_PA;
-            res->scale = 0;
-            break;
+    res->val[0] = (uint16_t) values[0]; // f1
+    res->unit = UNIT_UNDEF;
+    res->scale = 0;
+    scrReturn(1);
 
-        // ICM20X TODO Doesn't work in the lagopus shield
-//      case :
-//          qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
-//          res->val[0] = 221;
-//          res->unit = UNIT_NONE;
-//          res->scale = 0;
-//          break;
+    res->val[0] = (uint16_t) values[1]; // f2
+    scrReturn(1);
 
-        // MLX90614
-        case 15:
-            qtpy_measure_data(dev, 3, values); // aM3! : object temperature, ambient temperature
-            res->val[0] = 211;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 16:
-            res->val[0] = round(values[0] * 100);
-            res->unit = UNIT_TEMP_C;
-            res->scale = -2;
-            break;
-        case 17:
-            res->val[0] = round(values[1] * 100);
-            res->unit = UNIT_TEMP_C;
-            res->scale = -2;
-            break;
+    res->val[0] = (uint16_t) values[2]; // f3
+    scrReturn(1);
 
-        // SHT31
-        case 18:
-            qtpy_measure_data(dev, 4, values); // aM4! : temperature, humidity
-            res->val[0] = 219;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 19:
-            res->val[0] = round(values[0] * 100);
-            res->unit = UNIT_TEMP_C;
-            res->scale = -2;
-            break;
-        case 20:
-            res->val[0] = round(values[1] * 100);
-            res->unit = UNIT_PERCENT;
-            res->scale = -2;
-            break;
+    res->val[0] = (uint16_t) values[3]; // f4
+    scrReturn(1);
 
-        // TMP1XX
-        case 21:
-            qtpy_measure_data(dev, 5, values); // aM5! : temperature
-            res->val[0] = 212;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 22:
-            res->val[0] = round(values[0] * 100);
-            res->unit = UNIT_TEMP_C;
-            res->scale = -2;
-            break;
+    res->val[0] = (uint16_t) values[4]; // f5
+    scrReturn(1);
 
-        // VCNL4040
-        case 23:
-            qtpy_measure_data(dev, 6, values); // aM6! : prox, lux, white
-            res->val[0] = 222;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 24:
-            res->val[0] = (uint16_t) values[0]; // prox
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
-            break;
-        case 25:
-            res->val[0] = (uint16_t) values[1]; // lux
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
-            break;
-        case 26:
-            res->val[0] = (uint16_t) values[2]; // white
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
-            break;
+    res->val[0] = (uint16_t) values[5]; // f6
+    scrReturn(1);
 
-        // VEML7700
-        case 27:
-            qtpy_measure_data(dev, 7, values); // aM7! : lux, white, als
-            res->val[0] = 223;
-            res->unit = UNIT_NONE;
-            res->scale = 0;
-            break;
-        case 28:
-            res->val[0] = round(values[0] * 100); // lux
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = -2;
-            break;
-        case 29:
-            res->val[0] = round(values[1] * 100); // white
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = -2;
-            break;
-        case 30:
-            res->val[0] = (uint16_t) values[2]; // als
-            res->unit = UNIT_UNDEF; // XXX
-            res->scale = 0;
-            break;
+    res->val[0] = (uint16_t) values[6]; // f7
+    scrReturn(1);
 
-        // VL53L1X TODO
-//      case 31:
-//          qtpy_measure_data(dev, 8, values); // aM8! : n, distance, ..., distance
-//          res->val[0] = 213;
-//          res->unit = UNIT_NONE;
-//          res->scale = 0;
-//          break;
+    res->val[0] = (uint16_t) values[7]; // f8
+    scrReturn(1);
 
-        default:
-            state = 0;
-            qtpy_end(dev);
-            return 0;
+    res->val[0] = (uint16_t) values[8]; // clear
+    scrReturn(1);
+
+    res->val[0] = (uint16_t) values[9]; // nir
+    scrReturn(1);
+
+    // BME280
+    qtpy_measure_data(dev, 1, values); // aM1! : temp, humidity, pressure
+    res->val[0] = 210;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = round(values[0] * 100);
+    res->unit = UNIT_TEMP_C;
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = round(values[1] * 100);
+    res->unit = UNIT_PERCENT;
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = round(values[2]);
+    res->unit = UNIT_PA;
+    res->scale = 0;
+    scrReturn(1);
+
+    // ICM20X TODO Doesn't work in the lagopus shield
+//  qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
+//  res->val[0] = 221;
+//  res->unit = UNIT_NONE;
+//  res->scale = 0;
+//  scrReturn(1);
+
+    // MLX90614
+    qtpy_measure_data(dev, 3, values); // aM3! : object temperature, ambient temperature
+    res->val[0] = 211;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = round(values[0] * 100);
+    res->unit = UNIT_TEMP_C;
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = round(values[1] * 100);
+    res->unit = UNIT_TEMP_C;
+    res->scale = -2;
+    scrReturn(1);
+
+    // SHT31
+    qtpy_measure_data(dev, 4, values); // aM4! : temperature, humidity
+    res->val[0] = 219;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = round(values[0] * 100);
+    res->unit = UNIT_TEMP_C;
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = round(values[1] * 100);
+    res->unit = UNIT_PERCENT;
+    res->scale = -2;
+    scrReturn(1);
+
+    // TMP1XX
+    qtpy_measure_data(dev, 5, values); // aM5! : temperature
+    res->val[0] = 212;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = round(values[0] * 100);
+    res->unit = UNIT_TEMP_C;
+    res->scale = -2;
+    scrReturn(1);
+
+    // VCNL4040
+    qtpy_measure_data(dev, 6, values); // aM6! : prox, lux, white
+    res->val[0] = 222;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = (uint16_t) values[0]; // prox
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = (uint16_t) values[1]; // lux
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = (uint16_t) values[2]; // white
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = 0;
+    scrReturn(1);
+
+    // VEML7700
+    qtpy_measure_data(dev, 7, values); // aM7! : lux, white, als
+    res->val[0] = 223;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    res->val[0] = round(values[0] * 100); // lux
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = round(values[1] * 100); // white
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = -2;
+    scrReturn(1);
+
+    res->val[0] = (uint16_t) values[2]; // als
+    res->unit = UNIT_UNDEF; // XXX
+    res->scale = 0;
+    scrReturn(1);
+
+    // VL53L1X
+    n = qtpy_measure_data(dev, 8, values); // aM8! : n, distance, ..., distance
+    res->val[0] = 213;
+    res->unit = UNIT_NONE;
+    res->scale = 0;
+    scrReturn(1);
+
+    for (i = 0; i < n; i++) {
+        res->val[0] = (unsigned int) values[i];
+        res->unit = UNIT_UNDEF;
+        res->scale = 0;
+        scrReturn(1);
     }
 
-    state++;
-    return 1; // Continue
+    qtpy_end(dev);
+
+    scrFinish(0);
 }
 
 static sensor_t sensor_qtpy = {

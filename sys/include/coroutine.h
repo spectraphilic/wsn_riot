@@ -123,6 +123,11 @@
  * $Id$
  */
 
+ /*
+  * Update (by J. David Ibáñez). Fix static coroutines so they can be called
+  * more than once: reset state on finish.
+  */
+
 #ifndef COROUTINE_H
 #define COROUTINE_H
 
@@ -133,8 +138,8 @@
  */
 
 #define scrBegin         static int scrLine = 0; switch(scrLine) { case 0:;
-#define scrFinish(z)     } return (z)
-#define scrFinishV       } return
+#define scrFinish(z)     } scrLine = 0; return (z)
+#define scrFinishV       } scrLine = 0; return
 
 #define scrReturn(z)     \
         do {\
