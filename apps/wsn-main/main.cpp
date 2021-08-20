@@ -57,6 +57,7 @@ static int send(const uint8_t *data, size_t size)
     }
 
     // Data
+    printf("gnrc_pktbuf_add(...) size = %d\n", size);
     pkt = gnrc_pktbuf_add(NULL, data, size, GNRC_NETTYPE_UNDEF);
     if (pkt == NULL) {
         LOG_ERROR("unable to copy data to packet buffer\n");
@@ -202,7 +203,7 @@ static void connect_loop(void)
 
 int main(void)
 {
-    uint8_t buffer[200];
+    uint8_t buffer[150];
     nanocbor_encoder_t enc;
     phydat_t res;
 

@@ -278,8 +278,10 @@ static int sensor_qtpy_read(const void *ptr, phydat_t *res)
     scrReturn(1);
     fill_data(res, n, UNIT_NONE, 0);
     scrReturn(1);
-    for (i = 0; i < n; i++) {
-        fill_data(res, (unsigned int) values[i], UNIT_UNDEF, 0);
+    fill_data(res, (unsigned int) values[0], UNIT_UNDEF, 0);
+    scrReturn(1);
+    for (i = 1; i < n; i++) {
+        fill_data(res, (unsigned int) values[i] - (unsigned int) values[i-1], UNIT_UNDEF, 0);
         scrReturn(1);
     }
 
