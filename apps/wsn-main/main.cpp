@@ -202,7 +202,7 @@ static void connect_loop(void)
 
 int main(void)
 {
-    uint8_t buffer[128];
+    uint8_t buffer[200];
     nanocbor_encoder_t enc;
     phydat_t res;
 

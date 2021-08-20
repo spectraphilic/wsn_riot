@@ -182,7 +182,15 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
 
 qtpy_t qtpy_dev;
 
-static int sensor_qtpy_read(const void *ptr, phydat_t *res) {
+static void fill_data(phydat_t *res, int16_t val, uint8_t unit, int8_t scale)
+{
+    res->val[0] = val;
+    res->unit = unit;
+    res->scale = scale;
+}
+
+static int sensor_qtpy_read(const void *ptr, phydat_t *res)
+{
     static float values[20];
     static int n = 0;
     static int i;
@@ -194,173 +202,84 @@ static int sensor_qtpy_read(const void *ptr, phydat_t *res) {
     // AS7341
     qtpy_begin(dev);
     qtpy_measure_data(dev, 0, values); // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
-    res->val[0] = 220;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 220, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = (uint16_t) values[0]; // f1
-    res->unit = UNIT_UNDEF;
-    res->scale = 0;
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[1]; // f2
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[2]; // f3
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[3]; // f4
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[4]; // f5
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[5]; // f6
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[6]; // f7
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[7]; // f8
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[8]; // clear
-    scrReturn(1);
-
-    res->val[0] = (uint16_t) values[9]; // nir
-    scrReturn(1);
+    for (i = 0; i < 10; i++) {
+        fill_data(res, (uint16_t) values[i], UNIT_UNDEF, 0); // f1
+        scrReturn(1);
+    }
 
     // BME280
     qtpy_measure_data(dev, 1, values); // aM1! : temp, humidity, pressure
-    res->val[0] = 210;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 210, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = round(values[0] * 100);
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
+    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
     scrReturn(1);
-
-    res->val[0] = round(values[1] * 100);
-    res->unit = UNIT_PERCENT;
-    res->scale = -2;
+    fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
     scrReturn(1);
-
-    res->val[0] = round(values[2]);
-    res->unit = UNIT_PA;
-    res->scale = 0;
+    fill_data(res, round(values[2]), UNIT_PA, 0);
     scrReturn(1);
 
     // ICM20X TODO Doesn't work in the lagopus shield
 //  qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
-//  res->val[0] = 221;
-//  res->unit = UNIT_NONE;
-//  res->scale = 0;
+//  fill_data(res, 221, UNIT_NONE, 0);
 //  scrReturn(1);
 
     // MLX90614
     qtpy_measure_data(dev, 3, values); // aM3! : object temperature, ambient temperature
-    res->val[0] = 211;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 211, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = round(values[0] * 100);
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
+    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
     scrReturn(1);
-
-    res->val[0] = round(values[1] * 100);
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
+    fill_data(res, round(values[1] * 100), UNIT_TEMP_C, -2);
     scrReturn(1);
 
     // SHT31
     qtpy_measure_data(dev, 4, values); // aM4! : temperature, humidity
-    res->val[0] = 219;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 219, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = round(values[0] * 100);
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
+    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
     scrReturn(1);
-
-    res->val[0] = round(values[1] * 100);
-    res->unit = UNIT_PERCENT;
-    res->scale = -2;
+    fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
     scrReturn(1);
 
     // TMP1XX
     qtpy_measure_data(dev, 5, values); // aM5! : temperature
-    res->val[0] = 212;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 212, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = round(values[0] * 100);
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
+    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
     scrReturn(1);
 
     // VCNL4040
     qtpy_measure_data(dev, 6, values); // aM6! : prox, lux, white
-    res->val[0] = 222;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 222, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = (uint16_t) values[0]; // prox
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = 0;
+    fill_data(res, (uint16_t) values[0], UNIT_UNDEF, 0); // prox
     scrReturn(1);
-
-    res->val[0] = (uint16_t) values[1]; // lux
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = 0;
+    fill_data(res, (uint16_t) values[1], UNIT_UNDEF, 0); // lux
     scrReturn(1);
-
-    res->val[0] = (uint16_t) values[2]; // white
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = 0;
+    fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // white
     scrReturn(1);
 
     // VEML7700
     qtpy_measure_data(dev, 7, values); // aM7! : lux, white, als
-    res->val[0] = 223;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 223, UNIT_NONE, 0);
     scrReturn(1);
-
-    res->val[0] = round(values[0] * 100); // lux
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = -2;
+    fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2); // lux
     scrReturn(1);
-
-    res->val[0] = round(values[1] * 100); // white
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = -2;
+    fill_data(res, round(values[1] * 100), UNIT_UNDEF, -2); // white
     scrReturn(1);
-
-    res->val[0] = (uint16_t) values[2]; // als
-    res->unit = UNIT_UNDEF; // XXX
-    res->scale = 0;
+    fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // als
     scrReturn(1);
 
     // VL53L1X
     n = qtpy_measure_data(dev, 8, values); // aM8! : n, distance, ..., distance
-    res->val[0] = 213;
-    res->unit = UNIT_NONE;
-    res->scale = 0;
+    fill_data(res, 213, UNIT_NONE, 0);
     scrReturn(1);
-
+    fill_data(res, n, UNIT_NONE, 0);
+    scrReturn(1);
     for (i = 0; i < n; i++) {
-        res->val[0] = (unsigned int) values[i];
-        res->unit = UNIT_UNDEF;
-        res->scale = 0;
+        fill_data(res, (unsigned int) values[i], UNIT_UNDEF, 0);
         scrReturn(1);
     }
 
