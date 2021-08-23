@@ -9,7 +9,6 @@
 #include <net/gnrc/netif/hdr.h>
 #include <net/gnrc/netreg.h>
 #include <od.h>
-#include <phydat.h>
 #include <timex.h>
 #include <ztimer.h>
 
@@ -31,7 +30,7 @@
     #define NODE_ID ""
 #endif
 
-#define SLEEP 15 // seconds
+#define SLEEP 20 // seconds
 #define RCV_QUEUE_SIZE 8
 
 #ifndef BASETIME
@@ -205,7 +204,7 @@ int main(void)
 {
     uint8_t buffer[150];
     nanocbor_encoder_t enc;
-    phydat_t res;
+    phyval_t res;
 
     LED0_ON;
     //test_utils_interactive_sync();
@@ -244,14 +243,12 @@ int main(void)
         nanocbor_fmt_uint(&enc, 3);
         nanocbor_fmt_uint(&enc, loop);
 
-
         sensor_t *sensor = sensors_list;
         while (sensor) {
             printf("%s:\n", sensor->name);
             while (sensor->read(sensor->dev, &res)) {
-                int value = res.val[0];
-                printf("%6d unit=%-2s scale=%d\n", value, phydat_unit_to_str(res.unit), res.scale);
-                nanocbor_fmt_int(&enc, value);
+                printf("%6ld unit=%-2s scale=%d\n", res.value, phydat_unit_to_str(res.unit), res.scale);
+                nanocbor_fmt_int(&enc, res.value);
             }
             sensor = sensor->next;
         }

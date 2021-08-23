@@ -18,13 +18,12 @@
  * @}
  */
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include <debug.h>
 #include <ztimer.h>
 
 #include <math.h>
 #include <log.h>
-#include <phydat.h>
 #include "coroutine.h"
 #include "sensors.h"
 
@@ -182,14 +181,14 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
 
 qtpy_t qtpy_dev;
 
-static void fill_data(phydat_t *res, int16_t val, uint8_t unit, int8_t scale)
+static void fill_data(phyval_t *res, int32_t value, uint8_t unit, int8_t scale)
 {
-    res->val[0] = val;
+    res->value = value;
     res->unit = unit;
     res->scale = scale;
 }
 
-static int sensor_qtpy_read(const void *ptr, phydat_t *res)
+static int sensor_qtpy_read(const void *ptr, phyval_t *res)
 {
     static float values[20];
     static int n = 0;
@@ -217,13 +216,17 @@ static int sensor_qtpy_read(const void *ptr, phydat_t *res)
     scrReturn(1);
     fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
     scrReturn(1);
-    fill_data(res, round(values[2]), UNIT_PA, 0);
+    fill_data(res, round(values[2] * 100), UNIT_PA, 0); // BME280 sends hPa, x100 to transofrm to Pa
     scrReturn(1);
 
-    // ICM20X TODO Doesn't work in the lagopus shield
-//  qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
-//  fill_data(res, 221, UNIT_NONE, 0);
-//  scrReturn(1);
+    // ICM20X XXX Doesn't work in the lagopus shield
+    qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
+    fill_data(res, 221, UNIT_NONE, 0);
+    scrReturn(1);
+    for (i = 0; i < 10; i++) {
+        fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2);
+        scrReturn(1);
+    }
 
     // MLX90614
     qtpy_measure_data(dev, 3, values); // aM3! : object temperature, ambient temperature
