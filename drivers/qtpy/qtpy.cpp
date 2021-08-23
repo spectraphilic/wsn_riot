@@ -171,7 +171,7 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
             return n;
     }
 
-    return -1; // XXX
+    return -1;
 }
 
 
@@ -200,92 +200,102 @@ static int sensor_qtpy_read(const void *ptr, phyval_t *res)
 
     // AS7341
     qtpy_begin(dev);
-    qtpy_measure_data(dev, 0, values); // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
-    fill_data(res, 220, UNIT_NONE, 0);
-    scrReturn(1);
-    for (i = 0; i < 10; i++) {
-        fill_data(res, (uint16_t) values[i], UNIT_UNDEF, 0); // f1
+    if (qtpy_measure_data(dev, 0, values) > 0) { // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
+        fill_data(res, 220, UNIT_NONE, 0);
         scrReturn(1);
+        for (i = 0; i < 10; i++) {
+            fill_data(res, (uint16_t) values[i], UNIT_UNDEF, 0); // f1
+            scrReturn(1);
+        }
     }
 
     // BME280
-    qtpy_measure_data(dev, 1, values); // aM1! : temp, humidity, pressure
-    fill_data(res, 210, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
-    scrReturn(1);
-    fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
-    scrReturn(1);
-    fill_data(res, round(values[2] * 100), UNIT_PA, 0); // BME280 sends hPa, x100 to transofrm to Pa
-    scrReturn(1);
-
-    // ICM20X XXX Doesn't work in the lagopus shield
-    qtpy_measure_data(dev, 2, values); // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
-    fill_data(res, 221, UNIT_NONE, 0);
-    scrReturn(1);
-    for (i = 0; i < 10; i++) {
-        fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2);
+    if (qtpy_measure_data(dev, 1, values) > 0) { // aM1! : temp, humidity, pressure
+        fill_data(res, 210, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
+        scrReturn(1);
+        fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
+        scrReturn(1);
+        fill_data(res, round(values[2] * 100), UNIT_PA, 0); // BME280 sends hPa, x100 to transofrm to Pa
         scrReturn(1);
     }
 
+    // ICM20X Doesn't work in the lagopus shield
+//  if (qtpy_measure_data(dev, 2, values) > 0) { // aM2! : temp, acc(xyz), mag(xyz), gyro(xyz)
+//      fill_data(res, 221, UNIT_NONE, 0);
+//      scrReturn(1);
+//      for (i = 0; i < 10; i++) {
+//          fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2);
+//          scrReturn(1);
+//      }
+//  }
+
     // MLX90614
-    qtpy_measure_data(dev, 3, values); // aM3! : object temperature, ambient temperature
-    fill_data(res, 211, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
-    scrReturn(1);
-    fill_data(res, round(values[1] * 100), UNIT_TEMP_C, -2);
-    scrReturn(1);
+    if (qtpy_measure_data(dev, 3, values) > 0) { // aM3! : object temperature, ambient temperature
+        fill_data(res, 211, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
+        scrReturn(1);
+        fill_data(res, round(values[1] * 100), UNIT_TEMP_C, -2);
+        scrReturn(1);
+    }
 
     // SHT31
-    qtpy_measure_data(dev, 4, values); // aM4! : temperature, humidity
-    fill_data(res, 219, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
-    scrReturn(1);
-    fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
-    scrReturn(1);
+    if (qtpy_measure_data(dev, 4, values) > 0) { // aM4! : temperature, humidity
+        fill_data(res, 219, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
+        scrReturn(1);
+        fill_data(res, round(values[1] * 100), UNIT_PERCENT, -2);
+        scrReturn(1);
+    }
 
     // TMP1XX
-    qtpy_measure_data(dev, 5, values); // aM5! : temperature
-    fill_data(res, 212, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
-    scrReturn(1);
+    if (qtpy_measure_data(dev, 5, values) > 0) { // aM5! : temperature
+        fill_data(res, 212, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, round(values[0] * 100), UNIT_TEMP_C, -2);
+        scrReturn(1);
+    }
 
     // VCNL4040
-    qtpy_measure_data(dev, 6, values); // aM6! : prox, lux, white
-    fill_data(res, 222, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, (uint16_t) values[0], UNIT_UNDEF, 0); // prox
-    scrReturn(1);
-    fill_data(res, (uint16_t) values[1], UNIT_UNDEF, 0); // lux
-    scrReturn(1);
-    fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // white
-    scrReturn(1);
+    if (qtpy_measure_data(dev, 6, values) > 0) { // aM6! : prox, lux, white
+        fill_data(res, 222, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, (uint16_t) values[0], UNIT_UNDEF, 0); // prox
+        scrReturn(1);
+        fill_data(res, (uint16_t) values[1], UNIT_UNDEF, 0); // lux
+        scrReturn(1);
+        fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // white
+        scrReturn(1);
+    }
 
     // VEML7700
-    qtpy_measure_data(dev, 7, values); // aM7! : lux, white, als
-    fill_data(res, 223, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2); // lux
-    scrReturn(1);
-    fill_data(res, round(values[1] * 100), UNIT_UNDEF, -2); // white
-    scrReturn(1);
-    fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // als
-    scrReturn(1);
+    if (qtpy_measure_data(dev, 7, values) > 0) { // aM7! : lux, white, als
+        fill_data(res, 223, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, round(values[0] * 100), UNIT_UNDEF, -2); // lux
+        scrReturn(1);
+        fill_data(res, round(values[1] * 100), UNIT_UNDEF, -2); // white
+        scrReturn(1);
+        fill_data(res, (uint16_t) values[2], UNIT_UNDEF, 0); // als
+        scrReturn(1);
+    }
 
     // VL53L1X
     n = qtpy_measure_data(dev, 8, values); // aM8! : n, distance, ..., distance
-    fill_data(res, 213, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, n, UNIT_NONE, 0);
-    scrReturn(1);
-    fill_data(res, (unsigned int) values[0], UNIT_UNDEF, 0);
-    scrReturn(1);
-    for (i = 1; i < n; i++) {
-        fill_data(res, (unsigned int) values[i] - (unsigned int) values[i-1], UNIT_UNDEF, 0);
+    if (n > 0) {
+        fill_data(res, 213, UNIT_NONE, 0);
         scrReturn(1);
+        fill_data(res, n, UNIT_NONE, 0);
+        scrReturn(1);
+        fill_data(res, (unsigned int) values[0], UNIT_UNDEF, 0);
+        scrReturn(1);
+        for (i = 1; i < n; i++) {
+            fill_data(res, (unsigned int) values[i] - (unsigned int) values[i-1], UNIT_UNDEF, 0);
+            scrReturn(1);
+        }
     }
 
     qtpy_end(dev);
