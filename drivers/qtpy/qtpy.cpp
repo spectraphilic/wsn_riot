@@ -198,13 +198,15 @@ static int sensor_qtpy_read(const void *ptr, phyval_t *res)
 
     scrBegin;
 
+    // TODO Replace UNIT_UNDEF by a proper unit, if it exists in phydat.h
+
     // AS7341
     qtpy_begin(dev);
     if (qtpy_measure_data(dev, 0, values) > 0) { // aM! : f1, f2, f3, f4, f5, f6, f7, f8, clear, nir
         fill_data(res, 220, UNIT_NONE, 0);
         scrReturn(1);
         for (i = 0; i < 10; i++) {
-            fill_data(res, (uint16_t) values[i], UNIT_UNDEF, 0); // f1
+            fill_data(res, (uint16_t) values[i], UNIT_UNDEF, 0);
             scrReturn(1);
         }
     }
