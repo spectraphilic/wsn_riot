@@ -37,7 +37,7 @@ void wsn_boot(void)
     // Storage
     if (IS_USED(MODULE_FATFS_VFS)) {
         if (wsn_mount() == 0) {
-            if (IS_USED(MODULE_SETTNGS)) {
+            if (IS_USED(MODULE_SETTINGS)) {
                 if (settings_load() == 0)
                     LOG_INFO("Settings loaded\n");
             } else {

@@ -24,8 +24,9 @@
  * @note This is copy & paste from RIOT/sys/shell/commands/sc_vfs.c because in
  *       RIOT this function is defined as static, so we cannot use it.
  *
- * @note Maybe we should use strerror instead, which is standard, but it's not
- *       available in AVR libc.
+ * @note TODO We should use strerror instead, which is standard, but for some
+ *       reason it seems to return an empty string, at least with the
+ *       remote-revb.
  *
  * @param[in]   err     the error number, see errno.h from libc
  * @param[out]  buf     pointer to a buffer where the error string will be

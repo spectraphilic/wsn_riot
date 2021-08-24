@@ -53,6 +53,7 @@ int wsn_mount(void)
         char err[16];
         errno_string(error, err, sizeof(err));
         LOG_ERROR("Error mounting SD card: %s\n", err);
+        //LOG_ERROR("Error mounting SD card: %s\n", strerror(error));
         return error;
     }
 

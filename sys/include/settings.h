@@ -12,6 +12,10 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Defines the Wide Area Network used
  */
@@ -107,6 +111,10 @@ extern struct Settings settings;
  * @brief Number of configuration variables
  */
 extern const size_t settings_len;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /** @} */

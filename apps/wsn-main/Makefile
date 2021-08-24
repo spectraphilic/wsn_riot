@@ -6,12 +6,17 @@ USEMODULE += phydat
 USEMODULE += ztimer_msec
 USEPKG += nanocbor
 
-# Drivers
-#USEMODULE += bme280_i2c
-
 # Project modules
 USEMODULE += wsn
 
-CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
+ifdef BASETIME
+    CFLAGS += -DBASETIME=$(BASETIME)
+endif
+
+ifdef NODE_ID
+    CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
+else
+    $(error NODE_ID is not set)
+endif
 
 include $(RIOTBASE)/Makefile.include
