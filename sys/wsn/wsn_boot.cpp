@@ -40,7 +40,8 @@ void wsn_boot(void)
     if (IS_USED(MODULE_FATFS_VFS)) {
         if (wsn_mount() == 0) {
             if (IS_USED(MODULE_SETTINGS)) {
-                if (settings_load() == 0)
+                int error = settings_load();
+                if (error == 0)
                     LOG_INFO("Settings loaded\n");
             } else {
                 LOG_WARNING("Missing settings module\n");

@@ -9,6 +9,15 @@
 #include <triage.h>
 
 
+typedef struct {
+    uint8_t year;
+    uint8_t month;
+    uint8_t day;
+    uint32_t offset;
+    uint8_t size;
+} item_t;
+
+
 static int get_data_filename(char *filename, int year, int month, int day)
 {
     return sprintf(filename, "data/%d%d%d.bin", year, month, day);
@@ -36,12 +45,32 @@ int wsn_save_frame(time_t time, const void *data, uint8_t size)
     vfs_close(fd);
 
     // Add to queue
-    uint8_t item[8] = {year, month, day};
-    *(uint32_t *)(item + 3) = offset;
-    item[7] = size;
-    queue_push(item);
+    item_t item = {year, month, day, offset, size};
+    queue_push(&item);
 
     return 0;
 }
 
+int wsn_load_frame(uint8_t *data, uint8_t *size)
+{
+    char filename[30];
+    item_t item;
 
+    uint32_t n = queue_peek(&item);
+    if (n == 0) {
+        return 0;
+    }
+
+    get_data_filename(filename, item.year, item.month, item.day);
+    int fd = vfs_open(filename, O_RDONLY, 0);
+    vfs_lseek(fd, item.offset, SEEK_SET);
+    *size = vfs_read(fd, data, item.size);
+    vfs_close(fd);
+
+    return n;
+}
+
+int wsn_drop_frame(void)
+{
+    return queue_drop();
+}

@@ -102,7 +102,7 @@ int settings_load(void)
     if (fd < 0) {
         char err[16];
         errno_string(errno, err, sizeof(err));
-        LOG_ERROR("Failed to open %s (%s)\n", filename, err);
+        LOG_WARNING("Failed to open %s (%s)\n", filename, err);
         return -1;
     }
 

@@ -13,9 +13,10 @@
 #include <ztimer.h>
 
 // Project
-#include "sensors.h"
-#include "triage.h"
-#include "wsn.h"
+#include <sensors.h>
+#include <triage.h>
+#include <wsn.h>
+#include "config.h"
 
 
 #ifdef MODULE_ZTIMER_MSEC
@@ -29,9 +30,6 @@
 #ifndef NODE_ID
     #define NODE_ID ""
 #endif
-
-#define SLEEP 20 // seconds
-#define RCV_QUEUE_SIZE 8
 
 #ifndef BASETIME
     #define BASETIME 0
@@ -92,6 +90,27 @@ static int send(const uint8_t *data, size_t size)
     return 0;
 }
 
+
+static void send_frames()
+{
+    uint8_t buffer[150];
+    uint8_t len;
+    int error;
+
+    while (1) {
+        int n = wsn_load_frame(buffer, &len);
+        if (n <= 0)
+            break;
+
+        error = send(buffer, len);
+        if (error < 0)
+            break;
+
+        n = wsn_drop_frame();
+        if (n <= 0)
+            break;
+    }
+}
 
 
 static void _dump_snip(gnrc_pktsnip_t *pkt)
@@ -203,7 +222,7 @@ static void connect_loop(void)
     while (base_time == 0) {
         send((uint8_t*)msg, size);
         LOG_INFO("%s\n", msg);
-        ztimer_sleep(ZTIMER, SLEEP * TICKS_PER_SEC);
+        ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC); // 20s
     }
 }
 
@@ -219,7 +238,7 @@ int main(void)
     // Boot
     wsn_boot();
     LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
-    LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", SLEEP);
+    LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", LOOP_SECONDS);
     LOG_INFO("basetime=%d\n", base_time);
 
     // Connect to gateway
@@ -277,12 +296,14 @@ int main(void)
         }
 
         // Send
-//      send(buffer, len);
+        if ((loop + 1) % LOOPS_SEND == 0) {
+            send_frames();
+        }
 
         // Done
         LOG_INFO("Loop=%u DONE\n", loop);
         LED0_OFF;
-        ztimer_sleep(ZTIMER, SLEEP * TICKS_PER_SEC);
+        ztimer_sleep(ZTIMER, LOOP_SECONDS * TICKS_PER_SEC);
         LED0_ON;
     }
 

@@ -45,8 +45,17 @@ int wsn_network_init(void);
 /**
  * @brief Saves a frame into the filesystem
  */
-int wsn_save_frame(time_t time, uint8_t *data, uint16_t length);
+int wsn_save_frame(time_t time, uint8_t *data, uint8_t length);
 
+/**
+ * @brief Loads a frame from the filesystem
+ */
+int wsn_load_frame(uint8_t *data, uint8_t *size);
+
+/**
+ * @brief Drop the first frame from the filesystem
+ */
+int wsn_drop_frame(void);
 
 #ifdef __cplusplus
 }

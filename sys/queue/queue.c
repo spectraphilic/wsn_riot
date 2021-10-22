@@ -7,10 +7,20 @@
 #include "queue.h"
 
 
+const uint32_t headsize = 4;
+
 static queue_t queue = {
     .path = "/QUEUE.BIN",
     .itemsize = 8
 };
+
+
+static int write_header(int fd, queue_header_t header)
+{
+    vfs_lseek(fd, 0, SEEK_SET);
+    ssize_t size = vfs_write(fd, &header, sizeof(header));
+    return (size < 0) ? size : 0;
+}
 
 int queue_make(void)
 {
@@ -23,12 +33,15 @@ int queue_make(void)
         return fd;
     }
 
+    // Header
+    queue_header_t header;
+    header.offset = sizeof(header); // the first element starts just after the header
+
     // Write header
-    uint32_t first = 0;
-    ssize_t n = vfs_write(fd, &first, 4);
-    if (n < 0) {
+    int error = write_header(fd, header);
+    if (error) {
         vfs_close(fd);
-        return n;
+        return error;
     }
 
     // Close
@@ -37,9 +50,52 @@ int queue_make(void)
 
 int queue_push(void *item)
 {
-    int fd = vfs_open(queue.path, O_CREAT | O_WRONLY | O_APPEND | O_SYNC, 0);
+    int fd = vfs_open(queue.path, O_WRONLY | O_APPEND | O_SYNC, 0);
     vfs_write(fd, item, queue.itemsize);
     vfs_close(fd);
 
     return 0;
+}
+
+int queue_peek(void *item)
+{
+    queue_header_t header;
+
+    int fd = vfs_open(queue.path, O_RDONLY, 0);
+    vfs_read(fd, &header, sizeof(header));                    // Read header
+    off_t filesize = vfs_lseek(fd, 0, SEEK_END);              // File size
+    uint32_t n = (filesize - header.offset) / queue.itemsize; // Number of elements
+
+    if (n > 0) {
+        vfs_lseek(fd, header.offset, SEEK_SET);
+        vfs_read(fd, item, queue.itemsize);
+    }
+
+    vfs_close(fd);
+
+    return n;
+}
+
+int queue_drop(void)
+{
+    queue_header_t header;
+
+    int fd = vfs_open(queue.path, O_RDONLY, 0);
+    vfs_read(fd, &header, sizeof(header));                    // Read header
+    off_t filesize = vfs_lseek(fd, 0, SEEK_END);              // File size
+    uint32_t n = (filesize - header.offset) / queue.itemsize; // Number of elements
+
+    if (n == 0) {
+        vfs_close(fd);
+        return -1;
+    }
+
+    header.offset += queue.itemsize;
+    int error = write_header(fd, header);
+    if (error) {
+        return error;
+    }
+
+    vfs_close(fd);
+    return n - 1;
 }
