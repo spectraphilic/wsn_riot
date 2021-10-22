@@ -64,3 +64,9 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 
     return n;
 }
+
+
+off_t tell(int fd)
+{
+    return lseek(fd, 0, SEEK_CUR);
+}

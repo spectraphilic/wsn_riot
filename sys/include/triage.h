@@ -100,6 +100,15 @@ char* dgets(int fd, char *str, int num);
 
 ssize_t pread(int fd, void *buf, size_t count, off_t offset);
 
+/**
+ * @brief Returns the current position of the given file descriptor
+ *
+ * @note Alike to ftell but for file descriptors, this could be in POSIX but
+ * it's not.
+ */
+
+off_t tell(int fd);
+
 
 /**
  * @brief Press s to test, r to print it is ready

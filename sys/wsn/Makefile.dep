@@ -11,5 +11,6 @@ USEMODULE += gnrc_netdev_default
 # Project modules
 USEMODULE += log_file
 USEMODULE += qtpy
+USEMODULE += queue
 USEMODULE += settings
 USEMODULE += triage

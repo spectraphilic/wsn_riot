@@ -1,10 +1,12 @@
 // RIOT
 #include <log.h>
 #include <periph/cpuid.h>
+#include <vfs.h>
 
 // Project
 #include "settings.h"
 #include "qtpy.h"
+#include "queue.h"
 #include "wsn.h"
 
 
@@ -43,6 +45,9 @@ void wsn_boot(void)
             } else {
                 LOG_WARNING("Missing settings module\n");
             }
+
+            vfs_mkdir("/data", 0);
+            queue_make();
         }
     } else {
         LOG_WARNING("Missing VFS module\n");

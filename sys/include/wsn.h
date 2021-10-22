@@ -42,6 +42,11 @@ int wsn_mount(void);
  */
 int wsn_network_init(void);
 
+/**
+ * @brief Saves a frame into the filesystem
+ */
+int wsn_save_frame(time_t time, uint8_t *data, uint16_t length);
+
 
 #ifdef __cplusplus
 }

@@ -37,7 +37,15 @@
     #define BASETIME 0
 #endif
 
-static unsigned int base_time = BASETIME;
+
+static unsigned int base_time = BASETIME; // Seconds
+
+
+static time_t get_time()
+{
+    ztimer_now_t now = ztimer_now(ZTIMER);
+    return base_time + now / TICKS_PER_SEC;
+}
 
 
 static int send(const uint8_t *data, size_t size)
@@ -199,7 +207,6 @@ static void connect_loop(void)
     }
 }
 
-
 int main(void)
 {
     uint8_t buffer[150];
@@ -221,15 +228,15 @@ int main(void)
     // Main loop
     for (unsigned int loop=0; ; loop++) {
         LOG_INFO("Loop=%u\n", loop);
+        time_t time = get_time();
 
         // Read sensors and fill buffer
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
         nanocbor_fmt_array_indefinite(&enc);
 
         // Timestamp
-        ztimer_now_t now = ztimer_now(ZTIMER);
         nanocbor_fmt_uint(&enc, 0);
-        nanocbor_fmt_uint(&enc, base_time + now / TICKS_PER_SEC);
+        nanocbor_fmt_uint(&enc, time);
 
         // Serial number
         nanocbor_fmt_uint(&enc, 1);
@@ -254,17 +261,23 @@ int main(void)
         }
 
         nanocbor_fmt_end_indefinite(&enc);
-        size_t required = nanocbor_encoded_len(&enc);
-        assert(required);
+        size_t len = nanocbor_encoded_len(&enc);
+        assert(len);
 
         printf("CBOR = ");
-        for (size_t k=0; k < required; k++) {
+        for (size_t k=0; k < len; k++) {
             printf("%02x", buffer[k]);
         }
         printf("\n");
 
+        // Save the frame
+        int error = wsn_save_frame(time, buffer, len);
+        if (error < 0) {
+            LOG_ERROR("Failed to save frame, error=%d\n", error);
+        }
+
         // Send
-        send(buffer, required);
+//      send(buffer, len);
 
         // Done
         LOG_INFO("Loop=%u DONE\n", loop);
