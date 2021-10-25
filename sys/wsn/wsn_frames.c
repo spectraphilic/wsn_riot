@@ -1,10 +1,14 @@
+// Standard
 #include <stdio.h>
 #include <time.h>
 
 #include <fcntl.h>
 
+// Riot
+#include <log.h>
 #include <vfs.h>
 
+// Project
 #include <queue.h>
 #include <triage.h>
 
@@ -20,7 +24,7 @@ typedef struct {
 
 static int get_data_filename(char *filename, int year, int month, int day)
 {
-    return sprintf(filename, "data/%d%d%d.bin", year, month, day);
+    return sprintf(filename, "/data/%d%d%d.bin", year, month, day);
 }
 
 
@@ -38,6 +42,7 @@ int wsn_save_frame(time_t time, const void *data, uint8_t size)
     // Save frame
     int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_APPEND | O_SYNC, 0);
     if (fd < 0) {
+        LOG_ERROR("Failed to open %s (%s)\n", filename, errno_string(fd));
         return fd;
     }
     off_t offset = tell(fd);

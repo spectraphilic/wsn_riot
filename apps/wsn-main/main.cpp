@@ -95,21 +95,26 @@ static void send_frames()
 {
     uint8_t buffer[150];
     uint8_t len;
-    int error;
+    int success = 0;
 
     while (1) {
+        // Load frame
         int n = wsn_load_frame(buffer, &len);
         if (n <= 0)
             break;
 
-        error = send(buffer, len);
+        // Send frame
+        int error = send(buffer, len);
         if (error < 0)
             break;
+        success++;
 
+        // Drop frame
         n = wsn_drop_frame();
         if (n <= 0)
             break;
     }
+    LOG_INFO("%d frames sent\n", success);
 }
 
 
@@ -290,10 +295,7 @@ int main(void)
         printf("\n");
 
         // Save the frame
-        int error = wsn_save_frame(time, buffer, len);
-        if (error < 0) {
-            LOG_ERROR("Failed to save frame (%s)\n", errno_string(error));
-        }
+        wsn_save_frame(time, buffer, len);
 
         // Send
         if ((loop + 1) % LOOPS_SEND == 0) {

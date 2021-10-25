@@ -1,10 +1,13 @@
 #include <errno.h>
 #include <fcntl.h>
 
+// Riot
 #include <log.h>
 #include <vfs.h>
 
+// Project
 #include "queue.h"
+#include "triage.h"
 
 
 const uint32_t headsize = 4;
@@ -19,7 +22,11 @@ static int write_header(int fd, queue_header_t header)
 {
     vfs_lseek(fd, 0, SEEK_SET);
     ssize_t size = vfs_write(fd, &header, sizeof(header));
-    return (size < 0) ? size : 0;
+    if (size < 0) {
+        LOG_ERROR("Failed to write header (%s)\n", errno_string(size));
+        return -1;
+    }
+    return 0;
 }
 
 int queue_make(void)
@@ -30,6 +37,7 @@ int queue_make(void)
         return 0;
     }
     if (fd < 0) {
+        LOG_ERROR("Failed to open %s (%s)\n", queue.path, errno_string(fd));
         return fd;
     }
 
@@ -80,19 +88,21 @@ int queue_drop(void)
 {
     queue_header_t header;
 
-    int fd = vfs_open(queue.path, O_RDONLY, 0);
+    int fd = vfs_open(queue.path, O_RDWR, 0);
     vfs_read(fd, &header, sizeof(header));                    // Read header
     off_t filesize = vfs_lseek(fd, 0, SEEK_END);              // File size
     uint32_t n = (filesize - header.offset) / queue.itemsize; // Number of elements
 
     if (n == 0) {
         vfs_close(fd);
+        LOG_WARNING("Queue is empty\n");
         return -1;
     }
 
     header.offset += queue.itemsize;
     int error = write_header(fd, header);
     if (error) {
+        vfs_close(fd);
         return error;
     }
 
