@@ -15,30 +15,26 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
- * @brief Print short name for the given error number
+ * @brief Return short name for the given error number
  *
  * Where the error number is as defined in errno.h from the C standard
  * library.
  *
- * @note This is copy & paste from RIOT/sys/shell/commands/sc_vfs.c because in
- *       RIOT this function is defined as static, so we cannot use it.
+ * @note TODO We should use strerror instead, which is standard, but it doesn't
+ *       seem to work as defined, at least with the remote-revb.
  *
- * @note TODO We should use strerror instead, which is standard, but for some
- *       reason it seems to return an empty string, at least with the
- *       remote-revb.
+ * @param[in]   errnum  the error number, see errno.h from libc
  *
- * @param[in]   err     the error number, see errno.h from libc
- * @param[out]  buf     pointer to a buffer where the error string will be
- *                      stored
- * @param[in]   buflen  maximum number of bytes to be used in the buffer,
- *                      including the terminating null character
- *
- * @return      >= 0    total number of characters written, not including the
- *                      terminating null character
- * @return      < 0     indicates an error
+ * @return      char*   string with the short name of the error number
+ * @return      unknown for unexpected values of errnum
  */
-int errno_string(int err, char *buf, size_t buflen);
+char* errno_string(int errnum);
+
 
 /**
  * @brief Print formatted string to file descriptor
@@ -115,6 +111,10 @@ off_t tell(int fd);
  *
  */
 void test_utils_interactive_sync(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

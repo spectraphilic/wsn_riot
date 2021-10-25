@@ -77,9 +77,7 @@ int settings_save(void)
 
     int fd = open(filename, O_WRONLY | O_CREAT);
     if (fd < 0) {
-        char err[16];
-        errno_string(errno, err, sizeof(err));
-        LOG_ERROR("Failed to open %s (%s)\n", filename, err);
+        LOG_ERROR("Failed to open %s (%s)\n", filename, errno_string(fd));
         return -1;
     }
 
@@ -100,9 +98,7 @@ int settings_load(void)
 
     int fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        char err[16];
-        errno_string(errno, err, sizeof(err));
-        LOG_WARNING("Failed to open %s (%s)\n", filename, err);
+        LOG_WARNING("Failed to open %s (%s)\n", filename, errno_string(fd));
         return -1;
     }
 

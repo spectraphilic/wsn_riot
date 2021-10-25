@@ -26,9 +26,7 @@ int cmd_cat(int argc, char **argv)
     // Open
     int fd = open(name, O_RDONLY);
     if (fd < 0) {
-        char err[16];
-        errno_string(errno, err, sizeof(err));
-        LOG_ERROR("Failed to open %s (%s)\n", name, err);
+        LOG_ERROR("Failed to open %s (%s)\n", name, errno_string(fd));
         return -1;
     }
 

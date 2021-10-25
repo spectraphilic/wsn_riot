@@ -292,7 +292,7 @@ int main(void)
         // Save the frame
         int error = wsn_save_frame(time, buffer, len);
         if (error < 0) {
-            LOG_ERROR("Failed to save frame, error=%d\n", error);
+            LOG_ERROR("Failed to save frame (%s)\n", errno_string(error));
         }
 
         // Send
