@@ -13,6 +13,8 @@
 #ifndef WSN_H
 #define WSN_H
 
+#include <time.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
