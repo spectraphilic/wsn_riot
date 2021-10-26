@@ -57,6 +57,25 @@ int wsn_load_frame(uint8_t *data, uint8_t *size);
  */
 int wsn_drop_frame(void);
 
+/**
+ * @brief Returns the basetime
+ *
+ * The basetime is an internal variable, useful to calculate the system time.
+ * If the value is zero it means that the system time has not been set yet.
+ */
+time_t wsn_time_basetime(void);
+
+/**
+ * @brief Returns system time
+ */
+time_t wsn_time_get(void);
+
+/**
+ * @brief Sets system time
+ */
+int wsn_time_set(time_t time);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -31,20 +31,6 @@
     #define NODE_ID ""
 #endif
 
-#ifndef BASETIME
-    #define BASETIME 0
-#endif
-
-
-static unsigned int base_time = BASETIME; // Seconds
-
-
-static time_t get_time()
-{
-    ztimer_now_t now = ztimer_now(ZTIMER);
-    return base_time + now / TICKS_PER_SEC;
-}
-
 
 static int send(const uint8_t *data, size_t size)
 {
@@ -134,11 +120,11 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
         case GNRC_NETTYPE_UNDEF:
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
-            n = sscanf((char*)pkt->data, "pong %u", &base_time);
+            // pong
+            unsigned int time;
+            n = sscanf((char*)pkt->data, "pong %u", &time);
             if (n == 1) {
-                ztimer_now_t now = ztimer_now(ZTIMER);
-                base_time -= now / TICKS_PER_SEC;
-                printf("TIME %u\n", base_time);
+                wsn_time_set(time);
             }
             break;
         default:
@@ -171,7 +157,9 @@ static void _dump(gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_release(pkt);
 }
 
-static void *_eventloop(void *arg)
+kernel_pid_t eventloop_pid = KERNEL_PID_UNDEF;
+static char eventloop_stack[THREAD_STACKSIZE_MAIN];
+static void *eventloop(void *arg)
 {
     (void)arg;
     msg_t msg, reply;
@@ -209,22 +197,28 @@ static void *_eventloop(void *arg)
     return NULL;
 }
 
-kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
-static char _stack[THREAD_STACKSIZE_MAIN];
-static void connect_loop(void)
+static void start_eventloop(void)
 {
-    gnrc_pktdump_pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN -1,
-                         THREAD_CREATE_STACKTEST,
-                         _eventloop, NULL, "pktdump");
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(
-        GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+    // Create (and start) eventloop thread
+    eventloop_pid = thread_create(
+        eventloop_stack,
+        sizeof(eventloop_stack),
+        THREAD_PRIORITY_MAIN -1,
+        THREAD_CREATE_STACKTEST,
+        eventloop,
+        NULL,
+        "pktdump"
+    );
 
+    // Register the eventloop to receive events from the network stack
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(
+        GNRC_NETREG_DEMUX_CTX_ALL, eventloop_pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     // Send ping messages to the gateway until it replies
     const char msg[] = "ping";
     const uint8_t size = strlen(msg);
-    while (base_time == 0) {
+    while (wsn_time_basetime() == 0) {
         send((uint8_t*)msg, size);
         LOG_INFO("%s\n", msg);
         ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC); // 20s
@@ -244,15 +238,15 @@ int main(void)
     wsn_boot();
     LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("This program loops forever, sleeping for %ds in every loop.\n", LOOP_SECONDS);
-    LOG_INFO("basetime=%d\n", base_time);
+    LOG_INFO("basetime=%d\n", wsn_time_basetime());
 
     // Connect to gateway
-    connect_loop();
+    start_eventloop();
 
     // Main loop
     for (unsigned int loop=0; ; loop++) {
         LOG_INFO("Loop=%u\n", loop);
-        time_t time = get_time();
+        time_t time = wsn_time_get();
 
         // Read sensors and fill buffer
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));

@@ -7,7 +7,8 @@
 #include "lis3331ldh.h"
 
 
-int cmd_acc(int argc, char **argv) {
+int cmd_acc(int argc, char **argv)
+{
     const i2c_t dev = I2C_DEV(0);
     int error = 0;
 
