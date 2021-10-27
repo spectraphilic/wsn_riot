@@ -6,7 +6,8 @@ USEMODULE += mtd_sdcard
 
 # Networking
 USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_netdev_default
+USEMODULE += gnrc
+USEMODULE += netdev_default
 
 # Project modules
 USEMODULE += log_file
