@@ -68,11 +68,12 @@ static void *task_func(void *arg)
         size_t len = nanocbor_encoded_len(&enc);
         assert(len);
 
-        printf("CBOR = ");
+        // For debugging purposes, print CBOR data
+        char message[150] = "CBOR=";
         for (size_t k=0; k < len; k++) {
-            printf("%02x", buffer[k]);
+            sprintf(message + strlen(message), "%02x", buffer[k]);
         }
-        printf("\n");
+        LOG_INFO(message);
 
         // Save the frame
         wsn_save_frame(time, buffer, len);
