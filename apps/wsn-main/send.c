@@ -25,14 +25,14 @@ int send_data(const uint8_t *data, size_t size)
     printf("gnrc_pktbuf_add(...) size = %d\n", size);
     pkt = gnrc_pktbuf_add(NULL, data, size, GNRC_NETTYPE_UNDEF);
     if (pkt == NULL) {
-        LOG_ERROR("unable to copy data to packet buffer\n");
+        LOG_ERROR("Unable to copy data to packet buffer");
         return -1;
     }
 
     // Header
     hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
     if (hdr == NULL) {
-        LOG_ERROR("packet buffer full\n");
+        LOG_ERROR("Packet buffer full");
         gnrc_pktbuf_release(pkt);
         return -1;
     }
@@ -42,7 +42,7 @@ int send_data(const uint8_t *data, size_t size)
 
     // Send
     if (gnrc_netif_send((gnrc_netif_t *)netif, pkt) < 1) {
-        LOG_ERROR("unable to send");
+        LOG_ERROR("Unable to send");
         gnrc_pktbuf_release(pkt);
         return -1;
     }

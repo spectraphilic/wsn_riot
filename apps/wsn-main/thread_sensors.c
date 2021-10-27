@@ -23,7 +23,7 @@ static void *task_func(void *arg)
 {
     (void)arg;
 
-    LOG_INFO("Running sensors thread, loop every %d seconds.\n", LOOP_SECONDS);
+    LOG_INFO("Running sensors thread, loop every %d seconds.", LOOP_SECONDS);
 
     uint8_t buffer[150];
     nanocbor_encoder_t enc;
@@ -31,7 +31,7 @@ static void *task_func(void *arg)
 
     for (unsigned int loop=0; ; loop++) {
         LED0_ON;
-        LOG_INFO("Loop=%u\n", loop);
+        LOG_INFO("Loop=%u", loop);
         time_t time = wsn_time_get();
 
         // Read sensors and fill buffer
@@ -78,7 +78,7 @@ static void *task_func(void *arg)
         wsn_save_frame(time, buffer, len);
 
         // Done
-        LOG_INFO("Loop=%u DONE\n", loop);
+        LOG_INFO("Loop=%u DONE", loop);
         LED0_OFF;
 
         ztimer_sleep(ZTIMER, LOOP_SECONDS * TICKS_PER_SEC);

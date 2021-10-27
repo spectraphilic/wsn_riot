@@ -63,7 +63,7 @@ int lis3331ldh_init(i2c_t dev)
         DEBUG("[lis3331ldh] error reading register: %d\n", error);
         return error;
     } else if (data != 0x32) {
-        LOG_ERROR("acc unexpected data=%u\n", data);
+        LOG_ERROR("acc unexpected data=%u", data);
         return -1;
     }
 

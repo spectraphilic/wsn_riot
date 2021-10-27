@@ -42,16 +42,16 @@ void wsn_boot(void)
             if (IS_USED(MODULE_SETTINGS)) {
                 int error = settings_load();
                 if (error == 0)
-                    LOG_INFO("Settings loaded\n");
+                    LOG_INFO("Settings loaded");
             } else {
-                LOG_WARNING("Missing settings module\n");
+                LOG_WARNING("Missing settings module");
             }
 
             vfs_mkdir("/data", 0);
             queue_make();
         }
     } else {
-        LOG_WARNING("Missing VFS module\n");
+        LOG_WARNING("Missing VFS module");
     }
 
     // Sensors

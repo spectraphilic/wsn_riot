@@ -23,7 +23,7 @@ static int write_header(int fd, queue_header_t header)
     vfs_lseek(fd, 0, SEEK_SET);
     ssize_t size = vfs_write(fd, &header, sizeof(header));
     if (size < 0) {
-        LOG_ERROR("Failed to write header (%s)\n", errno_string(size));
+        LOG_ERROR("Failed to write header (%s)", errno_string(size));
         return -1;
     }
     return 0;
@@ -37,7 +37,7 @@ int queue_make(void)
         return 0;
     }
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)\n", queue.path, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", queue.path, errno_string(fd));
         return fd;
     }
 
@@ -95,7 +95,7 @@ int queue_drop(void)
 
     if (n == 0) {
         vfs_close(fd);
-        LOG_WARNING("Queue is empty\n");
+        LOG_WARNING("Queue is empty");
         return -1;
     }
 

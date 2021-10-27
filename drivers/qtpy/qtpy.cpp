@@ -320,10 +320,10 @@ void qtpy_init_auto(void)
         case 0:
             break;
         case -EPROTO:
-            LOG_ERROR("[QTPY] Protocol error\n");
+            LOG_ERROR("[QTPY] Protocol error");
             return;
         default:
-            LOG_ERROR("[QTPY] Unexpected error %d\n");
+            LOG_ERROR("[QTPY] Unexpected error %d");
             return;
     }
 

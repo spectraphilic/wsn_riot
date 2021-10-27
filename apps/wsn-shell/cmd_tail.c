@@ -19,7 +19,7 @@
 int cmd_tail(int argc, char **argv)
 {
     if (argc != 3) {
-        LOG_WARNING("Unexpected number of arguments: %d\n", argc);
+        LOG_WARNING("Unexpected number of arguments: %d", argc);
         return -1;
     }
 
@@ -33,7 +33,7 @@ int cmd_tail(int argc, char **argv)
     char *name = argv[2];
     int fd = open(name, O_RDONLY);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)\n", name, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", name, errno_string(fd));
         return -1;
     }
 

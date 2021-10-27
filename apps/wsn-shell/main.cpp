@@ -50,7 +50,7 @@ int main(void)
 #ifdef MODULE_WSN
     wsn_boot();
 #endif
-    LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s\n", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
+    LOG_INFO("app=wsn-shell board=%s mcu=%s riot=%s", RIOT_BOARD, RIOT_MCU, RIOT_VERSION);
 
     // Run the shell
     char buffer[SHELL_DEFAULT_BUFSIZE]; // 128

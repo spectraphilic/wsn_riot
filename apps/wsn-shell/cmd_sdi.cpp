@@ -17,13 +17,13 @@ int cmd_sdi(int argc, char **argv)
 {
     // Arguments
     if (argc != 2) {
-        LOG_WARNING("Unexpected number of arguments: %d\n", argc);
+        LOG_WARNING("Unexpected number of arguments: %d", argc);
         return -1;
     }
 
     char *command = argv[1];
     if (command[strlen(command) - 1] != '!') {
-        LOG_WARNING("Commands must end by '!'\n");
+        LOG_WARNING("Commands must end by '!'");
         return -1;
     }
 

@@ -46,7 +46,7 @@ int wsn_network_init(void)
             nid_str[res] = '\0';
         }
 
-        LOG_INFO("NETWORK id=%d addr=%s chan=%s nid=%s\n", id, hwaddr_str, channel_str, nid_str);
+        LOG_INFO("NETWORK id=%d addr=%s chan=%s nid=%s", id, hwaddr_str, channel_str, nid_str);
     }
 
     return 0;

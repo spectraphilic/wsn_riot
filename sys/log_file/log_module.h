@@ -14,27 +14,28 @@
 
 // Posix
 #include <fcntl.h>
-#include <unistd.h>
 
 // Riot
 #include <fmt.h>
+#include <thread.h>
 #include <ztimer.h>
+#include <vfs.h>
 
 
 static inline const char* loglevel2str(unsigned level) {
     switch (level) {
         case LOG_NONE:
-            return "NONE    ";
+            return "none";
         case LOG_ERROR:
-            return "ERROR   ";
+            return "error";
         case LOG_WARNING:
-            return "WARNING ";
+            return "warning";
         case LOG_INFO:
-            return "INFO    ";
+            return "info";
         case LOG_DEBUG:
-            return "DEBUG   ";
+            return "debug";
         case LOG_ALL:
-            return "ALL     ";
+            return "all";
         default:
             return "";
     }
@@ -42,30 +43,49 @@ static inline const char* loglevel2str(unsigned level) {
 
 
 static inline void log_write(unsigned level, const char *format, ...) {
-    size_t size = 150;
-    char buffer[size];
+    size_t buffer_len = 180;
+    char buffer[buffer_len];
+    char message[80];
 
-    // Timestamp + Level
+    // Message
+    va_list args;
+    va_start(args, format);
+    vsnprintf(message, sizeof(message) - 1, format, args);
+    va_end(args);
+
+    // Log line
     ztimer_now_t now = ztimer_now(ZTIMER_USEC);
     unsigned seconds = now / 1000000;
     unsigned ms = (now / 1000) % 1000;
-    sprintf(buffer, "%u.%03u %s", seconds, ms, loglevel2str(level));
+    snprintf(
+        buffer,
+        buffer_len,
+        "time=%u.%03u level=%s thread=%s %s",
+        seconds,
+        ms,
+        loglevel2str(level),
+        thread_getname(thread_getpid()),
+        message
+    );
 
-    // + Message
-    size_t len = strlen(buffer);
+    // Append a new line if there is not one already
+    size_t n = strlen(buffer);
+    if (buffer[n-1] != '\n') {
+        if (n == buffer_len - 1)
+            n--;
 
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer + len, size - len - 1, format, args);
-    va_end(args);
+        buffer[n] = '\n';
+        buffer[n+1] = '\0';
+    }
 
+    // Print to stdout
     print_str(buffer);
 
     // Print to file
-    int fd = open("/log2.txt", O_APPEND | O_CREAT); // TODO Rename to log.txt
+    int fd = vfs_open("/log.txt", O_APPEND | O_CREAT, 0);
     if (fd >= 0) {
-        write(fd, buffer, strlen(buffer));
-        close(fd);
+        vfs_write(fd, buffer, strlen(buffer));
+        vfs_close(fd);
     }
 }
 

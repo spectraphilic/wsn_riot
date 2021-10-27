@@ -13,8 +13,8 @@ int main(void)
 
     // Boot
     wsn_boot();
-    LOG_INFO("app=wsn-main board=%s mcu=%s\n", RIOT_BOARD, RIOT_MCU);
-    LOG_INFO("basetime=%d\n", wsn_time_basetime());
+    LOG_INFO("app=wsn-main board=%s mcu=%s", RIOT_BOARD, RIOT_MCU);
+    LOG_INFO("basetime=%d", wsn_time_basetime());
 
     // Start thread that handles incoming packets
     thread_recv_start();
@@ -24,7 +24,7 @@ int main(void)
     const uint8_t size = strlen(msg);
     while (wsn_time_basetime() == 0) {
         send_data((uint8_t*)msg, size);
-        LOG_INFO("%s\n", msg);
+        LOG_INFO(msg);
         ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC); // 20s
     }
 

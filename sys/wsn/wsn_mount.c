@@ -50,11 +50,11 @@ int wsn_mount(void)
 
     int error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("Error mounting SD card: %s\n", errno_string(error));
+        LOG_ERROR("Error mounting SD card: %s", errno_string(error));
         return error;
     }
 
-    LOG_INFO("SD card mounted\n");
+    LOG_INFO("SD card mounted");
     return 0;
 }
 

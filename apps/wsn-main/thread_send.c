@@ -29,11 +29,11 @@ static void *task_func(void *arg)
 {
     (void)arg;
 
-    LOG_INFO("Running sending thread, loop every %d seconds.\n", SEND_SECONDS);
+    LOG_INFO("Running sending thread, loop every %d seconds.", SEND_SECONDS);
 
     while (1) {
         // Send while there're frames to send
-        LOG_INFO("Sending frames...\n");
+        LOG_INFO("Sending frames...");
         while (1) {
             int n = send_frame();
             if (n <= 0)
@@ -45,7 +45,7 @@ static void *task_func(void *arg)
                 break;
         }
 
-        LOG_INFO("Sending frames DONE\n");
+        LOG_INFO("Sending frames DONE");
         ztimer_sleep(ZTIMER, SEND_SECONDS * TICKS_PER_SEC);
     }
 

@@ -42,7 +42,7 @@ int wsn_save_frame(time_t time, const void *data, uint8_t size)
     // Save frame
     int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_APPEND | O_SYNC, 0);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)\n", filename, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return fd;
     }
     off_t offset = tell(fd);

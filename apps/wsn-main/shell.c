@@ -12,7 +12,7 @@
 static int check_argc(int argc, int expected)
 {
     if (argc != expected) {
-        LOG_WARNING("Expected %d arguments, got %d\n", expected, argc);
+        LOG_WARNING("Expected %d arguments, got %d", expected, argc);
         return -1;
     }
 

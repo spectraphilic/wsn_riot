@@ -35,7 +35,7 @@ int settings_index(const char *name)
         }
     }
 
-    LOG_WARNING("Unexpected settings name: %s\n", name);
+    LOG_WARNING("Unexpected settings name: %s", name);
     return -1;
 }
 
@@ -60,7 +60,7 @@ int settings_set(const char *name, const char *value)
         case 0:
             value_u32 = scn_u32_dec(value, 1);
             if (value_u32 >= WAN_LEN) {
-                LOG_WARNING("Unexpected value %s = %s\n", name, value);
+                LOG_WARNING("Unexpected value %s = %s", name, value);
                 return -1;
             }
             settings.wan_type = (wan_type_t) value_u32;
@@ -77,7 +77,7 @@ int settings_save(void)
 
     int fd = open(filename, O_WRONLY | O_CREAT);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)\n", filename, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return -1;
     }
 
@@ -86,7 +86,7 @@ int settings_save(void)
 
     error = close(fd);
     if (error) {
-        LOG_ERROR("Failed to close %s\n", filename);
+        LOG_ERROR("Failed to close %s", filename);
     }
     return error;
 }
@@ -98,7 +98,7 @@ int settings_load(void)
 
     int fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        LOG_WARNING("Failed to open %s (%s)\n", filename, errno_string(fd));
+        LOG_WARNING("Failed to open %s (%s)", filename, errno_string(fd));
         return -1;
     }
 
@@ -116,7 +116,7 @@ int settings_load(void)
 
     int error = close(fd);
     if (error) {
-        LOG_ERROR("Failed to close %s\n", filename);
+        LOG_ERROR("Failed to close %s", filename);
     }
     return error;
 }

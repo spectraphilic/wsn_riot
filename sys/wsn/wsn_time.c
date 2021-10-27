@@ -37,12 +37,12 @@ int wsn_time_set(time_t time)
 
     // Not before 26 Oct 2021
     if (time < 1635199200) {
-        LOG_WARNING("Unexpected value %lu\n", time);
+        LOG_WARNING("Unexpected value %lu", time);
         return -1;
     }
 
     // Set time
     basetime = time - now / TICKS_PER_SEC;
-    LOG_INFO("Basetime set to %lu\n", basetime);
+    LOG_INFO("Basetime set to %lu", basetime);
     return 0;
 }
