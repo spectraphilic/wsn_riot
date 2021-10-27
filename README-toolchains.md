@@ -30,7 +30,7 @@ Debian:
 Gentoo (the USE flags are required to build avr-g++):
 
     $ sudo emerge crossdev
-    $ USE="-openmp -hardened -sanitize -vtv" crossdev -S -t avr
+    $ USE="cxx -openmp -hardened -sanitize -vtv" crossdev -S -t avr
 
 Verify:
 
