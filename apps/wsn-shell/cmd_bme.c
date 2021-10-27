@@ -5,18 +5,17 @@
 #include <periph/gpio.h>
 #include <ztimer.h>
 
-// WSN
-#include "bmx280.h"
-#include "bmx280_params.h"
+// Project
+#include <bmx280.h>
+#include <bmx280_params.h>
 
 
 int cmd_bme(int argc, char **argv) {
     // Arguments
-    if (argc != 1) {
-        printf("unexpected number of arguments: %d\n", argc);
+    (void)argv;
+    if (check_argc(argc, 1) < 0) {
         return -1;
     }
-    assert(argv); // Avoids warning
 
     //const bmx280_params_t * sens_param;
     int error = 0;

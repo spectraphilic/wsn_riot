@@ -40,7 +40,7 @@ int wsn_save_frame(time_t time, const void *data, uint8_t size)
     get_data_filename(filename, year, month, day);
 
     // Save frame
-    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_APPEND | O_SYNC, 0);
+    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
     if (fd < 0) {
         LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return fd;

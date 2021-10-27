@@ -75,7 +75,7 @@ int settings_save(void)
 {
     const char *filename = "/settings.txt";
 
-    int fd = open(filename, O_WRONLY | O_CREAT);
+    int fd = open(filename, O_CREAT | O_WRONLY);
     if (fd < 0) {
         LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return -1;

@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <stdio.h>
+#include <log.h>
 
 
 /* This is copy-paste from RIOT/cpu/avr8_common/avr_libc_extra/posix_unistd.c
@@ -81,20 +81,12 @@ char* errno_string(int errnum)
 }
 
 
-void test_utils_interactive_sync(void)
+int check_argc(int argc, int expected)
 {
-    char c = '\0'; /* Print help on first loop */
-    do {
-        if (c == 'r') {
-            /* This one should have a different case than the help message
-             * otherwise we match it when using 'expect' */
-            puts("READY");
-        }
-        else if (c != '\n' && c != '\r') {
-            puts("Help: Press s to start test, r to print it is ready");
-        }
-        c = getchar();
-    } while (c != 's');
+    if (argc != expected) {
+        printf("Expected %d arguments, got %d\n", expected, argc);
+        return -1;
+    }
 
-    puts("START");
+    return 0;
 }

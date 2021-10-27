@@ -7,6 +7,7 @@
 
 // Project
 #include <wsn.h>
+#include "config.h"
 
 
 #define QUEUE_SIZE 8
@@ -114,7 +115,7 @@ void thread_recv_start(void)
     pid = thread_create(
         stack,
         sizeof(stack),
-        THREAD_PRIORITY_MAIN -1,
+        THREAD_PRIORITY_RECV,
         THREAD_CREATE_STACKTEST,
         task_func,
         NULL,

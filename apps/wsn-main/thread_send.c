@@ -58,7 +58,7 @@ void thread_send_start(void)
     pid = thread_create(
         stack,
         sizeof(stack),
-        THREAD_PRIORITY_MAIN -1,
+        THREAD_PRIORITY_SEND,
         THREAD_CREATE_STACKTEST,
         task_func,
         NULL,

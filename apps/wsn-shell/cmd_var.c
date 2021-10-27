@@ -7,7 +7,7 @@
 #include <log.h>
 
 // Project
-#include "settings.h"
+#include <settings.h>
 
 
 const char * const help[] = {

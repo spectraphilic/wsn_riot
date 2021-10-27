@@ -12,10 +12,6 @@
 #include "common.h"
 #include "config.h"
 
-#ifndef NODE_ID
-    #define NODE_ID ""
-#endif
-
 static kernel_pid_t pid = KERNEL_PID_UNDEF;
 static char stack[THREAD_STACKSIZE_MAIN];
 
@@ -94,7 +90,7 @@ void thread_sensors_start(void)
     pid = thread_create(
         stack,
         sizeof(stack),
-        THREAD_PRIORITY_MAIN -1,
+        THREAD_PRIORITY_SENSORS,
         THREAD_CREATE_STACKTEST,
         task_func,
         NULL,

@@ -1,10 +1,11 @@
 #ifdef MODULE_LIS3331LDH
 
 // RIOT
-#include "periph/i2c.h"
+#include <periph/i2c.h>
 
-// WSN
-#include "lis3331ldh.h"
+// Project
+#include <lis3331ldh.h>
+#include <triage.h>
 
 
 int cmd_acc(int argc, char **argv)
@@ -15,16 +16,14 @@ int cmd_acc(int argc, char **argv)
     // Registers
 
     // Arguments
-    if (argc != 1) {
-        printf("unexpected number of arguments: %d\n", argc);
+    (void)argv;
+    if (check_argc(argc, 1) < 0) {
         return -1;
     }
-    assert(argv); // Avoids warning
 
     // Acquire
     error = i2c_acquire(dev);
-    if (error)
-    {
+    if (error) {
         printf("i2c_acquire error=%d\n", error);
         return error;
     }

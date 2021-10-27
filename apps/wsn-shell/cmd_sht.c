@@ -3,8 +3,8 @@
 #define SHT3X_PARAM_I2C_ADDR    (SHT3X_I2C_ADDR_1)
 #define SHT3X_PARAM_MODE        (SHT3X_SINGLE_SHOT)
 #define SHT3X_PARAM_REPEAT      (SHT3X_MEDIUM)
-#include "sht3x.h"
-#include "sht3x_params.h"
+#include <sht3x.h>
+#include <sht3x_params.h>
 
 
 int cmd_sht(int argc, char **argv) {
@@ -16,11 +16,10 @@ int cmd_sht(int argc, char **argv) {
     // Registers
 
     // Arguments
-    if (argc != 1) {
-        printf("unexpected number of arguments: %d\n", argc);
+    (void)argv;
+    if (check_argc(argc, 1) < 0) {
         return -1;
     }
-    assert(argv); // Avoids warning
 
     if ((res = sht3x_init(&dev, &sht3x_params[0])) != SHT3X_OK) {
         puts("Initialization failed\n");

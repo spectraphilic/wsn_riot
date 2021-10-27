@@ -18,8 +18,7 @@
 
 int cmd_tail(int argc, char **argv)
 {
-    if (argc != 3) {
-        LOG_WARNING("Unexpected number of arguments: %d", argc);
+    if (check_argc(argc, 3) < 0) {
         return -1;
     }
 

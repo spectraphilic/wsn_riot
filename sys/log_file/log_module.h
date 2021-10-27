@@ -82,7 +82,7 @@ static inline void log_write(unsigned level, const char *format, ...) {
     print_str(buffer);
 
     // Print to file
-    int fd = vfs_open("/log.txt", O_APPEND | O_CREAT, 0);
+    int fd = vfs_open("/log.txt", O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
     if (fd >= 0) {
         vfs_write(fd, buffer, strlen(buffer));
         vfs_close(fd);

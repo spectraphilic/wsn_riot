@@ -6,18 +6,9 @@
 #include <shell.h>
 
 // Project
+#include <triage.h>
 #include <wsn.h>
 
-
-static int check_argc(int argc, int expected)
-{
-    if (argc != expected) {
-        LOG_WARNING("Expected %d arguments, got %d", expected, argc);
-        return -1;
-    }
-
-    return 0;
-}
 
 static int cmd_time(int argc, char **argv)
 {

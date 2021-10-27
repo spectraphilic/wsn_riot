@@ -7,6 +7,7 @@
 #include <log.h>
 
 // Project
+#include <triage.h>
 #include <qtpy.h>
 #include <qtpy_params.h>
 
@@ -16,8 +17,7 @@ extern qtpy_t qtpy_dev;
 int cmd_sdi(int argc, char **argv)
 {
     // Arguments
-    if (argc != 2) {
-        LOG_WARNING("Unexpected number of arguments: %d", argc);
+    if (check_argc(argc, 2) < 0) {
         return -1;
     }
 

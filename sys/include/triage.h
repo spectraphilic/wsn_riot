@@ -107,10 +107,11 @@ off_t tell(int fd);
 
 
 /**
- * @brief Press s to test, r to print it is ready
+ * @brief Check number of arguments
  *
+ * Helper used in shell commands
  */
-void test_utils_interactive_sync(void);
+int check_argc(int argc, int expected);
 
 #ifdef __cplusplus
 }
