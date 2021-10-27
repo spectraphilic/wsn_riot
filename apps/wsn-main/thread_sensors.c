@@ -27,7 +27,6 @@ static void *task_func(void *arg)
 
     for (unsigned int loop=0; ; loop++) {
         LED0_ON;
-        LOG_INFO("Loop=%u", loop);
         time_t time = wsn_time_get();
 
         // Read sensors and fill buffer
@@ -73,11 +72,10 @@ static void *task_func(void *arg)
 
         // Save the frame
         wsn_save_frame(time, buffer, len);
+        LOG_INFO("Frame saved len=%d", len);
 
         // Done
-        LOG_INFO("Loop=%u DONE", loop);
         LED0_OFF;
-
         ztimer_sleep(ZTIMER, LOOP_SECONDS * TICKS_PER_SEC);
     }
 

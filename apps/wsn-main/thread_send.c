@@ -18,11 +18,17 @@ static int send_frame(void)
 
     // Load frame
     int n = wsn_load_frame(buffer, &len);
+    LOG_INFO("Frame loaded len=%d (%d left)", len, n);
     if (n <= 0)
         return n;
 
     // Send frame
-    return send_data(buffer, len);
+    int error = send_data(buffer, len);
+    if (error < 0)
+        return error;
+
+    LOG_INFO("Frame sent", n);
+    return n;
 }
 
 static void *task_func(void *arg)
@@ -33,7 +39,6 @@ static void *task_func(void *arg)
 
     while (1) {
         // Send while there're frames to send
-        LOG_INFO("Sending frames...");
         while (1) {
             int n = send_frame();
             if (n <= 0)
@@ -41,11 +46,11 @@ static void *task_func(void *arg)
 
             // Drop frame
             n = wsn_drop_frame();
+            LOG_INFO("Frame dropped (%d left)", n);
             if (n <= 0)
                 break;
         }
 
-        LOG_INFO("Sending frames DONE");
         ztimer_sleep(ZTIMER, SEND_SECONDS * TICKS_PER_SEC);
     }
 
