@@ -22,6 +22,7 @@ const shell_command_t shell_commands[] = {
 #endif
 #ifdef MODULE_VFS
     {"cat", "print contents of given filename", cmd_cat},
+    {"catx", "print contents of given filename in hexadecimal", cmd_catx},
 #endif
 #ifdef MODULE_SHT3X
     {"sht", "read SHT31", cmd_sht},
