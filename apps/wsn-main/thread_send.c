@@ -3,6 +3,7 @@
 #include <ztimer.h>
 
 // Project
+#include <frames.h>
 #include <wsn.h>
 #include "common.h"
 #include "config.h"
@@ -17,7 +18,7 @@ static int send_frame(void)
     uint8_t len;
 
     // Load frame
-    int n = wsn_load_frame(buffer, &len);
+    int n = frames_load(buffer, &len);
     LOG_INFO("Frame loaded len=%d (%d left)", len, n);
     if (n <= 0)
         return n;
@@ -45,7 +46,7 @@ static void *task_func(void *arg)
                 break;
 
             // Drop frame
-            n = wsn_drop_frame();
+            n = frames_drop();
             LOG_INFO("Frame dropped (%d left)", n);
             if (n <= 0)
                 break;

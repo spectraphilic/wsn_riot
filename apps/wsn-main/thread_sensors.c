@@ -7,6 +7,7 @@
 #include <thread.h>
 
 // Project
+#include <frames.h>
 #include <sensors.h>
 #include <wsn.h>
 #include "common.h"
@@ -71,7 +72,7 @@ static void *task_func(void *arg)
         LOG_INFO(message);
 
         // Save the frame
-        wsn_save_frame(time, buffer, len);
+        frames_save(time, buffer, len);
         LOG_INFO("Frame saved len=%d", len);
 
         // Done

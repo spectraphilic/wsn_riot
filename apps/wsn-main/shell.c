@@ -6,6 +6,7 @@
 #include <shell.h>
 
 // Project
+#include <frames.h>
 #include <triage.h>
 #include <wsn.h>
 
@@ -27,7 +28,7 @@ static int cmd_ack(int argc, char **argv)
         return -1;
     }
 
-    int n = wsn_drop_frame();
+    int n = frames_drop();
     if (n < 0) {
         LOG_ERROR("Failed to drop frame");
         return -1;

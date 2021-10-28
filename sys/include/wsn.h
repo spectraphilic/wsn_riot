@@ -45,21 +45,6 @@ int wsn_mount(void);
 int wsn_network_init(void);
 
 /**
- * @brief Saves a frame into the filesystem
- */
-int wsn_save_frame(time_t time, uint8_t *data, uint8_t length);
-
-/**
- * @brief Loads a frame from the filesystem
- */
-int wsn_load_frame(uint8_t *data, uint8_t *size);
-
-/**
- * @brief Drop the first frame from the filesystem
- */
-int wsn_drop_frame(void);
-
-/**
  * @brief Returns the basetime
  *
  * The basetime is an internal variable, useful to calculate the system time.
@@ -76,7 +61,6 @@ time_t wsn_time_get(void);
  * @brief Sets system time
  */
 int wsn_time_set(time_t time);
-
 
 #ifdef __cplusplus
 }

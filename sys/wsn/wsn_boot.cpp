@@ -4,10 +4,10 @@
 #include <vfs.h>
 
 // Project
-#include "settings.h"
-#include "qtpy.h"
-#include "queue.h"
-#include "wsn.h"
+#include <frames.h>
+#include <settings.h>
+#include <qtpy.h>
+#include <wsn.h>
 
 
 uint64_t cpuid = 0;
@@ -47,8 +47,7 @@ void wsn_boot(void)
                 LOG_WARNING("Missing settings module");
             }
 
-            vfs_mkdir("/data", 0);
-            queue_make();
+            frames_init();
         }
     } else {
         LOG_WARNING("Missing VFS module");
