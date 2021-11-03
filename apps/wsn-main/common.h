@@ -1,6 +1,7 @@
 #ifndef WSN_COMMON_H
 #define WSN_COMMON_H
 
+#include <shell.h>
 #include <timex.h>
 
 #ifdef MODULE_ZTIMER_MSEC
@@ -19,6 +20,7 @@ int send_data(const uint8_t *data, size_t size);
 void thread_recv_start(void);
 void thread_send_start(void);
 void thread_sensors_start(void);
+extern const shell_command_t shell_commands[];
 
 #ifdef __cplusplus
 }

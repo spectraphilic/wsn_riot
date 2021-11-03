@@ -3,10 +3,12 @@
 #include <net/gnrc/netif/hdr.h>
 #include <net/gnrc/netreg.h>
 #include <od.h>
+#include <shell.h>
 #include <thread.h>
 
 // Project
 #include <wsn.h>
+#include "common.h"
 #include "config.h"
 
 
@@ -18,7 +20,6 @@ static char stack[THREAD_STACKSIZE_MAIN];
 static void dump_snip(gnrc_pktsnip_t *pkt)
 {
     size_t hdr_len = 0;
-    int n;
 
     switch (pkt->type) {
         case GNRC_NETTYPE_NETIF:
@@ -31,9 +32,11 @@ static void dump_snip(gnrc_pktsnip_t *pkt)
         case GNRC_NETTYPE_UNDEF:
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
-            // pong
+            // Command
+//          shell_run_once(shell_commands, (char*)pkt->data, pkt->size);
+
             unsigned int time;
-            n = sscanf((char*)pkt->data, "pong %u", &time);
+            int n = sscanf((char*)pkt->data, "time %u", &time);
             if (n == 1) {
                 wsn_time_set(time);
             }
