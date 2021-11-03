@@ -7,6 +7,7 @@ USEMODULE += saul_default
 
 # Shell
 USEMODULE += i2c_scan
+USEMODULE += gnrc_txtsnd
 USEMODULE += shell
 USEMODULE += shell_commands
 
