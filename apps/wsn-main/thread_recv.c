@@ -1,7 +1,7 @@
 // Riot
+#include <log.h>
 #include <msg.h>
-#include <net/gnrc/netif/hdr.h>
-#include <net/gnrc/netreg.h>
+#include <net/gnrc.h>
 #include <od.h>
 #include <shell.h>
 #include <thread.h>
@@ -114,18 +114,23 @@ static void *task_func(void *arg)
 
 void thread_recv_start(void)
 {
-    // Create the thread
-    pid = thread_create(
-        stack,
-        sizeof(stack),
-        THREAD_PRIORITY_RECV,
-        THREAD_CREATE_STACKTEST,
-        task_func,
-        NULL,
-        "network-tap"
-    );
+    if (pid == KERNEL_PID_UNDEF) {
+        // Create the thread
+        pid = thread_create(
+            stack,
+            sizeof(stack),
+            THREAD_PRIORITY_RECV,
+            THREAD_CREATE_STACKTEST,
+            task_func,
+            NULL,
+            "network-tap"
+        );
 
-    // Register the thread to receive events from the network stack
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
+        // Register the thread to receive events from the network stack
+        gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
+        int error = gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
+        if (error) {
+            LOG_ERROR("gnrc_netreg_register failed");
+        }
+    }
 }

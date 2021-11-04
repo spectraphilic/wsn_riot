@@ -25,7 +25,7 @@ int main(void)
     while (wsn_time_basetime() == 0) {
         send_data((uint8_t*)msg, size);
         LOG_INFO(msg);
-        ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC); // 20s
+        ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC);
     }
 
     // Start other threads
