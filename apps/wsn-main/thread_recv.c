@@ -7,12 +7,13 @@
 #include <thread.h>
 
 // Project
+#include <triage.h>
 #include <wsn.h>
 #include "common.h"
 #include "config.h"
 
 
-#define QUEUE_SIZE 8
+static const int queue_size = 8;
 
 static kernel_pid_t pid = KERNEL_PID_UNDEF;
 static char stack[THREAD_STACKSIZE_MAIN];
@@ -76,8 +77,8 @@ static void *task_func(void *arg)
     (void)arg;
 
     // Setup the message queue
-    msg_t msg_queue[QUEUE_SIZE];
-    msg_init_queue(msg_queue, QUEUE_SIZE);
+    msg_t msg_queue[queue_size];
+    msg_init_queue(msg_queue, queue_size);
 
     // Prepare message reply
     msg_t reply;
@@ -126,11 +127,26 @@ void thread_recv_start(void)
             "network-tap"
         );
 
+        if (pid < 0) {
+            LOG_ERROR("Failed to create thread %s", errno_string(pid));
+            return;
+        }
+
         // Register the thread to receive events from the network stack
         gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
         int error = gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
         if (error) {
             LOG_ERROR("gnrc_netreg_register failed");
+            return;
+        }
+
+        // Get system time from the gateway if not set already
+        const char msg[] = "ping";
+        const uint8_t size = strlen(msg);
+        while (wsn_time_basetime() == 0) {
+            send_data((uint8_t*)msg, size);
+            LOG_INFO(msg);
+            ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC);
         }
     }
 }

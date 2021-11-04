@@ -157,7 +157,7 @@ static int queue_drop(void)
 
 static int get_data_filename(char *filename, int year, int month, int day)
 {
-    return sprintf(filename, "/data/%d%d%d.bin", year, month, day);
+    return sprintf(filename, "/data/%02d%02d%02d.bin", year, month, day);
 }
 
 

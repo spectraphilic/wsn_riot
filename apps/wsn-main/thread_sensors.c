@@ -9,6 +9,7 @@
 // Project
 #include <frames.h>
 #include <sensors.h>
+#include <triage.h>
 #include <wsn.h>
 #include "common.h"
 #include "config.h"
@@ -86,13 +87,20 @@ static void *task_func(void *arg)
 
 void thread_sensors_start(void)
 {
-    pid = thread_create(
-        stack,
-        sizeof(stack),
-        THREAD_PRIORITY_SENSORS,
-        THREAD_CREATE_STACKTEST,
-        task_func,
-        NULL,
-        "sensors"
-    );
+    if (pid == KERNEL_PID_UNDEF) {
+        pid = thread_create(
+            stack,
+            sizeof(stack),
+            THREAD_PRIORITY_SENSORS,
+            THREAD_CREATE_STACKTEST,
+            task_func,
+            NULL,
+            "sensors"
+        );
+
+        if (pid < 0) {
+            LOG_ERROR("Failed to create thread %s", errno_string(pid));
+            return;
+        }
+    }
 }
