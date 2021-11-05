@@ -13,7 +13,11 @@
 #ifndef WSN_H
 #define WSN_H
 
+// Standard
 #include <time.h>
+
+// Riot
+#include <timex.h>
 
 #ifdef __cplusplus
 extern "C" {

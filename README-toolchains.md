@@ -90,3 +90,31 @@ Exit the terminal and open a new one, so this change takes effect. Then verify:
     $ arm-none-eabi-gcc --version
     arm-none-eabi-gcc (GNU Arm Embedded Toolchain 9-2020-q2-update) 9.3.1 20200408 (release)
     [...]
+
+
+RISC-V
+------------------------
+
+Probably you don't need this, unless you have to send a PR to RIOT.
+
+I've installed this toolchain using xPack (RIOT's CI, Murdock, uses xPack). For
+this to work you need to have node/npm installed.
+
+First install xpm (system wide):
+
+    $ sudo npm install --global xpm@latest
+
+Now you can install the toolchain:
+
+    $ xpm install --global @xpack-dev-tools/riscv-none-embed-gcc@latest --verbose
+
+Now add the path, if using direnv, in your project:
+
+   $ vi .envrc
+   export PATH=/home/jdavid/.local/xPacks/@xpack-dev-tools/riscv-none-embed-gcc/10.1.0-1.2.1/.content/bin/:$PATH
+
+Links:
+
+- https://doc.riot-os.org/getting-started.html#autotoc\_md1688
+- https://xpack.github.io/
+- https://xpack.github.io/riscv-none-embed-gcc/

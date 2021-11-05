@@ -78,7 +78,7 @@ static void *task_func(void *arg)
 
         // Done
         LED0_OFF;
-        ztimer_sleep(ZTIMER, LOOP_SECONDS * TICKS_PER_SEC);
+        ztimer_sleep(ZTIMER_MSEC, LOOP_SECONDS * MS_PER_SEC);
     }
 
     // Never reached

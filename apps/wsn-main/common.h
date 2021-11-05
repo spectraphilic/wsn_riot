@@ -4,14 +4,6 @@
 #include <shell.h>
 #include <timex.h>
 
-#ifdef MODULE_ZTIMER_MSEC
-    #define ZTIMER ZTIMER_MSEC
-    #define TICKS_PER_SEC MS_PER_SEC
-#else
-    #define ZTIMER ZTIMER_USEC
-    #define TICKS_PER_SEC US_PER_SEC
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

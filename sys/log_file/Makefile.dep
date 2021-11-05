@@ -1,2 +1,2 @@
 USEMODULE += fmt
-USEMODULE += ztimer_usec
+USEMODULE += ztimer_msec

@@ -18,6 +18,7 @@
 // Riot
 #include <fmt.h>
 #include <thread.h>
+#include <timex.h>
 #include <ztimer.h>
 #include <vfs.h>
 
@@ -54,15 +55,13 @@ static inline void log_write(unsigned level, const char *format, ...) {
     va_end(args);
 
     // Log line
-    ztimer_now_t now = ztimer_now(ZTIMER_USEC);
-    unsigned seconds = now / 1000000;
-    unsigned ms = (now / 1000) % 1000;
+    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
     snprintf(
         buffer,
         buffer_len,
-        "time=%u.%03u level=%s thread=%s %s",
-        seconds,
-        ms,
+        "time=%lu.%03lu level=%s thread=%s %s",
+        now / MS_PER_SEC,
+        now % MS_PER_SEC,
         loglevel2str(level),
         thread_getname(thread_getpid()),
         message

@@ -5,6 +5,7 @@
 #include <od.h>
 #include <shell.h>
 #include <thread.h>
+#include <timex.h>
 
 // Project
 #include <triage.h>
@@ -146,7 +147,7 @@ void thread_recv_start(void)
         while (wsn_time_basetime() == 0) {
             send_data((uint8_t*)msg, size);
             LOG_INFO(msg);
-            ztimer_sleep(ZTIMER, 10 * TICKS_PER_SEC);
+            ztimer_sleep(ZTIMER_MSEC, 10 * MS_PER_SEC);
         }
     }
 }

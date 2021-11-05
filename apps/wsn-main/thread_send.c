@@ -1,6 +1,7 @@
 // Riot
 #include <board.h>
 #include <log.h>
+#include <timex.h>
 #include <ztimer.h>
 
 // Project
@@ -56,7 +57,7 @@ static void *task_func(void *arg)
         }
 
         LED1_OFF;
-        ztimer_sleep(ZTIMER, SEND_SECONDS * TICKS_PER_SEC);
+        ztimer_sleep(ZTIMER_MSEC, SEND_SECONDS * MS_PER_SEC);
     }
 
     // Never reached

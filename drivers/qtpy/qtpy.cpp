@@ -165,7 +165,7 @@ static int qtpy_measure_data(qtpy_t *dev, uint8_t number, float values[])
     n = qtpy_measure(dev, &ttt, number);
     if (n > 0) {
         if (ttt > 0)
-            ztimer_sleep(ZTIMER_SEC, ttt);
+            ztimer_sleep(ZTIMER_MSEC, ttt * MS_PER_SEC);
 
         if (qtpy_data(dev, values, n) == n)
             return n;
