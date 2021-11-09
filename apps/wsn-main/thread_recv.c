@@ -8,6 +8,7 @@
 #include <timex.h>
 
 // Project
+#include <frames.h>
 #include <triage.h>
 #include <wsn.h>
 #include "common.h"
@@ -35,13 +36,31 @@ static void dump_snip(gnrc_pktsnip_t *pkt)
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
             // Command
-//          shell_run_once(shell_commands, (char*)pkt->data, pkt->size);
+            // TODO Use the shell, for this we need to call handle_input_line from
+            // RIOT/sys/shell/shell.c but it's declared as static. This has been
+            // asked before, see https://github.com/RIOT-OS/RIOT/issues/4967
+            // TODO Send a PR
+            // handle_input_line(shell_commands, (char*)pkt->data));
 
+            char *data = (char*)pkt->data;
+            int n;
+
+            // time
             unsigned int time;
-            int n = sscanf((char*)pkt->data, "time %u", &time);
+            n = sscanf(data, "time %u", &time);
             if (n == 1) {
                 wsn_time_set(time);
+                break;
             }
+
+            // ack
+            if (strcmp(data, "ack") == 0) {
+                n = frames_drop();
+                if (n > 0) {
+                    send_frame();
+                }
+            }
+
             break;
         default:
             printf("NETTYPE_UNKNOWN (%i)\n", pkt->type);
@@ -90,6 +109,7 @@ static void *task_func(void *arg)
     msg_t msg;
     while (1) {
         msg_receive(&msg);
+        LED2_ON;
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:

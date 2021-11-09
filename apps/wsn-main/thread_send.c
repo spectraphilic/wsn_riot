@@ -13,16 +13,17 @@
 #include "config.h"
 
 
-static int send_frame(void)
+int send_frame(void)
 {
     uint8_t buffer[150];
     uint8_t len;
 
     // Load frame
     int n = frames_load(buffer, &len);
-    LOG_INFO("Frame loaded len=%d (%d left)", len, n);
     if (n <= 0)
         return n;
+
+    LOG_INFO("Frame loaded len=%d (%d left)", len, n);
 
     // Send frame
     int error = send_data(buffer, len);
@@ -37,22 +38,10 @@ static void *task_func(void *arg)
 {
     (void)arg;
 
-    LOG_INFO("Running sending thread, loop every %d seconds.", SEND_SECONDS);
-
+    LOG_INFO("Send frames every %d seconds.", SEND_SECONDS);
     while (1) {
-        // Send while there're frames to send
-        while (1) {
-            int n = send_frame();
-            if (n <= 0)
-                break;
-
-            // Drop frame
-            n = frames_drop();
-            LOG_INFO("Frame dropped (%d left)", n);
-            if (n <= 0)
-                break;
-        }
-
+        LED1_ON;
+        send_frame();
         LED1_OFF;
         ztimer_sleep(ZTIMER_MSEC, SEND_SECONDS * MS_PER_SEC);
     }
