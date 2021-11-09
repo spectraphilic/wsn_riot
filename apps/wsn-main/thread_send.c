@@ -1,6 +1,7 @@
 // Riot
 #include <board.h>
 #include <log.h>
+#include <thread.h>
 #include <timex.h>
 #include <ztimer.h>
 
@@ -11,9 +12,6 @@
 #include "common.h"
 #include "config.h"
 
-
-static kernel_pid_t pid = KERNEL_PID_UNDEF;
-static char stack[THREAD_STACKSIZE_MAIN];
 
 static int send_frame(void)
 {
@@ -42,7 +40,6 @@ static void *task_func(void *arg)
     LOG_INFO("Running sending thread, loop every %d seconds.", SEND_SECONDS);
 
     while (1) {
-        LED1_ON;
         // Send while there're frames to send
         while (1) {
             int n = send_frame();
@@ -66,20 +63,5 @@ static void *task_func(void *arg)
 
 void thread_send_start(void)
 {
-    if (pid == KERNEL_PID_UNDEF) {
-        pid = thread_create(
-            stack,
-            sizeof(stack),
-            THREAD_PRIORITY_SEND,
-            THREAD_CREATE_STACKTEST,
-            task_func,
-            NULL,
-            "send-frames"
-        );
-
-        if (pid < 0) {
-            LOG_ERROR("Failed to create thread %s", errno_string(pid));
-            return;
-        }
-    }
+    task_func(NULL);
 }

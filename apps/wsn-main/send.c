@@ -41,8 +41,9 @@ int send_data(const uint8_t *data, size_t size)
     nethdr->flags = flags;
 
     // Send
-    if (gnrc_netif_send((gnrc_netif_t *)netif, pkt) < 1) {
-        LOG_ERROR("Unable to send");
+    int error = gnrc_netif_send((gnrc_netif_t *)netif, pkt);
+    if (error < 1) {
+        LOG_ERROR("Unable to send error=%d", error);
         gnrc_pktbuf_release(pkt);
         return -1;
     }
