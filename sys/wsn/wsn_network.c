@@ -53,7 +53,7 @@ int wsn_network_init(void)
         }
 
         LOG_INFO(
-            "NETWORK id=%d addr=%s %s chan=0x%s nid=0x%s",
+            "netif id=%d addr=%s %s chan=%s nid=%s",
             id,
             hwaddr_long,
             hwaddr_short,

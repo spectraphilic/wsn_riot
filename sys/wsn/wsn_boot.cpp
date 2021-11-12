@@ -1,12 +1,16 @@
 // RIOT
 #include <log.h>
 #include <periph/cpuid.h>
-#include <vfs.h>
+#ifdef MODULE_VFS
+    #include <vfs.h>
+#endif
 
 // Project
 #include <frames.h>
 #include <settings.h>
-#include <qtpy.h>
+#ifdef MODULE_QTPY
+    #include <qtpy.h>
+#endif
 #include <wsn.h>
 
 
@@ -47,17 +51,21 @@ void wsn_boot(void)
                 LOG_WARNING("Missing settings module");
             }
 
-            frames_init();
+            if (IS_USED(MODULE_FRAMES)) {
+                frames_init();
+            }
         }
     } else {
         LOG_WARNING("Missing VFS module");
     }
 
     // Sensors
-    if (IS_USED(MODULE_QTPY))
+    #ifdef MODULE_QTPY
         qtpy_init_auto();
+    #endif
 
     // Network
-    if (IS_USED(MODULE_GNRC_NETIF))
+    if (IS_USED(MODULE_GNRC_NETIF)) {
         wsn_network_init();
+    }
 }

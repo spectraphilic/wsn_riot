@@ -1,3 +1,4 @@
+FEATURES_REQUIRED += cpp
 FEATURES_REQUIRED += periph_cpuid
 
 # Storage

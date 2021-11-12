@@ -20,12 +20,16 @@
 
 //#define ENABLE_DEBUG 1
 #include <debug.h>
+#include <math.h>
+
+// Riot
+#include <log.h>
+#include <timex.h>
 #include <ztimer.h>
 
-#include <math.h>
-#include <log.h>
-#include "coroutine.h"
-#include "sensors.h"
+#include <coroutine.h>
+#include <sensors.h>
+#include <triage.h>
 
 #include "qtpy.h"
 #include "qtpy_constants.h"
@@ -316,14 +320,15 @@ void qtpy_init_auto(void)
 {
     DEBUG("Init sensor board\n");
 
-    switch (qtpy_init(&qtpy_dev, &qtpy_params[0])) {
+    int error = qtpy_init(&qtpy_dev, &qtpy_params[0]);
+    switch (error) {
         case 0:
             break;
         case -EPROTO:
             LOG_ERROR("[QTPY] Protocol error");
             return;
         default:
-            LOG_ERROR("[QTPY] Unexpected error %d");
+            LOG_ERROR("[QTPY] Unexpected error %s", errno_string(error));
             return;
     }
 

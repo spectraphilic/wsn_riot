@@ -1,10 +1,11 @@
-#include <assert.h>
+#ifdef MODULE_NANOCBOR
 
 // Riot
 #include <board.h>
 #include <log.h>
 #include <nanocbor/nanocbor.h>
 #include <thread.h>
+#include <ztimer.h>
 
 // Project
 #include <frames.h>
@@ -63,14 +64,16 @@ static void *task_func(void *arg)
 
         nanocbor_fmt_end_indefinite(&enc);
         size_t len = nanocbor_encoded_len(&enc);
-        assert(len);
+        if (len == 0) {
+            // TODO
+        }
 
         // For debugging purposes, print CBOR data
         char message[150] = "CBOR=";
         for (size_t k=0; k < len; k++) {
             sprintf(message + strlen(message), "%02x", buffer[k]);
         }
-        LOG_INFO(message);
+        LOG_INFO("%s", message);
 
         // Save the frame
         frames_save(time, buffer, len);
@@ -104,3 +107,5 @@ void thread_sensors_start(void)
         }
     }
 }
+
+#endif

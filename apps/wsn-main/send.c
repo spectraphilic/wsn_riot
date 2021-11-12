@@ -12,6 +12,10 @@ int send_data(const uint8_t *data, size_t size)
     gnrc_netif_hdr_t *nethdr;
 
     netif_t *netif = netif_get_by_id(2);
+    if (netif == NULL) {
+        LOG_ERROR("Network interface not found");
+        return -1;
+    }
 
     // Broadcast
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];

@@ -14,7 +14,7 @@ int main(void)
     // Boot
     wsn_boot();
     LOG_INFO("app=wsn-main board=%s mcu=%s", RIOT_BOARD, RIOT_MCU);
-    LOG_INFO("basetime=%d", wsn_time_basetime());
+    LOG_INFO("basetime=%lld", wsn_time_basetime());
 
     // Start thread that handles incoming packets
     thread_recv_start();

@@ -18,7 +18,7 @@ int cmd_ds18b20(int argc, char **argv) {
         printf("unexpected number of arguments: %d\n", argc);
         return -1;
     }
-    assert(argv); // Avoids warning
+    (void)argv; // Avoids warning
 
     switch (ds18_init(&dev, &ds18_params[0])) {
         case DS18_ERROR:
