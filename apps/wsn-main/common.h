@@ -10,9 +10,9 @@ extern "C" {
 
 int send_data(const uint8_t *data, size_t size);
 int send_frame(void);
-void thread_recv_start(void);
+kernel_pid_t thread_recv_start(void);
 void thread_send_start(void);
-void thread_sensors_start(void);
+kernel_pid_t thread_sensors_start(void);
 extern const shell_command_t shell_commands[];
 
 int _ps_handler(int argc, char **argv); // XXX For debugging purposes

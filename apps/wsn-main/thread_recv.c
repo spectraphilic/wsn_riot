@@ -1,26 +1,72 @@
-// Riot
+#include <inttypes.h>
+#include <stdio.h>
+
+#include <errno.h>
+#include "byteorder.h"
+#include "thread.h"
+#include "msg.h"
+#include "net/gnrc/pktdump.h"
+#include "net/gnrc.h"
+#include "net/icmpv6.h"
+#include "net/ipv6/addr.h"
+#include "net/ipv6/hdr.h"
+#include "net/tcp.h"
+#include "net/udp.h"
+#include "net/sixlowpan.h"
+#include "od.h"
+
 #include <log.h>
-#include <msg.h>
-#include <net/gnrc.h>
-#include <od.h>
-#include <shell.h>
-#include <thread.h>
-#include <timex.h>
 
-// Project
 #include <frames.h>
-#include <triage.h>
 #include <wsn.h>
-#include "common.h"
 #include "config.h"
+#include "common.h"
 
 
-static const int queue_size = 8;
 
-static kernel_pid_t pid = KERNEL_PID_UNDEF;
-static char stack[THREAD_STACKSIZE_MAIN];
+static void handle_pkt(gnrc_pktsnip_t *pkt)
+{
+    LOG_INFO("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
 
-static void dump_snip(gnrc_pktsnip_t *pkt)
+    // Command
+    // TODO Use the shell, for this we need to call handle_input_line from
+    // RIOT/sys/shell/shell.c but it's declared as static. This has been
+    // asked before, see https://github.com/RIOT-OS/RIOT/issues/4967
+    // TODO Send a PR
+    // handle_input_line(shell_commands, (char*)pkt->data));
+
+    char *data = (char*)pkt->data;
+    int n;
+
+    // time
+    unsigned int time;
+    n = sscanf(data, "time %u", &time);
+    if (n == 1) {
+        wsn_time_set(time);
+        return;
+    }
+
+    // ack
+    if (strcmp(data, "ack") == 0) {
+        n = frames_drop();
+        if (n > 0) {
+            send_frame();
+        }
+    }
+}
+
+
+/**
+ * @brief   PID of the pktdump thread
+ */
+kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
+
+/**
+ * @brief   Stack for the pktdump thread
+ */
+static char _stack[GNRC_PKTDUMP_STACKSIZE];
+
+static void _dump_snip(gnrc_pktsnip_t *pkt)
 {
     size_t hdr_len = 0;
 
@@ -28,40 +74,86 @@ static void dump_snip(gnrc_pktsnip_t *pkt)
         case GNRC_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
             if (IS_USED(MODULE_GNRC_NETIF_HDR)) {
-                gnrc_netif_hdr_print((gnrc_netif_hdr_t*) pkt->data);
+                gnrc_netif_hdr_print(pkt->data);
                 hdr_len = pkt->size;
             }
             break;
         case GNRC_NETTYPE_UNDEF:
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
-            printf("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
-            // Command
-            // TODO Use the shell, for this we need to call handle_input_line from
-            // RIOT/sys/shell/shell.c but it's declared as static. This has been
-            // asked before, see https://github.com/RIOT-OS/RIOT/issues/4967
-            // TODO Send a PR
-            // handle_input_line(shell_commands, (char*)pkt->data));
-
-            char *data = (char*)pkt->data;
-            int n;
-
-            // time
-            unsigned int time;
-            n = sscanf(data, "time %u", &time);
-            if (n == 1) {
-                wsn_time_set(time);
-                break;
-            }
-
-            // ack
-            if (strcmp(data, "ack") == 0) {
-                n = frames_drop();
-                if (n > 0) {
-                    send_frame();
-                }
-            }
-
+            handle_pkt(pkt);
             break;
+#if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
+        case GNRC_NETTYPE_SIXLOWPAN:
+            printf("NETTYPE_SIXLOWPAN (%i)\n", pkt->type);
+            if (IS_USED(MODULE_SIXLOWPAN)) {
+                sixlowpan_print(pkt->data, pkt->size);
+                hdr_len = pkt->size;
+            }
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) */
+#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+        case GNRC_NETTYPE_IPV6:
+            printf("NETTYPE_IPV6 (%i)\n", pkt->type);
+            if (IS_USED(MODULE_IPV6_HDR)) {
+                ipv6_hdr_print(pkt->data);
+                hdr_len = sizeof(ipv6_hdr_t);
+            }
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_IPV6) */
+#if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT)
+        case GNRC_NETTYPE_IPV6_EXT:
+            printf("NETTYPE_IPV6_EXT (%i)\n", pkt->type);
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT) */
+#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
+        case GNRC_NETTYPE_ICMPV6:
+            printf("NETTYPE_ICMPV6 (%i)\n", pkt->type);
+            if (IS_USED(MODULE_ICMPV6)) {
+                icmpv6_hdr_print(pkt->data);
+                hdr_len = sizeof(icmpv6_hdr_t);
+            }
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_ICMPV6) */
+#if IS_USED(MODULE_GNRC_NETTYPE_TCP)
+        case GNRC_NETTYPE_TCP:
+            printf("NETTYPE_TCP (%i)\n", pkt->type);
+            if (IS_USED(MODULE_TCP)) {
+                tcp_hdr_print(pkt->data);
+                hdr_len = sizeof(tcp_hdr_t);
+            }
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_TCP) */
+#if IS_USED(MODULE_GNRC_NETTYPE_UDP)
+        case GNRC_NETTYPE_UDP:
+            printf("NETTYPE_UDP (%i)\n", pkt->type);
+            if (IS_USED(MODULE_UDP)) {
+                udp_hdr_print(pkt->data);
+                hdr_len = sizeof(udp_hdr_t);
+            }
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_UDP) */
+#if IS_USED(MODULE_GNRC_NETTYPE_CCN)
+        case GNRC_NETTYPE_CCN_CHUNK:
+            printf("GNRC_NETTYPE_CCN_CHUNK (%i)\n", pkt->type);
+            printf("Content is: %.*s\n", (int)pkt->size, (char*)pkt->data);
+            hdr_len = pkt->size;
+            break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_CCN) */
+#if IS_USED(MODULE_GNRC_NETTYPE_NDN)
+    case GNRC_NETTYPE_NDN:
+            printf("NETTYPE_NDN (%i)\n", pkt->type);
+        break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_NDN) */
+#if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN)
+    case GNRC_NETTYPE_LORAWAN:
+            printf("NETTYPE_LORAWAN (%i)\n", pkt->type);
+        break;
+#endif  /* IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) */
+#ifdef TEST_SUITES
+        case GNRC_NETTYPE_TEST:
+            printf("NETTYPE_TEST (%i)\n", pkt->type);
+            break;
+#endif
         default:
             printf("NETTYPE_UNKNOWN (%i)\n", pkt->type);
             break;
@@ -73,7 +165,7 @@ static void dump_snip(gnrc_pktsnip_t *pkt)
     }
 }
 
-static void dump_pkt(gnrc_pktsnip_t *pkt)
+static void _dump(gnrc_pktsnip_t *pkt)
 {
     int snips = 0;
     int size = 0;
@@ -82,7 +174,7 @@ static void dump_pkt(gnrc_pktsnip_t *pkt)
     while (snip != NULL) {
         printf("~~ SNIP %2i - size: %3u byte, type: ", snips,
                (unsigned int)snip->size);
-        dump_snip(snip);
+        _dump_snip(snip);
         ++snips;
         size += snip->size;
         snip = snip->next;
@@ -92,33 +184,29 @@ static void dump_pkt(gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_release(pkt);
 }
 
-static void *task_func(void *arg)
+static void *_eventloop(void *arg)
 {
     (void)arg;
+    msg_t msg, reply;
+    msg_t msg_queue[GNRC_PKTDUMP_MSG_QUEUE_SIZE];
 
-    // Setup the message queue
-    msg_t msg_queue[queue_size];
-    msg_init_queue(msg_queue, queue_size);
+    /* setup the message queue */
+    msg_init_queue(msg_queue, GNRC_PKTDUMP_MSG_QUEUE_SIZE);
 
-    // Prepare message reply
-    msg_t reply;
     reply.content.value = (uint32_t)(-ENOTSUP);
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 
-    // Forever wait for new messages and handle
-    msg_t msg;
     while (1) {
         msg_receive(&msg);
-        LED2_ON;
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 puts("PKTDUMP: data received:");
-                dump_pkt((gnrc_pktsnip_t*) msg.content.ptr);
+                _dump(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 puts("PKTDUMP: data to send:");
-                dump_pkt((gnrc_pktsnip_t*) msg.content.ptr);
+                _dump(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
             case GNRC_NETAPI_MSG_TYPE_SET:
@@ -130,44 +218,21 @@ static void *task_func(void *arg)
         }
     }
 
-    // Never reached
+    /* never reached */
     return NULL;
 }
 
-void thread_recv_start(void)
+kernel_pid_t thread_recv_start(void)
 {
-    if (pid == KERNEL_PID_UNDEF) {
-        // Create the thread
-        pid = thread_create(
-            stack,
-            sizeof(stack),
+    if (gnrc_pktdump_pid == KERNEL_PID_UNDEF) {
+        gnrc_pktdump_pid = thread_create(
+            _stack,
+            sizeof(_stack),
             THREAD_PRIORITY_RECV,
             THREAD_CREATE_STACKTEST,
-            task_func,
+            _eventloop,
             NULL,
-            "network-tap"
-        );
-
-        if (pid < 0) {
-            LOG_ERROR("Failed to create thread %s", errno_string(pid));
-            return;
-        }
-
-        // Register the thread to receive events from the network stack
-        gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
-        int error = gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
-        if (error) {
-            LOG_ERROR("gnrc_netreg_register failed");
-            return;
-        }
-
-        // Get system time from the gateway if not set already
-        const char msg[] = "ping";
-        const uint8_t size = strlen(msg);
-        while (wsn_time_basetime() == 0) {
-            send_data((uint8_t*)msg, size);
-            LOG_INFO(msg);
-            ztimer_sleep(ZTIMER_MSEC, 10 * MS_PER_SEC);
-        }
+            "network-tap");
     }
+    return gnrc_pktdump_pid;
 }

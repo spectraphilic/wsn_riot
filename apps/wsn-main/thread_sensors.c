@@ -88,7 +88,7 @@ static void *task_func(void *arg)
     return NULL;
 }
 
-void thread_sensors_start(void)
+kernel_pid_t thread_sensors_start(void)
 {
     if (pid == KERNEL_PID_UNDEF) {
         pid = thread_create(
@@ -103,9 +103,11 @@ void thread_sensors_start(void)
 
         if (pid < 0) {
             LOG_ERROR("Failed to create thread %s", errno_string(pid));
-            return;
+            return pid;
         }
     }
+
+    return pid;
 }
 
 #endif
