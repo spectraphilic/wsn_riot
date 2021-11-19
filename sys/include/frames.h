@@ -12,6 +12,8 @@
 #ifndef FRAMES_H
 #define FRAMES_H
 
+#include <ztimer.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,7 +26,7 @@ int frames_init(void);
 /**
  * @brief Saves a frame into the filesystem
  */
-int frames_save(time_t time, uint8_t *data, uint8_t length);
+int frames_save(ztimer_now_t time, const void *data, uint8_t length);
 
 /**
  * @brief Loads a frame from the filesystem

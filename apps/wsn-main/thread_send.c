@@ -23,14 +23,12 @@ int send_frame(void)
     if (n <= 0)
         return n;
 
-    LOG_INFO("Frame loaded len=%d (%d left)", len, n);
-
     // Send frame
     int error = send_data(buffer, len);
     if (error < 0)
         return error;
 
-    LOG_INFO("Frame sent (%d left)", n);
+    LOG_INFO("Frame sent n=%d");
     return n;
 }
 

@@ -26,7 +26,7 @@
 
 static void handle_pkt(gnrc_pktsnip_t *pkt)
 {
-    LOG_INFO("ECHO:  %.*s\n", pkt->size, (char*)pkt->data);
+    LOG_INFO("Recv \"%.*s\"\n", pkt->size, (char*)pkt->data);
 
     // Command
     // TODO Use the shell, for this we need to call handle_input_line from

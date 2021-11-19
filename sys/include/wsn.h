@@ -13,11 +13,9 @@
 #ifndef WSN_H
 #define WSN_H
 
-// Standard
-#include <time.h>
-
 // Riot
 #include <timex.h>
+#include <ztimer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,17 +57,17 @@ int wsn_network_init(void);
  * The basetime is an internal variable, useful to calculate the system time.
  * If the value is zero it means that the system time has not been set yet.
  */
-time_t wsn_time_basetime(void);
+ztimer_now_t wsn_time_basetime(void);
 
 /**
  * @brief Returns system time
  */
-time_t wsn_time_get(void);
+ztimer_now_t wsn_time_get(unsigned *ms);
 
 /**
  * @brief Sets system time
  */
-int wsn_time_set(time_t time);
+int wsn_time_set(ztimer_now_t time);
 
 #ifdef __cplusplus
 }

@@ -30,7 +30,7 @@ static void *task_func(void *arg)
 
     for (unsigned int loop=0; ; loop++) {
         LED0_ON;
-        time_t time = wsn_time_get();
+        ztimer_now_t time = wsn_time_get(NULL);
 
         // Read sensors and fill buffer
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
@@ -77,7 +77,6 @@ static void *task_func(void *arg)
 
         // Save the frame
         frames_save(time, buffer, len);
-        LOG_INFO("Frame saved len=%d", len);
 
         // Done
         LED0_OFF;

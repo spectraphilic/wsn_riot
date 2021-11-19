@@ -11,6 +11,7 @@
 #include <vfs.h>
 
 // Project
+#include <frames.h>
 #include <triage.h>
 
 
@@ -175,12 +176,12 @@ int frames_init(void)
     return error;
 }
 
-int frames_save(time_t time, const void *data, uint8_t size)
+int frames_save(ztimer_now_t time, const void *data, uint8_t size)
 {
     char filename[30];
 
     // Get filename
-    struct tm *calendar = gmtime(&time);
+    struct tm *calendar = gmtime((time_t*)&time);
     int year = calendar->tm_year % 100; // Since 1900, but we only care about the last 2 digits
     int month = calendar->tm_mon + 1; // Starts from zero, so we add +1
     int day = calendar->tm_mday;
@@ -206,6 +207,7 @@ int frames_save(time_t time, const void *data, uint8_t size)
     };
     queue_push(&item);
 
+    LOG_INFO("Frame saved size=%d", size);
     return 0;
 }
 
@@ -225,10 +227,13 @@ int frames_load(uint8_t *data, uint8_t *size)
     *size = vfs_read(fd, data, item.size);
     vfs_close(fd);
 
+    LOG_INFO("Frame loaded size=%d n=%lu", *size, n);
     return n;
 }
 
 int frames_drop(void)
 {
-    return queue_drop();
+    int n = queue_drop();
+    LOG_INFO("Frame dropped n=%d", n);
+    return n;
 }

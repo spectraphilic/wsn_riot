@@ -22,6 +22,9 @@
 #include <ztimer.h>
 #include <vfs.h>
 
+// Project
+#include <wsn.h>
+
 
 static inline const char* loglevel2str(unsigned level) {
     switch (level) {
@@ -55,13 +58,14 @@ static inline void log_write(unsigned level, const char *format, ...) {
     va_end(args);
 
     // Log line
-    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
+    unsigned ms;
+    ztimer_now_t now = wsn_time_get(&ms);
     snprintf(
         buffer,
         buffer_len,
-        "time=%lu.%03lu level=%s thread=%s %s",
-        now / MS_PER_SEC,
-        now % MS_PER_SEC,
+        "time=%lu.%03u level=%s thread=%s %s",
+        now,
+        ms,
         loglevel2str(level),
         thread_getname(thread_getpid()),
         message

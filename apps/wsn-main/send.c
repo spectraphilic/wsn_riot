@@ -26,7 +26,7 @@ int send_data(const uint8_t *data, size_t size)
     }
 
     // Data
-    LOG_INFO("gnrc_pktbuf_add(...) size = %d", size);
+    //LOG_INFO("gnrc_pktbuf_add(...) size = %d", size);
     pkt = gnrc_pktbuf_add(NULL, data, size, GNRC_NETTYPE_UNDEF);
     if (pkt == NULL) {
         LOG_ERROR("Unable to copy data to packet buffer");
