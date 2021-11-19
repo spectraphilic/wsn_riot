@@ -19,6 +19,20 @@ uint64_t cpuid = 0;
 
 void wsn_boot(void)
 {
+    puts("");
+    puts("Platform information, for development: ");
+    printf("   sizeof(short)        = %d\n", sizeof(short));
+    printf("   sizeof(int)          = %d\n", sizeof(int));
+    printf("   sizeof(long)         = %d\n", sizeof(long));
+    printf("   sizeof(long long)    = %d\n", sizeof(long long));
+    printf("   sizeof(time_t)       = %d\n", sizeof(time_t));
+    printf("   sizeof(ztimer_now_t) = %d\n", sizeof(ztimer_now_t));
+    printf("   THREAD_EXTRA_STACKSIZE_PRINTF = %d\n", THREAD_EXTRA_STACKSIZE_PRINTF);
+    printf("   THREAD_STACKSIZE_DEFAULT      = %d\n", THREAD_STACKSIZE_DEFAULT);
+    printf("   THREAD_STACKSIZE_IDLE         = %d\n", THREAD_STACKSIZE_IDLE);
+    printf("   ISR_STACKSIZE                 = %u\n", ISR_STACKSIZE);
+    puts("");
+
     /*
      * ID
      *
@@ -41,14 +55,10 @@ void wsn_boot(void)
     }
 
     // Storage
-    if (IS_USED(MODULE_FATFS_VFS)) {
+    if (IS_USED(MODULE_LITTLEFS2)) {
         if (wsn_mount() == 0) {
             if (IS_USED(MODULE_SETTINGS)) {
-                int error = settings_load();
-                if (error == 0)
-                    LOG_INFO("Settings loaded");
-            } else {
-                LOG_WARNING("Missing settings module");
+                settings_load();
             }
 
             if (IS_USED(MODULE_FRAMES)) {

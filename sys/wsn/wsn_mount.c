@@ -1,8 +1,8 @@
-#ifdef MODULE_FATFS_VFS
+#ifdef MODULE_LITTLEFS2
 
 // RIOT
 #include <board.h> /* MTD_0 should be defined in board.h */
-#include <fs/fatfs.h>
+#include <fs/littlefs2_fs.h>
 #include <log.h>
 #include <mtd.h>
 #include <vfs.h>
@@ -35,27 +35,53 @@ static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_dev;
 #endif
 
 
-mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
+static littlefs2_desc_t fs_desc = {
+    .lock = MUTEX_INIT,
+};
 
-static fatfs_desc_t fs_desc; // By default .vol_idx = 0
 static vfs_mount_t mountp = {
-    .fs = &fatfs_file_system,       // Driver
+    .fs = &littlefs2_file_system,   // Driver
     .private_data = &fs_desc,       // Driver data
     .mount_point = "/",             // Mount point
 };
 
 int wsn_mount(void)
 {
-    fatfs_mtd_devs[fs_desc.vol_idx] = MTD_0;
+    fs_desc.dev = MTD_0;
 
     int error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("Error mounting SD card: %s", errno_string(error));
+        LOG_ERROR("Failed to mount (%s)", errno_string(error));
         return error;
     }
 
     LOG_INFO("SD card mounted");
     return 0;
 }
+
+int wsn_format(void)
+{
+    int error;
+
+    // Do not check error. This will happen if the card has a different file
+    // system
+    vfs_umount(&mountp);
+
+    error = vfs_format(&mountp);
+    if (error < 0) {
+        LOG_ERROR("Failed to format (%s)\n", errno_string(error));
+        return error;
+    }
+
+    error = vfs_mount(&mountp);
+    if (error < 0) {
+        LOG_ERROR("Failed to mount (%s)", errno_string(error));
+        return error;
+    }
+
+    LOG_INFO("Successfully formatted\n");
+    return 0;
+}
+
 
 #endif

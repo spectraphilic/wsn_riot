@@ -37,6 +37,11 @@ extern uint64_t cpuid;
 void wsn_boot(void);
 
 /**
+ * @brief Format SD card
+ */
+int wsn_format(void);
+
+/**
  * @brief Mount filesystem
  *
  * Mounts the FAT filesystem in SD card at the root directory.

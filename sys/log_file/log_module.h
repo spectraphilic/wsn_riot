@@ -81,9 +81,14 @@ static inline void log_write(unsigned level, const char *format, ...) {
     print_str(buffer);
 
     // Print to file
-    int fd = vfs_open("/log.txt", O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
+    const char *filename = "/log.txt";
+    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
     if (fd >= 0) {
-        vfs_write(fd, buffer, strlen(buffer));
+        int len = strlen(buffer);
+        ssize_t size = vfs_write(fd, buffer, len);
+        if (size != (ssize_t)len) {
+            printf("Error in vfs_write(%s), return %d, expected %d ", filename, size, len);
+        }
         vfs_close(fd);
     }
 }

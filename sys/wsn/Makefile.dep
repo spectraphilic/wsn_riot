@@ -2,7 +2,7 @@ FEATURES_REQUIRED += cpp
 FEATURES_REQUIRED += periph_cpuid
 
 # Storage
-USEMODULE += fatfs_vfs
+USEMODULE += littlefs2
 USEMODULE += mtd_sdcard
 
 # Networking

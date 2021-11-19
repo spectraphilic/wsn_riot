@@ -26,7 +26,7 @@ typedef struct {
     uint8_t size;
 } item_t;
 
-const char queue_path[] = "/QUEUE.BIN";
+const char queue_path[] = "/queue.bin";
 const uint8_t head_size = sizeof(queue_header_t);
 const uint8_t item_size = sizeof(item_t);
 

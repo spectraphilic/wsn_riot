@@ -23,6 +23,7 @@ const shell_command_t shell_commands[] = {
 #ifdef MODULE_VFS
     {"cat", "print contents of given filename", cmd_cat},
     {"catx", "print contents of given filename in hexadecimal", cmd_catx},
+    {"format", "format the SD card", cmd_format},
 #endif
 #ifdef MODULE_SHT3X
     {"sht", "read SHT31", cmd_sht},

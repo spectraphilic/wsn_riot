@@ -21,7 +21,12 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
 
-ifeq (waspmote-pro, $(BOARD))
+ifeq (remote-revb, $(BOARD))
+  # Otherwise we get stack overflow errors, probably also needed for other
+  # boards. Default is 512 for cotexm_common
+  CFLAGS += -DTHREAD_EXTRA_STACKSIZE_PRINTF=1024
+
+else ifeq (waspmote-pro, $(BOARD))
   # This is to avoid "Invalid device signature" error, applies to other AVR
   # boards as well. Should be done in RIOT.
   FFLAGS_EXTRA = -F
