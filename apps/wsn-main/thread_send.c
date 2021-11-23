@@ -28,7 +28,7 @@ int send_frame(void)
     if (error < 0)
         return error;
 
-    LOG_INFO("Frame sent n=%d");
+    LOG_INFO("Frame sent (%d left)", n);
     return n;
 }
 

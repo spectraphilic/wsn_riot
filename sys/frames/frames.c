@@ -81,7 +81,7 @@ static int queue_make(void)
 
 static int queue_push(void *item)
 {
-    int fd = vfs_open(queue_path, O_WRONLY | O_APPEND | O_SYNC, 0);
+    int fd = vfs_open(queue_path, O_WRONLY | O_APPEND, 0);
     if (fd < 0) {
         return fd;
     }
@@ -181,19 +181,20 @@ int frames_save(ztimer_now_t time, const void *data, uint8_t size)
     char filename[30];
 
     // Get filename
-    struct tm *calendar = gmtime((time_t*)&time);
+    time_t timex = (time_t)time;
+    struct tm *calendar = gmtime(&timex);
     int year = calendar->tm_year % 100; // Since 1900, but we only care about the last 2 digits
     int month = calendar->tm_mon + 1; // Starts from zero, so we add +1
     int day = calendar->tm_mday;
     get_data_filename(filename, year, month, day);
 
     // Save frame
-    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
+    int fd = vfs_open(filename, O_CREAT | O_WRONLY, 0);
     if (fd < 0) {
         LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return fd;
     }
-    off_t offset = tell(fd);
+    off_t offset = vfs_lseek(fd, 0, SEEK_END);
     vfs_write(fd, data, size);
     vfs_close(fd);
 
@@ -207,7 +208,7 @@ int frames_save(ztimer_now_t time, const void *data, uint8_t size)
     };
     queue_push(&item);
 
-    LOG_INFO("Frame saved size=%d", size);
+    LOG_INFO("Save filename=%s offset=%ld size=%d", filename, item.offset, size);
     return 0;
 }
 
@@ -227,7 +228,7 @@ int frames_load(uint8_t *data, uint8_t *size)
     *size = vfs_read(fd, data, item.size);
     vfs_close(fd);
 
-    LOG_INFO("Frame loaded size=%d n=%lu", *size, n);
+    LOG_INFO("Load filename=%s offset=%ld size=%d (%lu left)", filename, item.offset, *size, n);
     return n;
 }
 
