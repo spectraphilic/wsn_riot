@@ -224,6 +224,10 @@ int frames_load(uint8_t *data, uint8_t *size)
 
     get_data_filename(filename, item.year, item.month, item.day);
     int fd = vfs_open(filename, O_RDONLY, 0);
+    if (fd < 0) {
+        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
+        return fd;
+    }
     vfs_lseek(fd, item.offset, SEEK_SET);
     *size = vfs_read(fd, data, item.size);
     vfs_close(fd);

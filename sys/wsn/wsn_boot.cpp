@@ -31,6 +31,8 @@ void wsn_boot(void)
     printf("   THREAD_STACKSIZE_DEFAULT      = %d\n", THREAD_STACKSIZE_DEFAULT);
     printf("   THREAD_STACKSIZE_IDLE         = %d\n", THREAD_STACKSIZE_IDLE);
     printf("   ISR_STACKSIZE                 = %u\n", ISR_STACKSIZE);
+    //printf("   CC2538_RF_FIFO_SIZE           = %d\n", CC2538_RF_FIFO_SIZE);
+    printf("   RFCORE_XREG_TXFIFOCNT         = %lu\n", RFCORE_XREG_TXFIFOCNT);
     puts("");
 
     /*

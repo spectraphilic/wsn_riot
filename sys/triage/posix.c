@@ -1,8 +1,12 @@
+// Standard library
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <sys/types.h>
+// Posix
 #include <unistd.h>
+
+// Riot
+#include <vfs.h>
 
 
 char* dgets(int fd, char *str, int num)
@@ -63,10 +67,4 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
     lseek(fd, position, SEEK_SET);
 
     return n;
-}
-
-
-off_t tell(int fd)
-{
-    return lseek(fd, 0, SEEK_CUR);
 }

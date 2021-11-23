@@ -69,11 +69,15 @@ static void *task_func(void *arg)
         }
 
         // For debugging purposes, print CBOR data
-        char message[150] = "CBOR=";
-        for (size_t k=0; k < len; k++) {
-            sprintf(message + strlen(message), "%02x", buffer[k]);
+        if (len < 30) {
+            char message[80] = "CBOR=";
+            for (size_t k=0; k < len; k++) {
+                sprintf(message + strlen(message), "%02x", buffer[k]);
+            }
+            LOG_INFO("%s", message);
+        } else {
+            LOG_INFO("CBOR size=%d", len);
         }
-        LOG_INFO("%s", message);
 
         // Save the frame
         frames_save(time, buffer, len);

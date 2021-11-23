@@ -39,8 +39,8 @@ static void handle_pkt(gnrc_pktsnip_t *pkt)
     int n;
 
     // time
-    unsigned int time;
-    n = sscanf(data, "time %u", &time);
+    ztimer_now_t time;
+    n = sscanf(data, "time %ld", &time);
     if (n == 1) {
         wsn_time_set(time);
         return;
