@@ -9,12 +9,12 @@
 #include <vfs.h>
 
 
-char* dgets(int fd, char *str, int num)
+char* vfs_gets(int fd, char *str, int num)
 {
     char c;
     int i;
     for (i = 0; i < num; i++) {
-        ssize_t n = read(fd, &c, 1);
+        ssize_t n = vfs_read(fd, &c, 1);
         if (n < 0) {
             return NULL;
         } else if (n == 0) {
@@ -33,7 +33,7 @@ char* dgets(int fd, char *str, int num)
 }
 
 
-int dprintf(int fd, const char *format, ...)
+int vfs_printf(int fd, const char *format, ...)
 {
     int size = 255;
     char buffer[size];
@@ -51,20 +51,20 @@ int dprintf(int fd, const char *format, ...)
         return -1;
     }
 
-    return write(fd, buffer, n);
+    return vfs_write(fd, buffer, n);
 }
 
 
-ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+ssize_t vfs_pread(int fd, void *buf, size_t count, off_t offset)
 {
-    off_t position = lseek(fd, 0, SEEK_CUR);
+    off_t position = vfs_lseek(fd, 0, SEEK_CUR);
     if (position < 0) {
         return position;
     }
 
-    lseek(fd, offset, SEEK_SET);
-    ssize_t n = read(fd, buf, count);
-    lseek(fd, position, SEEK_SET);
+    vfs_lseek(fd, offset, SEEK_SET);
+    ssize_t n = vfs_read(fd, buf, count);
+    vfs_lseek(fd, position, SEEK_SET);
 
     return n;
 }

@@ -1,15 +1,6 @@
-// Standard
-#include <errno.h>
-#include <string.h>
-
-// Posix
-#include <fcntl.h>
-#include <unistd.h>
-
 // Riot
-#include <fmt.h>
-#include <kernel_defines.h>
 #include <log.h>
+#include <vfs.h>
 
 // Project
 #include <triage.h>
@@ -75,16 +66,16 @@ int settings_save(void)
 {
     const char *filename = "/settings.txt";
 
-    int fd = open(filename, O_CREAT | O_WRONLY);
+    int fd = vfs_open(filename, O_CREAT | O_WRONLY, 0);
     if (fd < 0) {
         LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
         return -1;
     }
 
     int error;
-    dprintf(fd, "wan.type = %d\n", settings.wan_type);
+    vfs_printf(fd, "wan.type = %d\n", settings.wan_type);
 
-    error = close(fd);
+    error = vfs_close(fd);
     if (error) {
         LOG_ERROR("Failed to close %s", filename);
     }
@@ -96,7 +87,7 @@ int settings_load(void)
 {
     const char *filename = "/settings.txt";
 
-    int fd = open(filename, O_RDONLY);
+    int fd = vfs_open(filename, O_RDONLY, 0);
     if (fd < 0) {
         LOG_WARNING("Failed to open %s (%s)", filename, errno_string(fd));
         return -1;
@@ -105,7 +96,7 @@ int settings_load(void)
     char buffer[255];
     char name[20];
     char value[20];
-    while (dgets(fd, buffer, sizeof(buffer) - 1) != NULL) {
+    while (vfs_gets(fd, buffer, sizeof(buffer) - 1) != NULL) {
         if (buffer[0] == '\0') { // EOF
             break;
         }
@@ -114,7 +105,7 @@ int settings_load(void)
         }
     }
 
-    int error = close(fd);
+    int error = vfs_close(fd);
     if (error) {
         LOG_ERROR("Failed to close %s", filename);
     }

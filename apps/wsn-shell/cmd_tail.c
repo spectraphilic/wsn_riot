@@ -1,16 +1,9 @@
 #ifdef MODULE_VFS
 
-// Standard
-#include <errno.h>
-#include <stdio.h>
-
-// Posix
-#include <fcntl.h>
-#include <unistd.h>
-
 // RIOT
 #include <fmt.h>
 #include <log.h>
+#include <vfs.h>
 
 // Project
 #include <triage.h>
@@ -30,7 +23,7 @@ int cmd_tail(int argc, char **argv)
 
     // Open
     char *name = argv[2];
-    int fd = open(name, O_RDONLY);
+    int fd = vfs_open(name, O_RDONLY, 0);
     if (fd < 0) {
         LOG_ERROR("Failed to open %s (%s)", name, errno_string(fd));
         return -1;
@@ -42,9 +35,9 @@ int cmd_tail(int argc, char **argv)
     uint32_t nl = 0;
     ssize_t n;
 
-    offset = lseek(fd, 0, SEEK_END);
+    offset = vfs_lseek(fd, 0, SEEK_END);
     while (offset > 0) {
-        n = pread(fd, &c, 1, --offset);
+        n = vfs_pread(fd, &c, 1, --offset);
         if (n < 1) {
             break;
         }
@@ -63,9 +56,9 @@ int cmd_tail(int argc, char **argv)
     // Read forward
     size_t size = 255;
     char buffer[size];
-    lseek(fd, offset, SEEK_SET);
+    vfs_lseek(fd, offset, SEEK_SET);
     while (1) {
-        n = read(fd, buffer, size - 1);
+        n = vfs_read(fd, buffer, size - 1);
         if (n <= 0) { // Error or end-of-file
             break;
         }
@@ -76,7 +69,7 @@ int cmd_tail(int argc, char **argv)
     int error = (n < 0);
 
     // Close
-    error = close(fd);
+    error = vfs_close(fd);
     return error;
 }
 

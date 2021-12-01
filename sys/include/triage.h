@@ -39,11 +39,7 @@ char* errno_string(int errnum);
 /**
  * @brief Print formatted string to file descriptor
  *
- * @note Specified in POSIX.1-2008 this one should be provided by RIOT, but it
- *       is not.
- *
- * @note We cannot use the higher level fprintf because AVR libc doesn't
- *       support it.
+ * @note Like dprintf from POSIX.1-2008 but for vfs.
  *
  * @param[in]   fd      file descriptor
  * @param[in]   format  format string
@@ -52,7 +48,7 @@ char* errno_string(int errnum);
  * @return      >= 0    total number of bytes written to the file descriptor
  * @return      < 0     inidicates an error
  */
-int dprintf(int fd, const char *format, ...);
+int vfs_printf(int fd, const char *format, ...);
 
 /**
  * @brief Read a line from the given file descriptor
@@ -63,8 +59,7 @@ int dprintf(int fd, const char *format, ...);
  * But read no more than the given number minus one, for the terminating null
  * character that will be written.
  *
- * @note This is like fgets except it uses a file descriptor. It's not
- *       specified in POSIX.
+ * @note Like fgets from the standard library, but for vfs.
  *
  * @param[in]   fd      file descriptor
  * @param[out]  str     pointer to a buffer where the line will be stored
@@ -74,7 +69,7 @@ int dprintf(int fd, const char *format, ...);
  * @return      str     the same pointer to the buffer is returned on success
  * @return      NULL    indicates an error
  */
-char* dgets(int fd, char *str, int num);
+char* vfs_gets(int fd, char *str, int num);
 
 
 /**
@@ -94,7 +89,7 @@ char* dgets(int fd, char *str, int num);
  * @return      < 0 if error
  */
 
-ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+ssize_t vfs_pread(int fd, void *buf, size_t count, off_t offset);
 
 
 /**
