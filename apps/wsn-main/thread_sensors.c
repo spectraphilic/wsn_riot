@@ -100,16 +100,14 @@ static void *task_func(void *arg)
 
         // Save the frame
         frames_save(time, buffer, len);
-        LED0_OFF;
 
         // Send frames
         if (loop % SEND_LOOPS == 0) {
-            LED1_ON;
             send_frame();
-            LED1_OFF;
         }
 
         // Done
+        LED0_OFF;
         ztimer_sleep(ZTIMER_MSEC, LOOP_SECONDS * MS_PER_SEC);
     }
 
