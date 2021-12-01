@@ -55,7 +55,7 @@ static uint32_t read_header(int fd, queue_header_t *header)
 static int queue_make(void)
 {
     // Create file
-    int fd = vfs_open(queue_path, O_CREAT | O_WRONLY | O_SYNC | O_EXCL, 0);
+    int fd = vfs_open(queue_path, O_CREAT | O_WRONLY | O_EXCL, 0);
     if (fd == -EEXIST) {
         return 0;
     }

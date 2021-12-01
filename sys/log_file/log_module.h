@@ -86,7 +86,7 @@ static inline void log_write(unsigned level, const char *format, ...) {
 
     // Print to file
     const char *filename = "/log.txt";
-    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_SYNC | O_APPEND, 0);
+    int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_APPEND, 0);
     if (fd >= 0) {
         int len = strlen(buffer);
         ssize_t size = vfs_write(fd, buffer, len);
