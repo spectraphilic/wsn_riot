@@ -1,5 +1,5 @@
-Toolchains
-========================
+Howto Toolchains
+================
 
 You need to install a cross toolchain for every target architecture.
 

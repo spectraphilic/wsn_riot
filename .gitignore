@@ -1,4 +1,4 @@
 .*.swp
 /apps/*/bin/
-/doc/
+/doc/html/
 /.envrc

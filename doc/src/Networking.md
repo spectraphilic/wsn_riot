@@ -1,3 +1,6 @@
+Howto Networking
+================
+
 Test RE-Mote to XBee communication works.
 Use XCTU with XBee dongle.
 

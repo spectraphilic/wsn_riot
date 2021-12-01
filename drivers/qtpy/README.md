@@ -1,3 +1,6 @@
+Driver qtpy (SDI-12)
+====================
+
 This device driver is called qtpy for the Adafruit QT Py board, since that's
 what we use in production. But any board running the lagopus sketch from the
 wsn\_arduino repository will do.

@@ -1,5 +1,5 @@
-Quick Start
-========================
+Quick Start {#mainpage}
+===========
 
 Install requirements (some are optional, see comments). For Debian or Debian
 derivatives:
