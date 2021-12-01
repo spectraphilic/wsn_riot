@@ -23,6 +23,7 @@
 #include <vfs.h>
 
 // Project
+#include <triage.h>
 #include <wsn.h>
 
 
@@ -90,8 +91,11 @@ static inline void log_write(unsigned level, const char *format, ...) {
     if (fd >= 0) {
         int len = strlen(buffer);
         ssize_t size = vfs_write(fd, buffer, len);
-        if (size != (ssize_t)len) {
-            printf("Error in vfs_write(%s), return %d, expected %d ", filename, size, len);
+        if (size < 0) {
+            printf("Error callee=vfs_write args=%s errno=%s\n", filename, errno_string(size));
+        }
+        else if (size != (ssize_t)len) {
+            printf("Error callee=vfs_write args=%s wrote %d bytes should be %d\n", filename, size, len);
         }
         vfs_close(fd);
     }

@@ -51,8 +51,9 @@ int wsn_mount(void)
 
     int error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("Failed to mount (%s)", errno_string(error));
-        return error;
+        LOG_ERROR("func=wsn_mount callee=vfs_mount errno=%s", errno_string(error));
+        core_panic(PANIC_GENERAL_ERROR, "SD card is required");
+        //return error;
     }
 
     LOG_INFO("SD card mounted");
@@ -75,7 +76,7 @@ int wsn_format(void)
 
     error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("Failed to mount (%s)", errno_string(error));
+        LOG_ERROR("func=wsn_format callee=vfs_mount errno=%s", errno_string(error));
         return error;
     }
 
