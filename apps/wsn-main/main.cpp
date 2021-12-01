@@ -35,7 +35,6 @@ int main(void)
 
     // Start other threads
     thread_sensors_start();
-    thread_send_start();
 
     // The main thread will sleep forever
     thread_sleep();

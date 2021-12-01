@@ -18,6 +18,25 @@
 static kernel_pid_t pid = KERNEL_PID_UNDEF;
 static char stack[THREAD_STACKSIZE_MAIN];
 
+int send_frame(void)
+{
+    uint8_t buffer[150];
+    uint8_t len;
+
+    // Load frame
+    int n = frames_load(buffer, &len);
+    if (n <= 0)
+        return n;
+
+    // Send frame
+    int error = send_data(buffer, len);
+    if (error < 0)
+        return error;
+
+    LOG_INFO("Frame sent (%d left)", n);
+    return n;
+}
+
 static void *task_func(void *arg)
 {
     (void)arg;
@@ -81,9 +100,16 @@ static void *task_func(void *arg)
 
         // Save the frame
         frames_save(time, buffer, len);
+        LED0_OFF;
+
+        // Send frames
+        if (loop % SEND_LOOPS == 0) {
+            LED1_ON;
+            send_frame();
+            LED1_OFF;
+        }
 
         // Done
-        LED0_OFF;
         ztimer_sleep(ZTIMER_MSEC, LOOP_SECONDS * MS_PER_SEC);
     }
 
