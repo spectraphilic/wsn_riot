@@ -1,8 +1,8 @@
 #ifndef WSN_CONFIG_H
 #define WSN_CONFIG_H
 
-#define LOOP_SECONDS 30 // Loop every 30 seconds
-#define SEND_LOOPS 2 // Send frames every 2 loops
+#define LOOP_SECONDS 60 // Loop every 60 seconds
+#define SEND_LOOPS 5 // Send frames every 5 minutes
 
 #ifndef NODE_ID
     #define NODE_ID ""
