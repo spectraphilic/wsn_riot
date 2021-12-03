@@ -201,34 +201,6 @@ then it was a success. For example:
     BOARD=remote-revb make -C RIOT/tests/periph_rtt all flash test
 
 
-Boards
-========================
-
-These are some boards for interest:
-
-- ``remote-revb`` - The main board we use for development.
-
-- ``waspmote-pro`` - The old board used in our 1st generation motes. Some RIOT
-  programs may work.
-
-- ``arduino-uno`` and ``arduino-mega2560`` - Official Arduino boards with the
-  AVR architecture. However the Uno has very little memory, almost nothing of
-  interest will work on it.
-
-- ``arduino-zero`` - Official Arduino board with an ARM MCU.
-
-- ``feather-m0`` - A board from Adafruit with the same MCU as the Arduino Zero (SAMD21).
-
-Board: Arduino Zero
-------------------------
-
-To flash programs to the Arduino zero install openocd, see
-``https://api.riot-os.org/group__boards__arduino-zero.html``
-
-The board has 2 USB ports: the programming port and the native port.
-Use the programming port, the one close to the supply connector.
-
-
 Documentation
 ====================
 
@@ -239,16 +211,6 @@ of the project:
 
 And then open your browser at the proper location,
 ``file:///[...]/wsn_riot/doc/html/index.html``
-
-
-Troubleshooting
-====================
-
-If, with atmega boards, you get some error flashing like:
-
-    avrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x31
-
-Try unplugging and plugging again the USB cable.
 
 
 TODO
