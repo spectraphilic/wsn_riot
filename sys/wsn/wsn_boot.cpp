@@ -30,7 +30,9 @@ void wsn_boot(void)
     printf("   THREAD_EXTRA_STACKSIZE_PRINTF = %d\n", THREAD_EXTRA_STACKSIZE_PRINTF);
     printf("   THREAD_STACKSIZE_DEFAULT      = %d\n", THREAD_STACKSIZE_DEFAULT);
     printf("   THREAD_STACKSIZE_IDLE         = %d\n", THREAD_STACKSIZE_IDLE);
+#ifdef ISR_STACKSIZE
     printf("   ISR_STACKSIZE                 = %u\n", ISR_STACKSIZE);
+#endif
     puts("");
 
     /*
