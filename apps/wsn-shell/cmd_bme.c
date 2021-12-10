@@ -29,7 +29,7 @@ int cmd_bme(int argc, char **argv) {
         return -1;
     }
     gpio_set(SENS_PW_3V3);
-    ztimer_sleep(ZTIMER_USEC, 100000);
+    ztimer_sleep(ZTIMER_MSEC, 100);
 #endif
 
     // Initialize
