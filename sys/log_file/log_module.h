@@ -20,7 +20,10 @@
 #include <thread.h>
 #include <timex.h>
 #include <ztimer.h>
-#include <vfs.h>
+
+#ifdef MODULE_VFS
+    #include <vfs.h>
+#endif
 
 // Project
 #include <triage.h>
@@ -85,6 +88,7 @@ static inline void log_write(unsigned level, const char *format, ...) {
     // Print to stdout
     print_str(buffer);
 
+#ifdef MODULE_VFS
     // Print to file
     const char *filename = "/log.txt";
     int fd = vfs_open(filename, O_CREAT | O_WRONLY | O_APPEND, 0);
@@ -99,6 +103,8 @@ static inline void log_write(unsigned level, const char *format, ...) {
         }
         vfs_close(fd);
     }
+#endif
+
 }
 
 #endif

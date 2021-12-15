@@ -1,5 +1,7 @@
 #ifdef MODULE_VFS
 
+#include <fcntl.h>
+
 // RIOT
 #include <fmt.h>
 #include <log.h>

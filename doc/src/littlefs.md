@@ -27,7 +27,7 @@ To mount the filesystem:
 
 When finished unmount:
 
-    $ unmount mount
+    $ umount mount
 
 
 Troubleshooting

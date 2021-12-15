@@ -1,3 +1,5 @@
+#ifdef MODULE_VFS
+
 // Standard library
 #include <stdarg.h>
 #include <stdio.h>
@@ -68,3 +70,5 @@ ssize_t vfs_pread(int fd, void *buf, size_t count, off_t offset)
 
     return n;
 }
+
+#endif

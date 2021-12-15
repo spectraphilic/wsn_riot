@@ -1,7 +1,8 @@
 include ../Makefile.common
 
+FEATURES_REQUIRED += cpp
+
 # System modules
-USEMODULE += fmt
 #USEMODULE += periph_rtc
 USEMODULE += saul_default
 

@@ -21,6 +21,12 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
 
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  # The feather-m0 uses stdio over USB, and that's slow to start. So don't
+  # print the boot message, it will arrive too late anyway.
+  CFLAGS += -DCONFIG_SKIP_BOOT_MSG
+endif
+
 ifeq (remote-revb, $(BOARD))
   # Otherwise we get stack overflow errors, probably also needed for other
   # boards. Default is 512 for cotexm_common

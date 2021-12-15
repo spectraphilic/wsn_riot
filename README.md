@@ -51,8 +51,21 @@ The build can be modified passing some paramters, these may be useful:
     # Log level: LOG_NONE, LOG_ERROR, LOG_WARNING, LOG_INFO (default), LOG_DEBUG, LOG_ALL
     LOG_LEVEL=LOG_DEBUG
 
-    # Use modules changes behaviour
-    USEMODULE=log_color
+    # Wait n seconds before opening the terminal (default is 2)
+    TERM_DELAY=1
+
+    # The terminal to use (default is pyterm)
+    RIOT_TERMINAL=socat
+
+Modules can be enabled in the command line, for example:
+
+    # Type "s" to start
+    USEMODULE=test_utils_interactive_sync
+
+Examples with CFLAGS:
+
+    # Don't print the boot message "main(): This is RIOT! ..."
+    CFLAGS="-DCONFIG_SKIP_BOOT_MSG"
 
 
 Programs: wsn-shell

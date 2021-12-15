@@ -19,6 +19,11 @@ uint64_t cpuid = 0;
 
 void wsn_boot(void)
 {
+#if IS_USED(MODULE_STDIO_CDC_ACM)
+    // USB is slooow
+    ztimer_sleep(ZTIMER_MSEC, 2000);
+#endif
+
     puts("");
     puts("Platform information, for development: ");
     printf("   sizeof(short)        = %d\n", sizeof(short));
