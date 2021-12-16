@@ -27,12 +27,14 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   CFLAGS += -DCONFIG_SKIP_BOOT_MSG
 endif
 
-ifeq (remote-revb, $(BOARD))
-  # Otherwise we get stack overflow errors, probably also needed for other
-  # boards. Default is 512 for cotexm_common
+ifneq (,$(filter feather-m0 remote-revb,$(BOARD)))
+  # Increase stack size, otherwise we get overflow errors, or the program
+  # simply hangs. Default is 512 for cotexm_common.
+  # TODO Do this for every cortexm cpu
   CFLAGS += -DTHREAD_EXTRA_STACKSIZE_PRINTF=1024
+endif
 
-else ifeq (waspmote-pro, $(BOARD))
+ifeq (waspmote-pro, $(BOARD))
   # This is to avoid "Invalid device signature" error, applies to other AVR
   # boards as well. Should be done in RIOT.
   FFLAGS_EXTRA = -F
