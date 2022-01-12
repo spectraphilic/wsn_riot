@@ -76,6 +76,9 @@ void wsn_boot(void)
         LOG_WARNING("Missing VFS module");
     }
 
+    // RTC
+    wsn_rtc_init();
+
     // Sensors
     #ifdef MODULE_QTPY
         qtpy_init_auto();

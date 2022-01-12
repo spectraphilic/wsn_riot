@@ -1,6 +1,9 @@
 FEATURES_REQUIRED += cpp
 FEATURES_REQUIRED += periph_cpuid
 
+# Drivers
+#USEMODULE += ds3231
+
 # Storage
 USEMODULE += littlefs2
 USEMODULE += mtd_sdcard

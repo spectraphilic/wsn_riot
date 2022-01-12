@@ -13,6 +13,8 @@
 #ifndef WSN_H
 #define WSN_H
 
+#include <time.h>
+
 // Riot
 #include <timex.h>
 #include <ztimer.h>
@@ -50,6 +52,26 @@ int wsn_mount(void);
  * @brief Initialize the network
  */
 int wsn_network_init(void);
+
+/**
+ * @brief XXX
+ */
+int wsn_rtc_init(void);
+
+/**
+ * @brief XXX
+ */
+int wsn_rtc_temp(int16_t *temp);
+
+/**
+ * @brief XXX
+ */
+int wsn_rtc_time_get(struct tm *time);
+
+/**
+ * @brief XXX
+ */
+int wsn_rtc_time_set(struct tm *time);
 
 /**
  * @brief Returns the basetime

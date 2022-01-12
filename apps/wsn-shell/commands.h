@@ -14,6 +14,9 @@ int cmd_format(int argc, char **argv);
 int cmd_sht(int argc, char **argv);
 int cmd_tail(int argc, char **argv);
 int cmd_var(int argc, char **argv);
+int cmd_rtc_temp(int argc, char **argv);
+int cmd_rtc_time_get(int argc, char **argv);
+int cmd_rtc_time_set(int argc, char **argv);
 
 #ifdef __cplusplus
 }
