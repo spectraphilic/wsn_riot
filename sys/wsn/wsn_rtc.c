@@ -29,7 +29,7 @@ int wsn_rtc_init(void)
 
     // No RTC
     LOG_WARNING("Missing RTC module");
-    return 0;
+    return -1;
 }
 
 
@@ -47,7 +47,7 @@ int wsn_rtc_temp(int16_t *temp) {
 
     // No RTC
     LOG_WARNING("Missing RTC module");
-    return 0;
+    return -1;
 }
 
 
@@ -66,7 +66,7 @@ int wsn_rtc_time_get(struct tm *time)
 
     // No RTC
     LOG_WARNING("Missing RTC module");
-    return 0;
+    return -1;
 }
 
 
@@ -85,5 +85,5 @@ int wsn_rtc_time_set(struct tm *time)
 
     // No RTC
     LOG_WARNING("Missing RTC module");
-    return 0;
+    return -1;
 }

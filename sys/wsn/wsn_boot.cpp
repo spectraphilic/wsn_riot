@@ -77,7 +77,7 @@ void wsn_boot(void)
     }
 
     // RTC
-    wsn_rtc_init();
+    wsn_time_load();
 
     // Sensors
     #ifdef MODULE_QTPY

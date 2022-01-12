@@ -54,22 +54,22 @@ int wsn_mount(void);
 int wsn_network_init(void);
 
 /**
- * @brief XXX
+ * @brief Initialize the external RTC
  */
 int wsn_rtc_init(void);
 
 /**
- * @brief XXX
+ * @brief Return the temperature read from the RTC
  */
 int wsn_rtc_temp(int16_t *temp);
 
 /**
- * @brief XXX
+ * @brief Return the time read from the RTC
  */
 int wsn_rtc_time_get(struct tm *time);
 
 /**
- * @brief XXX
+ * @brief Set RTC time with the given time
  */
 int wsn_rtc_time_set(struct tm *time);
 
@@ -85,6 +85,11 @@ ztimer_now_t wsn_time_basetime(void);
  * @brief Returns system time
  */
 ztimer_now_t wsn_time_get(unsigned *ms);
+
+/**
+ * @brief Load system time from RTC
+ */
+int wsn_time_load(void);
 
 /**
  * @brief Sets system time
