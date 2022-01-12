@@ -59,6 +59,9 @@ The build can be modified passing some paramters, these may be useful:
 
 Modules can be enabled in the command line, for example:
 
+    # Have a shield with the DS3231 RTC
+    USEMODULE=ds3231
+
     # Type "s" to start
     USEMODULE=test_utils_interactive_sync
 

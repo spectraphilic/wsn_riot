@@ -26,9 +26,8 @@ const shell_command_t shell_commands[] = {
     {"format", "format the SD card", cmd_format},
 #endif
 #ifdef MODULE_DS3231
-    {"rtc_temp", "print temperature", cmd_rtc_temp},
-    {"rtc_time", "print time", cmd_rtc_time_get},
-    {"rtc_time_set", "set time", cmd_rtc_time_set},
+    {"rtc_temp", "get temperature", cmd_rtc_temp},
+    {"rtc_time", "get/set time", cmd_rtc_time},
 #endif
 #ifdef MODULE_SHT3X
     {"sht", "read SHT31", cmd_sht},

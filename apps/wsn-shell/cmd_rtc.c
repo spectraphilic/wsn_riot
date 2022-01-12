@@ -33,28 +33,6 @@ int cmd_rtc_temp(int argc, char **argv)
     return 0;
 }
 
-int cmd_rtc_time_get(int argc, char **argv)
-{
-    // Arguments
-    (void)argv;
-    if (check_argc(argc, 1) < 0) {
-        return -1;
-    }
-
-    // Read
-    struct tm time;
-    wsn_rtc_time_get(&time);
-
-    // Print
-    char dstr[ISOSTR_LEN];
-    size_t pos = strftime(dstr, ISOSTR_LEN, "%Y-%m-%dT%H:%M:%S", &time);
-    dstr[pos] = '\0';
-    printf("The current time is: %s\n", dstr);
-
-    return 0;
-}
-
-
 /* parse ISO date string (YYYY-MM-DDTHH:mm:ss) to struct tm */
 static int _tm_from_str(const char *str, struct tm *time)
 {
@@ -98,24 +76,37 @@ static int _tm_from_str(const char *str, struct tm *time)
     return 0;
 }
 
-int cmd_rtc_time_set(int argc, char **argv)
+int cmd_rtc_time(int argc, char **argv)
 {
-    // Arguments
-    if (check_argc(argc, 2) < 0) {
-        printf("usage: %s <iso-date-str YYYY-MM-DDTHH:mm:ss>\n", argv[0]);
+    struct tm time;
+
+    if (argc > 2) {
+        printf("Too many arguments\n");
         return -1;
     }
 
-    if (strlen(argv[1]) != (ISOSTR_LEN - 1)) {
-        puts("error: input date string has invalid length");
-        return 1;
+    // Get
+    if (argc == 1) {
+        wsn_rtc_time_get(&time);
+        // Print
+        char dstr[ISOSTR_LEN];
+        size_t pos = strftime(dstr, ISOSTR_LEN, "%Y-%m-%dT%H:%M:%S", &time);
+        dstr[pos] = '\0';
+        printf("The current time is: %s\n", dstr);
+
+        return 0;
     }
 
-    struct tm time;
+    // Set
+    if (strlen(argv[1]) != (ISOSTR_LEN - 1)) {
+        puts("error: input date string has invalid length");
+        return -1;
+    }
+
     int res = _tm_from_str(argv[1], &time);
     if (res != 0) {
         puts("error: unable do parse input date string");
-        return 1;
+        return -1;
     }
 
     if (wsn_rtc_time_set(&time) == 0) {
