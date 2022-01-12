@@ -33,7 +33,7 @@ extern "C" {
  */
 
 #ifndef QTPY_PARAM_PIN
-#define QTPY_PARAM_PIN 13
+#define QTPY_PARAM_PIN 5
 #endif
 
 #ifndef QTPY_PARAM_ADDRESS
