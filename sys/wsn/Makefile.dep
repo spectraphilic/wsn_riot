@@ -3,6 +3,7 @@ FEATURES_REQUIRED += periph_cpuid
 
 # Drivers
 #USEMODULE += ds3231
+#USEMODULE += sx127x
 
 # Storage
 USEMODULE += littlefs2

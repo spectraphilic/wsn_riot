@@ -59,8 +59,11 @@ The build can be modified passing some paramters, these may be useful:
 
 Modules can be enabled in the command line, for example:
 
-    # Have a shield with the DS3231 RTC
+    # Have a shield with the DS3231 RTC (e.g. DS3231 FeatherWing)
     USEMODULE=ds3231
+
+    # Have a shield with a SX127x module (e.g the RFM95W FeatherWing)
+    USEMODULE=sx127x
 
     # Type "s" to start
     USEMODULE=test_utils_interactive_sync
