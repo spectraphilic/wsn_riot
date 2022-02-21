@@ -5,6 +5,7 @@
 #include <fs/littlefs2_fs.h>
 #include <log.h>
 #include <mtd.h>
+#include <panic.h>
 #include <vfs.h>
 
 // Project
