@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-int send_data(const uint8_t *data, size_t size);
 int send_frame(void);
 kernel_pid_t thread_recv_start(void);
 void thread_send_start(void);

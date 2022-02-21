@@ -54,6 +54,11 @@ int wsn_mount(void);
 int wsn_network_init(void);
 
 /**
+ * @brief Send data to the network
+ */
+int wsn_network_send(const uint8_t *data, size_t size);
+
+/**
  * @brief Initialize the external RTC
  */
 int wsn_rtc_init(void);

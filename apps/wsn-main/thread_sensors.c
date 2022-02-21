@@ -29,7 +29,7 @@ int send_frame(void)
         return n;
 
     // Send frame
-    int error = send_data(buffer, len);
+    int error = wsn_network_send(buffer, len);
     if (error < 0)
         return error;
 

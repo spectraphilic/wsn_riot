@@ -26,7 +26,7 @@ int main(void)
     const char msg[] = "ping";
     const uint8_t size = strlen(msg);
     while (wsn_time_basetime() == 0) {
-        send_data((uint8_t*)msg, size);
+        wsn_network_send((uint8_t*)msg, size);
         LOG_INFO(msg);
         ztimer_sleep(ZTIMER_MSEC, 10 * MS_PER_SEC);
     }
