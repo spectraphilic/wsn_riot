@@ -196,6 +196,7 @@ static void *_eventloop(void *arg)
     reply.content.value = (uint32_t)(-ENOTSUP);
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 
+    LOG_INFO("Network listening thread started");
     while (1) {
         msg_receive(&msg);
 
@@ -213,7 +214,7 @@ static void *_eventloop(void *arg)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                puts("PKTDUMP: received something unexpected");
+                LOG_WARNING("Unexpected network message");
                 break;
         }
     }
