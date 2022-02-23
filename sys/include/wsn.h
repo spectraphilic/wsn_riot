@@ -16,6 +16,7 @@
 #include <time.h>
 
 // Riot
+#include <net/gnrc/netif.h>
 #include <timex.h>
 #include <ztimer.h>
 
@@ -47,6 +48,11 @@ int wsn_format(void);
  * Mounts the FAT filesystem in SD card at the root directory.
  */
 int wsn_mount(void);
+
+/**
+ * @brief Initialize the network
+ */
+int wsn_network_get_opt(gnrc_netif_t *gnrc_netif, netopt_t opt, void *value, size_t max_len);
 
 /**
  * @brief Initialize the network

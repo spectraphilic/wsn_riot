@@ -195,7 +195,7 @@ static void fill_data(phyval_t *res, int32_t value, uint8_t unit, int8_t scale)
 static int sensor_qtpy_read(const void *ptr, phyval_t *res)
 {
     static float values[20];
-//  static int n = 0;
+    static int n = 0;
     static int i;
 
     qtpy_t *dev = (qtpy_t*) ptr;
@@ -290,7 +290,6 @@ static int sensor_qtpy_read(const void *ptr, phyval_t *res)
     }
 
     // VL53L1X
-/*
     n = qtpy_measure_data(dev, 8, values); // aM8! : n, distance, ..., distance
     if (n > 0) {
         fill_data(res, 213, UNIT_NONE, 0);
@@ -304,7 +303,6 @@ static int sensor_qtpy_read(const void *ptr, phyval_t *res)
             scrReturn(1);
         }
     }
-*/
 
     qtpy_end(dev);
 

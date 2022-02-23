@@ -55,22 +55,35 @@ static void *task_func(void *arg)
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
         nanocbor_fmt_array_indefinite(&enc);
 
-        // Timestamp
+#if IS_USED(MODULE_SX127X)
+        // Source address
+        uint8_t address[GNRC_NETIF_L2ADDR_MAXLEN];
+        wsn_network_get_opt(NULL, NETOPT_ADDRESS, &address, sizeof(address));
         nanocbor_fmt_uint(&enc, 0);
-        nanocbor_fmt_uint(&enc, time);
+        nanocbor_fmt_uint(&enc, address[0]);
+
+        // Destination address
+        nanocbor_fmt_uint(&enc, 1);
+        nanocbor_fmt_uint(&enc, 1); // Send to gateway
+#endif
 
         // Serial number
-        nanocbor_fmt_uint(&enc, 1);
+        nanocbor_fmt_uint(&enc, 2);
         nanocbor_fmt_uint(&enc, cpuid);
 
         // Name (Node Identifier)
-        nanocbor_fmt_uint(&enc, 2);
+        nanocbor_fmt_uint(&enc, 3);
         nanocbor_put_tstr(&enc, NODE_ID);
 
         // Frame sequence number
-        nanocbor_fmt_uint(&enc, 3);
+        nanocbor_fmt_uint(&enc, 4);
         nanocbor_fmt_uint(&enc, loop);
 
+        // Timestamp
+        nanocbor_fmt_uint(&enc, 123);
+        nanocbor_fmt_uint(&enc, time);
+
+        // Sensors
         sensor_t *sensor = sensors_list;
         while (sensor) {
             printf("%s:\n", sensor->name);

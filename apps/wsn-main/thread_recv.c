@@ -1,33 +1,18 @@
-#include <inttypes.h>
-#include <stdio.h>
-
-#include <errno.h>
-#include "byteorder.h"
-#include "thread.h"
-#include "msg.h"
-#include "net/gnrc/pktdump.h"
-#include "net/gnrc.h"
-#include "net/icmpv6.h"
-#include "net/ipv6/addr.h"
-#include "net/ipv6/hdr.h"
-#include "net/tcp.h"
-#include "net/udp.h"
-#include "net/sixlowpan.h"
-#include "od.h"
-
+// Riot
 #include <log.h>
+#include <nanocbor/nanocbor.h>
+#include <net/gnrc/pktdump.h>
+#include <net/gnrc.h>
+#include <od.h>
 
+// Project
 #include <frames.h>
-#include <wsn.h>
-#include "config.h"
 #include "common.h"
+#include "config.h"
 
 
-
-static void handle_pkt(gnrc_pktsnip_t *pkt)
+static int handle_cmd(const char *data, size_t len)
 {
-    LOG_INFO("Recv \"%.*s\"\n", pkt->size, (char*)pkt->data);
-
     // Command
     // TODO Use the shell, for this we need to call handle_input_line from
     // RIOT/sys/shell/shell.c but it's declared as static. This has been
@@ -35,15 +20,16 @@ static void handle_pkt(gnrc_pktsnip_t *pkt)
     // TODO Send a PR
     // handle_input_line(shell_commands, (char*)pkt->data));
 
-    char *data = (char*)pkt->data;
     int n;
+
+    (void)len; // FIXME
 
     // time
     ztimer_now_t time;
     n = sscanf(data, "time %ld", &time);
     if (n == 1) {
         wsn_time_set(time);
-        return;
+        return -1;
     }
 
     // ack
@@ -53,6 +39,54 @@ static void handle_pkt(gnrc_pktsnip_t *pkt)
             send_frame();
         }
     }
+
+    return 0;
+}
+
+
+static int handle_pkt(gnrc_pktsnip_t *pkt)
+{
+    LOG_INFO("Recv \"%.*s\"\n", pkt->size, (char*)pkt->data);
+
+#if IS_USED(MODULE_SX127X)
+    // Parse CBOR
+    nanocbor_value_t decoder;
+    nanocbor_decoder_init(&decoder, pkt->data, pkt->size);
+
+    nanocbor_value_t array;
+    int rc = nanocbor_enter_array(&decoder, &array);
+    if (rc < 0) {
+        LOG_ERROR("Expected CBOR array");
+        return -1;
+    }
+
+    const uint8_t *buf = NULL;
+    size_t buf_len;
+
+    uint8_t source_addr, target_addr;
+    rc = nanocbor_get_uint8(&array, &source_addr);
+    rc = nanocbor_get_uint8(&array, &target_addr);
+
+    uint8_t address;
+    wsn_network_get_opt(NULL, NETOPT_ADDRESS, &address, sizeof(address));
+    LOG_INFO("Packet addressed to %u (my address is %u)", target_addr, address);
+    if (target_addr != address && target_addr != 0) {
+        return 0;
+    }
+
+    while (!nanocbor_at_end(&array)) {
+        rc = nanocbor_get_tstr(&array, &buf, &buf_len);
+        handle_cmd((const char*)buf, buf_len);
+    }
+#else
+    // TODO Handle CBOR array as well, but without the source/target address.
+    // Problem is wsn_pi/wsn_xbee.py needs to send CBOR, but waspmote expects
+    // str.
+    handle_cmd(pkt->data, pkt->size);
+#endif
+
+
+    return 0;
 }
 
 
