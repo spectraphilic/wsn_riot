@@ -53,7 +53,7 @@ static inline const char* loglevel2str(unsigned level) {
 static inline void log_write(unsigned level, const char *format, ...) {
     size_t buffer_len = 180;
     char buffer[buffer_len];
-    char message[80];
+    char message[99];
 
     // Message
     va_list args;

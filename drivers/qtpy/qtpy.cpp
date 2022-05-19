@@ -140,7 +140,7 @@ static int qtpy_measure(qtpy_t *dev, unsigned int *ttt, uint8_t number)
 
 static int qtpy_data(qtpy_t *dev, float values[], uint8_t n)
 {
-    char command[3];
+    char command[5];
     uint8_t d = 0;
 
     int i = 0;
