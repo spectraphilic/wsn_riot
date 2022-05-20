@@ -43,11 +43,6 @@ Up:
 - Available and affordable
 - Several combinations possible with different shields
 
-Down:
-
-- RIOT doesn't support the arduino feature for this board, see
-  https://github.com/RIOT-OS/RIOT/pull/17335
-
 
 Arduino Zero (arduino-zero)
 ---------------------------

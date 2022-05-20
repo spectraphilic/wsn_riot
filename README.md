@@ -1,16 +1,16 @@
-Quick Start {#mainpage}
-===========
+# Quick Start {#mainpage}
 
-Install requirements (some are optional, see comments). For Debian or Debian
-derivatives:
+Install system wide requirements (some are optional, see comments). For Debian
+or Debian derivatives:
 
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo apt install gcc-multilib g++-multilib     # Native port
-    sudo apt install gcc-arm-none-eabi             # ARM
-    sudo apt install avr-libc gcc-avr avrdude      # AVR
-    sudo apt install python3-serial                # To use the terminal (shell)
-    sudo apt install openocd                       # Flash to Arduino Zero
+    apt update
+    apt upgrade
+    apt install doxygen                       # To build the documentation
+    apt install python3-serial                # To use the terminal (shell)
+    apt install gcc-arm-none-eabi             # ARM
+    apt install gcc-multilib g++-multilib     # Native port
+    apt install avr-libc gcc-avr avrdude      # AVR
+    apt install openocd                       # Flash to Arduino Zero
 
 Checkout RIOT. It's included as a Git submodule, so you don't need to clone
 manually, just initialize and update the submodules:
@@ -18,28 +18,34 @@ manually, just initialize and update the submodules:
     git submodule init
     git submodule update
 
-By default programs are compiled for the native port (Linux process). But this
-is not very useful, since the native port lacks features required by many
-programs, so most often it just doesn't build.
+Try building our apps (for the `feather-m0` board by default):
 
-Instead we need to tell which board we want to build the program for. In the
-examples below we're using the remote-revb board. For example:
+    make -C apps/wsn-shell
+    make -C apps/wsn-main
+
+To build, flash, and run the terminal program:
+
+    make -C apps/wsn-shell all flash term
+
+Check the `apps` directory for the available programs.
+
+# Boards
+
+In RIOT programs are by default built for the native port (Linux process). But
+we have changed this, in `wsn_riot` programs are by default built for the
+`feather-m0` board. Anyway, our apps don't build for the native port, because
+they require the arduino feature.
+
+If you wish to try building for a different board, you need to pass the
+appropriate build option:
 
     BOARD=remote-revb make -C apps/wsn-shell
 
-This line will just build the program. To flash it and run the terminal type:
+# Build options
 
-    BOARD=remote-revb make -C apps/wsn-shell all flash term
+The build can be modified passing some parameters, these may be useful:
 
-The programs from the project are in the ``apps`` directory.
-
-
-Build options
-========================
-
-The build can be modified passing some paramters, these may be useful:
-
-    # The board to build for, default is native
+    # The board to build for, default is feather-m0
     BOARD=remote-revb
 
     # Port the mote is connected to, default is /dev/ttyACM0
@@ -73,14 +79,17 @@ Examples with CFLAGS:
     # Don't print the boot message "main(): This is RIOT! ..."
     CFLAGS="-DCONFIG_SKIP_BOOT_MSG"
 
+Curently our datalogger is based on the Feather M0 Adalogger board, with the
+LoRa and the RTC wings. So you should build with this configuration:
 
-Programs: wsn-shell
-========================
+    USEMODULE="ds3231 sx127x" make -C apps/wsn-shell all flash term
+
+# Programs: wsn-shell
 
 This program will open a shell. It allows for exploration, testing and
 configuration of the mote:
 
-    BOARD=remote-revb make -C apps/wsn-shell all flash term
+    make -C apps/wsn-shell all flash term
 
 In the shell you can type a number of commands. For example, ``help``` lists
 the commands available:
@@ -142,9 +151,8 @@ The ``sdi`` command sends any SDI-12 command:
     2021-08-24 11:59:23,185 # sdi 5D0!
     2021-08-24 11:59:23,532 # => 5+21.01+68.06+892.26
 
-    
-Programs: wsn-main
-========================
+
+# Programs: wsn-main
 
 This is the main program. It will loop forever:
 
@@ -155,7 +163,7 @@ This is the main program. It will loop forever:
 
 To build this program you must pass the mote's name, like so:
 
-    NODE_ID=remote_cs BOARD=remote-revb make -C apps/wsn-main all flash term
+    NODE_ID=cas1 make -C apps/wsn-main all flash term
 
 Before entering the sample/send loop it will first try to grab the time from
 the network: sending *ping* commands and waiting for a reply with the time.
@@ -163,7 +171,7 @@ the network: sending *ping* commands and waiting for a reply with the time.
 To avoid this first step, when you're developing and don't have the network
 set-up, you can pass the time at build time:
 
-    BASETIME=`date +%s` NODE_ID=remote_cs BOARD=remote-revb make -C apps/wsn-main/ all flash term
+    BASETIME=`date +%s` NODE_ID=cas1 make -C apps/wsn-main/ all flash term
 
 This is an excerpt of a loop:
 
@@ -181,8 +189,7 @@ You can verify the data, with the ``riot.py`` program from the ``wsn_pi`` projec
     {...}
 
 
-Optional: direnv
-========================
+# Optional: direnv
 
 If you don't want to type the node's name again and again, you can use *direnv*
 to define it once.
@@ -196,7 +203,7 @@ Install direnv in Debian or Debian derivatives:
 
 Create the ``.envrc`` file:
 
-    export NODE_ID=remote_cs
+    export NODE_ID=cas1
 
 Enable direnv:
 
@@ -204,24 +211,22 @@ Enable direnv:
 
 Now you don't need to pass ``NODE_ID`` in the command line:
 
-    BASETIME=`date +%s` BOARD=remote-revb make -C apps/wsn-main/ all flash term
+    BASETIME=`date +%s` make -C apps/wsn-main/ all flash term
 
 
-RIOT programs
-========================
+# RIOT programs
 
 You can as well try some examples and tests from RIOT:
 
-    BOARD=remote-revb make -C RIOT/examples/default all flash term
+    BOARD=feather-m0 make -C RIOT/examples/default all flash term
 
 Most RIOT tests have a test target, if the test doesn't end with a traceback
 then it was a success. For example:
 
-    BOARD=remote-revb make -C RIOT/tests/periph_rtt all flash test
+    BOARD=feather-m0 make -C RIOT/tests/periph_rtt all flash test
 
 
-Documentation
-====================
+# Documentation
 
 Our API is documented using doxygen. Just run doxygen from the root directory
 of the project:
@@ -232,8 +237,7 @@ And then open your browser at the proper location,
 ``file:///[...]/wsn_riot/doc/html/index.html``
 
 
-TODO
-=====================
+# TODO
 
 Always check open issues and pull requests, what we need may be already there.
 
