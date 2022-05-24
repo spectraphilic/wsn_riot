@@ -2,3 +2,4 @@
 /apps/*/bin/
 /doc/html/
 /.envrc
+/littlefs-fuse/

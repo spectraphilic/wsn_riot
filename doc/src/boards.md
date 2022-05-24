@@ -38,6 +38,14 @@ Flashing to the feather-m0 may not work, for example:
 To fix it you have to double click the reset button while the program is
 flashed, exactly when the ``sleep 2`` message is displayed.
 
+If a RIOT program is already on the microprocessor and it contains a shell component, it can be accessed with (as Feather M0 on linux are loaded on port `/dev/ttyACM0`)
+
+```
+RIOT/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200"
+```
+
+
+
 Up:
 
 - Available and affordable
