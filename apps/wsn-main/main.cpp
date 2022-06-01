@@ -4,6 +4,10 @@
 #include <net/gnrc.h>
 #include <ztimer.h>
 
+#if IS_USED(MODULE_PS)
+    #include <ps.h>
+#endif
+
 // Project
 #include <wsn.h>
 #include "common.h"
@@ -35,6 +39,11 @@ int main(void)
 
     // Start other threads
     thread_sensors_start();
+
+    // Print threads information before we sleep
+#if IS_USED(MODULE_PS)
+    ps();
+#endif
 
     // The main thread will sleep forever
     thread_sleep();

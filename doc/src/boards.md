@@ -1,8 +1,6 @@
-Boards
-======
+# Boards
 
-Zolertia's remote-revb board
-----------------------------
+## Zolertia's remote-revb board
 
 This is the board we have worked with the most, and so the best supported so
 far.
@@ -18,8 +16,7 @@ Down:
 - Missing driver for the CC1200 radio, see https://github.com/spectraphilic/wsn\_riot/issues/12
 
 
-Adafruit Feather M0 (feather-m0)
---------------------------------
+## Adafruit Feather M0 (feather-m0)
 
 Specifically we have these boards and these shields:
 
@@ -52,8 +49,7 @@ Up:
 - Several combinations possible with different shields
 
 
-Arduino Zero (arduino-zero)
----------------------------
+## Arduino Zero (arduino-zero)
 
 To flash programs to the arduino-zero board install openocd, see
 ``https://api.riot-os.org/group__boards__arduino-zero.html``
@@ -62,8 +58,7 @@ The board has 2 USB ports: the programming port and the native port.
 Use the programming port, the one close to the supply connector.
 
 
-AVR based boards
-----------------
+## AVR based boards
 
 AVR based boards such as the waspmote-pro and the arduino-mega2560 are unlikely
 to work for us, because the program won't fit in the memory.

@@ -25,7 +25,7 @@ Try building our apps (for the `feather-m0` board by default):
 
 To build, flash, and run the terminal program:
 
-    make -C apps/wsn-shell all flash term
+    make -C apps/wsn-shell flash term
 
 Check the `apps` directory for the available programs.
 
@@ -68,8 +68,11 @@ Modules can be enabled in the command line, for example:
     # Have a shield with the DS3231 RTC (e.g. DS3231 FeatherWing)
     USEMODULE=ds3231
 
-    # Have a shield with a SX127x module (e.g the RFM95W FeatherWing)
-    USEMODULE=sx127x
+    # Have a shield with a SX1276 module (e.g the RFM95W FeatherWing)
+    USEMODULE=sx1276
+
+    # For wsn-main, will print process information on boot
+    USEMODULE=ps
 
     # Type "s" to start
     USEMODULE=test_utils_interactive_sync
@@ -82,14 +85,14 @@ Examples with CFLAGS:
 Curently our datalogger is based on the Feather M0 Adalogger board, with the
 LoRa and the RTC wings. So you should build with this configuration:
 
-    USEMODULE="ds3231 sx127x" make -C apps/wsn-shell all flash term
+    USEMODULE="ds3231 sx1276" make -C apps/wsn-shell flash term
 
 # Programs: wsn-shell
 
 This program will open a shell. It allows for exploration, testing and
 configuration of the mote:
 
-    make -C apps/wsn-shell all flash term
+    make -C apps/wsn-shell flash term
 
 In the shell you can type a number of commands. For example, ``help``` lists
 the commands available:
@@ -163,7 +166,7 @@ This is the main program. It will loop forever:
 
 To build this program you must pass the mote's name, like so:
 
-    NODE_ID=cas1 make -C apps/wsn-main all flash term
+    NODE_ID=cas1 make -C apps/wsn-main flash term
 
 Before entering the sample/send loop it will first try to grab the time from
 the network: sending *ping* commands and waiting for a reply with the time.
@@ -171,7 +174,7 @@ the network: sending *ping* commands and waiting for a reply with the time.
 To avoid this first step, when you're developing and don't have the network
 set-up, you can pass the time at build time:
 
-    BASETIME=`date +%s` NODE_ID=cas1 make -C apps/wsn-main/ all flash term
+    BASETIME=`date +%s` NODE_ID=cas1 make -C apps/wsn-main/ flash term
 
 This is an excerpt of a loop:
 
@@ -211,19 +214,19 @@ Enable direnv:
 
 Now you don't need to pass ``NODE_ID`` in the command line:
 
-    BASETIME=`date +%s` make -C apps/wsn-main/ all flash term
+    BASETIME=`date +%s` make -C apps/wsn-main/ flash term
 
 
 # RIOT programs
 
 You can as well try some examples and tests from RIOT:
 
-    BOARD=feather-m0 make -C RIOT/examples/default all flash term
+    BOARD=feather-m0 make -C RIOT/examples/default flash term
 
 Most RIOT tests have a test target, if the test doesn't end with a traceback
 then it was a success. For example:
 
-    BOARD=feather-m0 make -C RIOT/tests/periph_rtt all flash test
+    BOARD=feather-m0 make -C RIOT/tests/periph_rtt flash test
 
 
 # Documentation

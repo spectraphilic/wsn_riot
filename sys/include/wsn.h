@@ -38,6 +38,11 @@ extern uint64_t cpuid;
 void wsn_boot(void);
 
 /**
+ * @brief Prints the PM blockers, for debugging only.
+ */
+void wsn_debug_pm(void);
+
+/**
  * @brief Format SD card
  */
 int wsn_format(void);
