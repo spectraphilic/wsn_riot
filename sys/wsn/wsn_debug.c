@@ -1,5 +1,6 @@
-#include <pm_layered.h>
+#ifdef MODULE_PM_LAYERED
 
+#include <pm_layered.h>
 
 void wsn_debug_pm(void)
 {
@@ -10,3 +11,5 @@ void wsn_debug_pm(void)
     }
     printf("\n");
 }
+
+#endif

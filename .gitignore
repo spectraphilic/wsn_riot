@@ -1,5 +1,6 @@
 .*.swp
+/.envrc
 /apps/*/bin/
 /doc/html/
-/.envrc
 /littlefs-fuse/
+/venv*/
