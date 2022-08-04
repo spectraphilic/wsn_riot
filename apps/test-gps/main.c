@@ -66,14 +66,14 @@ static unsigned ringbuffer_get_line(ringbuffer_t *rb, char *buf, unsigned bufsiz
 
 static void print_line(char *line)
 {
-    printf("RX ");
+    print_str("RX ");
     for (unsigned i=0; i < strlen(line); i++) {
         char c = line[i];
         if (c == '\n') {
-            printf("\\n");
+            print_str("\\n");
         }
         else if (c == '\r') {
-            printf("\\r");
+            print_str("\\r");
         }
         else if (c >= ' ' && c <= '~') {
             printf("%c", c);
@@ -87,10 +87,11 @@ static void print_line(char *line)
 
 static bool handle_gga(const char *line)
 {
+    // GGA - Global Positioning System Fix Data
     struct minmea_sentence_gga frame;
     int ok = minmea_parse_gga(&frame, line);
     if (ok) {
-        puts("GGA ok");
+        printf("GGA fix_quality: %d\n", frame.fix_quality);
     }
 
     return ok;
@@ -98,10 +99,10 @@ static bool handle_gga(const char *line)
 
 static bool handle_gll(const char *line)
 {
+    // GLL - Geographic Position - Latitude/Longitude
     struct minmea_sentence_gll frame;
     int ok = minmea_parse_gll(&frame, line);
     if (ok) {
-        puts("GLL ok");
     }
 
     return ok;
@@ -109,10 +110,10 @@ static bool handle_gll(const char *line)
 
 static bool handle_gsa(const char *line)
 {
+    // GSA - GPS DOP and active satellites
     struct minmea_sentence_gsa frame;
     int ok = minmea_parse_gsa(&frame, line);
     if (ok) {
-        puts("GSA ok");
     }
 
     return ok;
@@ -120,10 +121,10 @@ static bool handle_gsa(const char *line)
 
 static bool handle_gst(const char *line)
 {
+    // GST - GPS Pseudorange Noise Statistics
     struct minmea_sentence_gst frame;
     int ok = minmea_parse_gst(&frame, line);
     if (ok) {
-        puts("GST ok");
     }
 
     return ok;
@@ -131,10 +132,18 @@ static bool handle_gst(const char *line)
 
 static bool handle_gsv(const char *line)
 {
+    // GSV - Satellites in view
     struct minmea_sentence_gsv frame;
     int ok = minmea_parse_gsv(&frame, line);
     if (ok) {
-        puts("GSV ok");
+        printf("GSV: message %d of %d\n", frame.msg_nr, frame.total_msgs);
+        printf("GSV: satellites in view: %d\n", frame.total_sats);
+        for (int i = 0; i < 4; i++)
+            printf("GSV: sat nr %d, elevation: %d, azimuth: %d, snr: %d dbm\n",
+                frame.sats[i].nr,
+                frame.sats[i].elevation,
+                frame.sats[i].azimuth,
+                frame.sats[i].snr);
     }
 
     return ok;
@@ -142,10 +151,10 @@ static bool handle_gsv(const char *line)
 
 static bool handle_vtg(const char *line)
 {
+    // VTG - Track made good and Ground speed
     struct minmea_sentence_vtg frame;
     int ok = minmea_parse_vtg(&frame, line);
     if (ok) {
-        puts("VTG ok");
     }
 
     return ok;
@@ -153,10 +162,10 @@ static bool handle_vtg(const char *line)
 
 static bool handle_zda(const char *line)
 {
+    // ZDA - Time & Date - UTC, day, month, year and local time zone
     struct minmea_sentence_zda frame;
     int ok = minmea_parse_zda(&frame, line);
     if (ok) {
-        puts("ZDA ok");
     }
 
     return ok;
@@ -164,10 +173,16 @@ static bool handle_zda(const char *line)
 
 static bool handle_rmc(const char *line)
 {
+    // RMC - Recommended Minimum Navigation Information
     struct minmea_sentence_rmc frame;
     int ok = minmea_parse_rmc(&frame, line);
     if (ok) {
-        puts("RMC ok");
+        printf(
+            "RMC lat=%f long=%f speed=%f\n",
+            minmea_tocoord(&frame.latitude),
+            minmea_tocoord(&frame.longitude),
+            minmea_tofloat(&frame.speed)
+        );
     }
 
     return ok;
@@ -176,7 +191,7 @@ static bool handle_rmc(const char *line)
 static void handle(void)
 {
     char line[128];
-    int ok;
+    int ok = 1;
     ringbuffer_get_line(&rx_buf, line, sizeof(line));
 
     print_line(line);
@@ -191,54 +206,34 @@ static void handle(void)
             break;
         case MINMEA_SENTENCE_RMC:
             ok = handle_rmc(line);
-            if (!ok) {
-                puts("RMC error");
-            }
             break;
         case MINMEA_SENTENCE_GGA:
             ok = handle_gga(line);
-            if (!ok) {
-                puts("GGA error");
-            }
             break;
         case MINMEA_SENTENCE_GSA:
             ok = handle_gsa(line);
-            if (!ok) {
-                puts("GSA error");
-            }
             break;
         case MINMEA_SENTENCE_GLL:
             ok = handle_gll(line);
-            if (!ok) {
-                puts("GLL error");
-            }
             break;
         case MINMEA_SENTENCE_GST:
             ok = handle_gst(line);
-            if (!ok) {
-                puts("GST error");
-            }
             break;
         case MINMEA_SENTENCE_GSV:
             ok = handle_gsv(line);
-            if (!ok) {
-                puts("GSV error");
-            }
             break;
         case MINMEA_SENTENCE_VTG:
             ok = handle_vtg(line);
-            if (!ok) {
-                puts("VTG error");
-            }
             break;
         case MINMEA_SENTENCE_ZDA:
             ok = handle_zda(line);
-            if (!ok) {
-                puts("ZDA error");
-            }
             break;
         default:
             puts("MINMEA UNEXPECTED");
+    }
+
+    if (!ok) {
+        puts("Error parsing frame");
     }
 }
 
