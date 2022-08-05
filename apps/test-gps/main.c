@@ -56,34 +56,13 @@ static unsigned ringbuffer_get_line(ringbuffer_t *rb, char *buf, unsigned bufsiz
     return i;
 }
 
-static void print_line(char *line)
-{
-    print_str("RX ");
-    for (unsigned i=0; i < strlen(line); i++) {
-        char c = line[i];
-        if (c == '\n') {
-            print_str("\\n");
-        }
-        else if (c == '\r') {
-            print_str("\\r");
-        }
-        else if (c >= ' ' && c <= '~') {
-            printf("%c", c);
-        }
-        else {
-            printf("0x%02x", (unsigned char)c);
-        }
-    }
-    puts("");
-}
-
 static void handle(void)
 {
     char line[128];
     int ok = 1;
     ringbuffer_get_line(&rx_buf, line, sizeof(line));
 
-    print_line(line);
+    gps_print_line("RX ", line);
 
     int id = minmea_sentence_id(line, false);
     switch (id) {
@@ -193,7 +172,11 @@ int main(void)
     }
     puts("[OK] UART init");
 
-    ztimer_sleep(ZTIMER_USEC, 10 * US_PER_SEC);
+    ztimer_sleep(ZTIMER_USEC, 1 * US_PER_SEC);
+    gps_send_init_lla(uart);
+    puts("[OK] GPS init");
+
+    ztimer_sleep(ZTIMER_USEC, 5 * US_PER_SEC);
 //  uart_poweroff(uart);
 //  puts("[OK] UART off");
 

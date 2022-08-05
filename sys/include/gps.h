@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+void gps_print_line(const char *prefix, char *line);
 bool gps_handle_gga(const char *line);
 bool gps_handle_gll(const char *line);
 bool gps_handle_gsa(const char *line);
@@ -35,6 +36,7 @@ bool gps_handle_gsv(const char *line);
 bool gps_handle_vtg(const char *line);
 bool gps_handle_zda(const char *line);
 bool gps_handle_rmc(const char *line);
+void gps_send_init_lla(uart_t uart);
 
 #ifdef __cplusplus
 }

@@ -18,10 +18,124 @@
  * @}
  */
 
+#include <string.h>
+
+#include <fmt.h>
 #include <minmea.h>
+#include <periph/uart.h>
 
 #include "gps.h"
 
+
+void gps_print_line(const char *prefix, char *line)
+{
+    print_str(prefix);
+    for (unsigned i=0; i < strlen(line); i++) {
+        char c = line[i];
+        if (c == '\n') {
+            print_str("\\n");
+        }
+        else if (c == '\r') {
+            print_str("\\r");
+        }
+        else if (c >= ' ' && c <= '~') {
+            printf("%c", c);
+        }
+        else {
+            printf("0x%02x", (unsigned char)c);
+        }
+    }
+    puts("");
+}
+
+static uint8_t gps_get_checksum(const char *cmd)
+{
+    // A GPS sentence looks like $<cmd>*cc where cc are the 2 checksum bytes.
+    // The checksum is calculated by XOR of the content bytes <cmd>.
+    uint8_t checksum = 0;
+    for (uint16_t i=0; i < strlen(cmd); i++) {
+        checksum ^= cmd[i];
+    }
+    return checksum;
+}
+
+/*
+static char* gps_set_checksum(char *cmd)
+{
+    int len = strlen(cmd);
+    char checksum = gps_get_checksum(cmd);
+
+    uint8_t aux = checksum / 16;
+    if (aux < 10) {
+        cmd[len-2] = aux + '0';
+    }
+    else {
+        cmd[len-2] = aux + ('A' - 10);
+    }
+
+    aux = checksum % 16;
+    if (aux < 10) {
+        cmd[len-1] = aux + '0';
+    }
+    else {
+        cmd[len-1] = aux + ('A' - 10);
+    }
+
+    return cmd;
+}
+*/
+
+static void gps_send_command(uart_t uart, char *cmd)
+{
+    uint8_t checksum = gps_get_checksum(cmd);
+
+    char checksum_hex[3] = {0};
+    fmt_byte_hex(checksum_hex, checksum);
+
+    char line[128];
+    snprintf(line, sizeof(line), "$%s*%s\r\n", cmd, checksum_hex);
+
+    gps_print_line("TX ", line);
+
+    uart_write(uart, (uint8_t*)line, strlen(line));
+}
+
+void gps_send_init_lla(uart_t uart)
+{
+    // TODO These should be input paramaters
+
+//  // Svalbard
+//  const char *lat = "78.9245075";
+//  const char *lon = "11.9302955";
+//  // Zaragoza
+//  const char *lat = "41.680617";
+//  const char *lon = "-0.886233";
+//  const char *alt = "222";
+    // Alcotas
+    const char *lat = "40.013177";
+    const char *lon = "-0.785576";
+    const char *alt = "1000";
+
+    const char *clkOffset = "96000";
+
+    // 2022-08-05T12:00
+    const char *timeOfWeek = "475200";
+    const char *weekNo = "2221";
+
+    const char *channel = "12";
+    const char *resetCfg = "1";
+
+    char cmd[128];
+    snprintf(cmd, sizeof(cmd), "PSRF104,%s,%s,%s,%s,%s,%s,%s,%s", lat, lon, alt,
+        clkOffset,
+        timeOfWeek,
+        weekNo,
+        channel,
+        resetCfg
+    );
+
+    gps_send_command(uart, cmd);
+}
 
 bool gps_handle_gga(const char *line)
 {
