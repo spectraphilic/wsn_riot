@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+int gps_on(uart_t uart, uart_rx_cb_t rx_cb);
+void gps_off(void);
+void gps_print_data(void);
 void gps_print_line(const char *prefix, char *line);
 bool gps_handle_gga(const char *line);
 bool gps_handle_gll(const char *line);

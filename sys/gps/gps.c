@@ -20,12 +20,74 @@
 
 #include <string.h>
 
+#include <board.h>
 #include <fmt.h>
 #include <minmea.h>
+#include <periph/gpio.h>
 #include <periph/uart.h>
 
+#include <log.h>
 #include "gps.h"
 
+
+static bool __valid;
+static struct minmea_time __time;
+static struct minmea_float __latitude;
+static struct minmea_float __longitude;
+static struct minmea_float __speed;
+static struct minmea_date __date;
+
+
+int gps_on(uart_t uart, uart_rx_cb_t rx_cb)
+{
+#ifdef CPU_ATMEGA1281
+    // Select GPS
+    SET_MUX_GPS;
+
+    // Switch on
+    int err = gpio_init(GPS_PW, GPIO_OUT);
+    if (err != 0) {
+        LOG_ERROR("GPS gpio_init failed err=%d\n", err);
+        return -1;
+    }
+    gpio_set(GPS_PW);
+
+    // Init UART
+    err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
+    if (err != UART_OK) {
+        gpio_clear(GPS_PW);
+        LOG_ERROR("GPS uart_init failed err=%d\n", err);
+        return -1;
+    }
+    LOG_INFO("GPS on\n");
+
+    return 0;
+#else
+    (void)uart;
+    (void)rx_cb;
+    LOG_ERROR("GPS only the waspmote board is supported\n");
+    return -1;
+#endif
+}
+
+void gps_off(void)
+{
+#ifdef CPU_ATMEGA1281
+//  uart_poweroff(uart);
+    gpio_clear(GPS_PW);
+    LOG_INFO("GPS off\n");
+#endif
+}
+
+void gps_print_data(void)
+{
+    printf(
+        "GPS lat=%f long=%f speed=%f\n",
+        minmea_tocoord(&__latitude),
+        minmea_tocoord(&__longitude),
+        minmea_tofloat(&__speed)
+    );
+}
 
 void gps_print_line(const char *prefix, char *line)
 {
@@ -125,7 +187,7 @@ void gps_send_init_lla(uart_t uart)
     const char *channel = "12";
     const char *resetCfg = "1";
 
-    char cmd[128];
+    char cmd[100];
     snprintf(cmd, sizeof(cmd), "PSRF104,%s,%s,%s,%s,%s,%s,%s,%s", lat, lon, alt,
         clkOffset,
         timeOfWeek,
@@ -229,12 +291,17 @@ bool gps_handle_rmc(const char *line)
     struct minmea_sentence_rmc frame;
     int ok = minmea_parse_rmc(&frame, line);
     if (ok) {
-        printf(
-            "RMC lat=%f long=%f speed=%f\n",
-            minmea_tocoord(&frame.latitude),
-            minmea_tocoord(&frame.longitude),
-            minmea_tofloat(&frame.speed)
-        );
+        if (frame.valid) {
+            __valid = true;
+            __date = frame.date;
+            __time = frame.time;
+            __latitude = frame.latitude;
+            __longitude = frame.longitude;
+            __speed = frame.speed;
+        }
+        else {
+            LOG_WARNING("GPS Invalid RMC frame\n");
+        }
     }
 
     return ok;

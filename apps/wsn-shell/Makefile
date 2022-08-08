@@ -14,6 +14,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 
 # Project modules
+USEMODULE += gps
 USEMODULE += wsn
 
 include $(RIOTBASE)/Makefile.include
