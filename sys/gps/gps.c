@@ -25,6 +25,7 @@
 #include <minmea.h>
 #include <periph/gpio.h>
 #include <periph/uart.h>
+#include <ringbuffer.h>
 
 #include <log.h>
 #include "gps.h"
@@ -37,37 +38,65 @@ static struct minmea_float __longitude;
 static struct minmea_float __speed;
 static struct minmea_date __date;
 
+static char rx_mem[128];
+static ringbuffer_t rx_buf;
 
-int gps_on(uart_t uart, uart_rx_cb_t rx_cb, void *arg)
+#define GPS_TASK_PRIO        (THREAD_PRIORITY_MAIN - 1)
+static kernel_pid_t gps_task_pid;
+static char gps_task_stack[THREAD_STACKSIZE_MAIN];
+
+static void rx_cb(void *arg, uint8_t data)
 {
+    (void)arg;
+    ringbuffer_add_one(&rx_buf, data);
+
+    if (data == '\n') {
+        msg_t msg;
+        msg_send(&msg, gps_task_pid);
+    }
+}
+
+int gps_on(uart_t uart)
+{
+    int err;
+
 #ifdef CPU_ATMEGA1281
     // Select GPS
     SET_MUX_GPS;
 
     // Switch on
-    int err = gpio_init(GPS_PW, GPIO_OUT);
+    err = gpio_init(GPS_PW, GPIO_OUT);
     if (err != 0) {
         LOG_ERROR("GPS gpio_init failed err=%d\n", err);
         return -1;
     }
     gpio_set(GPS_PW);
+#endif
+
+    // Initialize ringbuffer
+    ringbuffer_init(&rx_buf, rx_mem, sizeof(rx_mem));
+
+    // Start the GPS thread
+    gps_task_pid = thread_create(
+        gps_task_stack,
+        sizeof(gps_task_stack),
+        GPS_TASK_PRIO,
+        0,
+        gps_task,
+        (void*)&rx_buf,
+        "gps"
+    );
 
     // Init UART
-    err = uart_init(uart, 4800, rx_cb, arg); // 4800 bauds
+    err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
     if (err != UART_OK) {
-        gpio_clear(GPS_PW);
         LOG_ERROR("GPS uart_init failed err=%d\n", err);
+        gps_off();
         return -1;
     }
     LOG_INFO("GPS on\n");
 
     return 0;
-#else
-    (void)uart;
-    (void)rx_cb;
-    LOG_ERROR("GPS only the waspmote board is supported\n");
-    return -1;
-#endif
 }
 
 void gps_off(void)
@@ -121,32 +150,6 @@ static uint8_t gps_get_checksum(const char *cmd)
     return checksum;
 }
 
-/*
-static char* gps_set_checksum(char *cmd)
-{
-    int len = strlen(cmd);
-    char checksum = gps_get_checksum(cmd);
-
-    uint8_t aux = checksum / 16;
-    if (aux < 10) {
-        cmd[len-2] = aux + '0';
-    }
-    else {
-        cmd[len-2] = aux + ('A' - 10);
-    }
-
-    aux = checksum % 16;
-    if (aux < 10) {
-        cmd[len-1] = aux + '0';
-    }
-    else {
-        cmd[len-1] = aux + ('A' - 10);
-    }
-
-    return cmd;
-}
-*/
-
 static void gps_send_command(uart_t uart, char *cmd)
 {
     uint8_t checksum = gps_get_checksum(cmd);
@@ -197,6 +200,56 @@ void gps_send_init_lla(uart_t uart)
     );
 
     gps_send_command(uart, cmd);
+}
+
+int gps_handle(const char *line)
+{
+    gps_print_line("RX ", line);
+
+    int ok = 1;
+    int id = minmea_sentence_id(line, false);
+    switch (id) {
+        case MINMEA_INVALID:
+            LOG_ERROR("MINMEA_INVALID\n");
+            return -1;
+        case MINMEA_UNKNOWN:
+            LOG_ERROR("MINMEA_UNKNOWN\n");
+            return -1;
+        case MINMEA_SENTENCE_RMC:
+            ok = gps_handle_rmc(line);
+            break;
+        case MINMEA_SENTENCE_GGA:
+            ok = gps_handle_gga(line);
+            break;
+        case MINMEA_SENTENCE_GSA:
+            ok = gps_handle_gsa(line);
+            break;
+        case MINMEA_SENTENCE_GLL:
+            ok = gps_handle_gll(line);
+            break;
+        case MINMEA_SENTENCE_GST:
+            ok = gps_handle_gst(line);
+            break;
+        case MINMEA_SENTENCE_GSV:
+            ok = gps_handle_gsv(line);
+            break;
+        case MINMEA_SENTENCE_VTG:
+            ok = gps_handle_vtg(line);
+            break;
+        case MINMEA_SENTENCE_ZDA:
+            ok = gps_handle_zda(line);
+            break;
+        default:
+            LOG_ERROR("MINMEA UNEXPECTED\n");
+            return -1;
+    }
+
+    if (!ok) {
+        LOG_ERROR("Failed to parse GPS sentence id=%d\n", id);
+        return -1;
+    }
+
+    return 0;
 }
 
 bool gps_handle_gga(const char *line)
@@ -305,4 +358,41 @@ bool gps_handle_rmc(const char *line)
     }
 
     return ok;
+}
+
+static unsigned ringbuffer_get_line(ringbuffer_t *rb, char *buf, unsigned bufsize)
+{
+    unsigned i = 0;
+    while (i < bufsize - 1) {
+        int c = ringbuffer_get_one(rb);
+        if (c < 0) {
+            break;
+        }
+        buf[i++] = (char)c;
+        if (c == '\n') {
+            break;
+        }
+    }
+
+    buf[i] = '\0';
+    return i;
+}
+
+void *gps_task(void *arg)
+{
+    msg_t msg;
+    msg_t msg_queue[8];
+    msg_init_queue(msg_queue, 8);
+
+    ringbuffer_t *rx_buf = (ringbuffer_t*)arg;
+    char line[128];
+
+    while (1) {
+        msg_receive(&msg);
+        ringbuffer_get_line(rx_buf, line, sizeof(line));
+        gps_handle(line);
+    }
+
+    // This should never be reached
+    return NULL;
 }

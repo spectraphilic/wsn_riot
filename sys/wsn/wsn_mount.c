@@ -53,8 +53,8 @@ int wsn_mount(void)
     int error = vfs_mount(&mountp);
     if (error < 0) {
         LOG_ERROR("func=wsn_mount callee=vfs_mount errno=%s", errno_string(error));
-        core_panic(PANIC_GENERAL_ERROR, "SD card is required");
-        //return error;
+        //core_panic(PANIC_GENERAL_ERROR, "SD card is required");
+        return error;
     }
 
     LOG_INFO("SD card mounted");

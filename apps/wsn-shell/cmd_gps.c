@@ -1,3 +1,5 @@
+#ifdef MODULE_GPS
+
 #include <periph/uart.h>
 #include <timex.h>
 #include <ztimer.h>
@@ -16,7 +18,7 @@ int cmd_gps(int argc, char **argv)
 
     // Switch on
     uart_t uart = UART_DEV(1);
-    int err = gps_on(uart, NULL);
+    int err = gps_on(uart);
     if (err != 0) {
         return -1;
     }
@@ -33,3 +35,5 @@ int cmd_gps(int argc, char **argv)
 
     return 0;
 }
+
+#endif
