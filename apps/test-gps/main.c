@@ -120,13 +120,12 @@ static void *printer(void *arg)
 
 static void rx_cb(void *arg, uint8_t data)
 {
-    (void)arg;
-
     ringbuffer_add_one(&rx_buf, data);
+    kernel_pid_t pid = *(kernel_pid_t*)arg;
 
     if (data == '\n') {
         msg_t msg;
-        msg_send(&msg, printer_pid);
+        msg_send(&msg, pid);
     }
 }
 
@@ -144,7 +143,7 @@ int main(void)
                                 PRINTER_PRIO, 0, printer, NULL, "printer");
 
     uart_t uart = UART_DEV(1);
-    int err = gps_on(uart, rx_cb);
+    int err = gps_on(uart, rx_cb, &printer_pid);
     if (err == 0) {
         ztimer_sleep(ZTIMER_USEC, 1 * US_PER_SEC);
         gps_send_init_lla(uart);

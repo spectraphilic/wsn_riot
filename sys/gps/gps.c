@@ -38,7 +38,7 @@ static struct minmea_float __speed;
 static struct minmea_date __date;
 
 
-int gps_on(uart_t uart, uart_rx_cb_t rx_cb)
+int gps_on(uart_t uart, uart_rx_cb_t rx_cb, void *arg)
 {
 #ifdef CPU_ATMEGA1281
     // Select GPS
@@ -53,7 +53,7 @@ int gps_on(uart_t uart, uart_rx_cb_t rx_cb)
     gpio_set(GPS_PW);
 
     // Init UART
-    err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
+    err = uart_init(uart, 4800, rx_cb, arg); // 4800 bauds
     if (err != UART_OK) {
         gpio_clear(GPS_PW);
         LOG_ERROR("GPS uart_init failed err=%d\n", err);
@@ -89,7 +89,7 @@ void gps_print_data(void)
     );
 }
 
-void gps_print_line(const char *prefix, char *line)
+void gps_print_line(const char *prefix, const char *line)
 {
     print_str(prefix);
     for (unsigned i=0; i < strlen(line); i++) {
