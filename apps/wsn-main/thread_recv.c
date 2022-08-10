@@ -1,3 +1,5 @@
+#ifdef MODULE_GNRC
+
 // Riot
 #include <log.h>
 #include <nanocbor/nanocbor.h>
@@ -271,3 +273,5 @@ kernel_pid_t thread_recv_start(void)
     }
     return gnrc_pktdump_pid;
 }
+
+#endif

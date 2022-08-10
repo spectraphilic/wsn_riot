@@ -18,13 +18,15 @@
  * @}
  */
 
+//#define ENABLE_DEBUG 1
+
 #include <string.h>
 
 #include <board.h>
+#include <debug.h>
 #include <fmt.h>
 #include <minmea.h>
 #include <periph/gpio.h>
-#include <periph/uart.h>
 #include <ringbuffer.h>
 
 #include <log.h>
@@ -42,8 +44,9 @@ static char rx_mem[128];
 static ringbuffer_t rx_buf;
 
 #define GPS_TASK_PRIO        (THREAD_PRIORITY_MAIN - 1)
-static kernel_pid_t gps_task_pid;
+static kernel_pid_t gps_task_pid = 0;
 static char gps_task_stack[THREAD_STACKSIZE_MAIN];
+
 
 static void rx_cb(void *arg, uint8_t data)
 {
@@ -77,15 +80,7 @@ int gps_on(uart_t uart)
     ringbuffer_init(&rx_buf, rx_mem, sizeof(rx_mem));
 
     // Start the GPS thread
-    gps_task_pid = thread_create(
-        gps_task_stack,
-        sizeof(gps_task_stack),
-        GPS_TASK_PRIO,
-        0,
-        gps_task,
-        (void*)&rx_buf,
-        "gps"
-    );
+    gps_start();
 
     // Init UART
     err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
@@ -118,7 +113,7 @@ void gps_print_data(void)
     );
 }
 
-void gps_print_line(const char *prefix, const char *line)
+static void print_line(const char *prefix, const char *line)
 {
     print_str(prefix);
     for (unsigned i=0; i < strlen(line); i++) {
@@ -139,7 +134,7 @@ void gps_print_line(const char *prefix, const char *line)
     puts("");
 }
 
-static uint8_t gps_get_checksum(const char *cmd)
+static uint8_t get_checksum(const char *cmd)
 {
     // A GPS sentence looks like $<cmd>*cc where cc are the 2 checksum bytes.
     // The checksum is calculated by XOR of the content bytes <cmd>.
@@ -150,9 +145,9 @@ static uint8_t gps_get_checksum(const char *cmd)
     return checksum;
 }
 
-static void gps_send_command(uart_t uart, char *cmd)
+static void send_command(uart_t uart, char *cmd)
 {
-    uint8_t checksum = gps_get_checksum(cmd);
+    uint8_t checksum = get_checksum(cmd);
 
     char checksum_hex[3] = {0};
     fmt_byte_hex(checksum_hex, checksum);
@@ -160,7 +155,7 @@ static void gps_send_command(uart_t uart, char *cmd)
     char line[128];
     snprintf(line, sizeof(line), "$%s*%s\r\n", cmd, checksum_hex);
 
-    gps_print_line("TX ", line);
+    print_line("TX ", line);
 
     uart_write(uart, (uint8_t*)line, strlen(line));
 }
@@ -199,72 +194,22 @@ void gps_send_init_lla(uart_t uart)
         resetCfg
     );
 
-    gps_send_command(uart, cmd);
+    send_command(uart, cmd);
 }
 
-int gps_handle(const char *line)
-{
-    gps_print_line("RX ", line);
-
-    int ok = 1;
-    int id = minmea_sentence_id(line, false);
-    switch (id) {
-        case MINMEA_INVALID:
-            LOG_ERROR("MINMEA_INVALID\n");
-            return -1;
-        case MINMEA_UNKNOWN:
-            LOG_ERROR("MINMEA_UNKNOWN\n");
-            return -1;
-        case MINMEA_SENTENCE_RMC:
-            ok = gps_handle_rmc(line);
-            break;
-        case MINMEA_SENTENCE_GGA:
-            ok = gps_handle_gga(line);
-            break;
-        case MINMEA_SENTENCE_GSA:
-            ok = gps_handle_gsa(line);
-            break;
-        case MINMEA_SENTENCE_GLL:
-            ok = gps_handle_gll(line);
-            break;
-        case MINMEA_SENTENCE_GST:
-            ok = gps_handle_gst(line);
-            break;
-        case MINMEA_SENTENCE_GSV:
-            ok = gps_handle_gsv(line);
-            break;
-        case MINMEA_SENTENCE_VTG:
-            ok = gps_handle_vtg(line);
-            break;
-        case MINMEA_SENTENCE_ZDA:
-            ok = gps_handle_zda(line);
-            break;
-        default:
-            LOG_ERROR("MINMEA UNEXPECTED\n");
-            return -1;
-    }
-
-    if (!ok) {
-        LOG_ERROR("Failed to parse GPS sentence id=%d\n", id);
-        return -1;
-    }
-
-    return 0;
-}
-
-bool gps_handle_gga(const char *line)
+static int handle_gga(const char *line)
 {
     // GGA - Global Positioning System Fix Data
     struct minmea_sentence_gga frame;
     int ok = minmea_parse_gga(&frame, line);
     if (ok) {
-        printf("GGA fix_quality: %d\n", frame.fix_quality);
+        DEBUG("[gps] GGA fix_quality: %d\n", frame.fix_quality);
     }
 
     return ok;
 }
 
-bool gps_handle_gll(const char *line)
+static int handle_gll(const char *line)
 {
     // GLL - Geographic Position - Latitude/Longitude
     struct minmea_sentence_gll frame;
@@ -275,7 +220,7 @@ bool gps_handle_gll(const char *line)
     return ok;
 }
 
-bool gps_handle_gsa(const char *line)
+static int handle_gsa(const char *line)
 {
     // GSA - GPS DOP and active satellites
     struct minmea_sentence_gsa frame;
@@ -286,7 +231,7 @@ bool gps_handle_gsa(const char *line)
     return ok;
 }
 
-bool gps_handle_gst(const char *line)
+static int handle_gst(const char *line)
 {
     // GST - GPS Pseudorange Noise Statistics
     struct minmea_sentence_gst frame;
@@ -297,7 +242,7 @@ bool gps_handle_gst(const char *line)
     return ok;
 }
 
-bool gps_handle_gsv(const char *line)
+static int handle_gsv(const char *line)
 {
     // GSV - Satellites in view
     struct minmea_sentence_gsv frame;
@@ -316,29 +261,7 @@ bool gps_handle_gsv(const char *line)
     return ok;
 }
 
-bool gps_handle_vtg(const char *line)
-{
-    // VTG - Track made good and Ground speed
-    struct minmea_sentence_vtg frame;
-    int ok = minmea_parse_vtg(&frame, line);
-    if (ok) {
-    }
-
-    return ok;
-}
-
-bool gps_handle_zda(const char *line)
-{
-    // ZDA - Time & Date - UTC, day, month, year and local time zone
-    struct minmea_sentence_zda frame;
-    int ok = minmea_parse_zda(&frame, line);
-    if (ok) {
-    }
-
-    return ok;
-}
-
-bool gps_handle_rmc(const char *line)
+static int handle_rmc(const char *line)
 {
     // RMC - Recommended Minimum Navigation Information
     struct minmea_sentence_rmc frame;
@@ -353,11 +276,83 @@ bool gps_handle_rmc(const char *line)
             __speed = frame.speed;
         }
         else {
-            LOG_WARNING("GPS Invalid RMC frame\n");
+            DEBUG("[gps] Invalid RMC frame\n");
         }
     }
 
     return ok;
+}
+
+static int handle_vtg(const char *line)
+{
+    // VTG - Track made good and Ground speed
+    struct minmea_sentence_vtg frame;
+    int ok = minmea_parse_vtg(&frame, line);
+    if (ok) {
+    }
+
+    return ok;
+}
+
+static int handle_zda(const char *line)
+{
+    // ZDA - Time & Date - UTC, day, month, year and local time zone
+    struct minmea_sentence_zda frame;
+    int ok = minmea_parse_zda(&frame, line);
+    if (ok) {
+    }
+
+    return ok;
+}
+
+static int handle_sentence(const char *line)
+{
+    print_line("RX ", line);
+
+    int ok = 1;
+    int id = minmea_sentence_id(line, false);
+    switch (id) {
+        case MINMEA_INVALID:
+            DEBUG("[gps] MINMEA_INVALID\n");
+            return -1;
+        case MINMEA_UNKNOWN:
+            DEBUG("[gps] MINMEA_UNKNOWN\n");
+            return -1;
+        case MINMEA_SENTENCE_RMC:
+            ok = handle_rmc(line);
+            break;
+        case MINMEA_SENTENCE_GGA:
+            ok = handle_gga(line);
+            break;
+        case MINMEA_SENTENCE_GSA:
+            ok = handle_gsa(line);
+            break;
+        case MINMEA_SENTENCE_GLL:
+            ok = handle_gll(line);
+            break;
+        case MINMEA_SENTENCE_GST:
+            ok = handle_gst(line);
+            break;
+        case MINMEA_SENTENCE_GSV:
+            ok = handle_gsv(line);
+            break;
+        case MINMEA_SENTENCE_VTG:
+            ok = handle_vtg(line);
+            break;
+        case MINMEA_SENTENCE_ZDA:
+            ok = handle_zda(line);
+            break;
+        default:
+            DEBUG("[gps] MINMEA UNEXPECTED\n");
+            return -1;
+    }
+
+    if (!ok) {
+        LOG_ERROR("Failed to parse GPS sentence id=%d\n", id);
+        return -1;
+    }
+
+    return 0;
 }
 
 static unsigned ringbuffer_get_line(ringbuffer_t *rb, char *buf, unsigned bufsize)
@@ -390,9 +385,24 @@ void *gps_task(void *arg)
     while (1) {
         msg_receive(&msg);
         ringbuffer_get_line(rx_buf, line, sizeof(line));
-        gps_handle(line);
+        handle_sentence(line);
     }
 
     // This should never be reached
     return NULL;
+}
+
+void gps_start(void)
+{
+    if (gps_task_pid == 0) {
+        gps_task_pid = thread_create(
+            gps_task_stack,
+            sizeof(gps_task_stack),
+            GPS_TASK_PRIO,
+            0,
+            gps_task,
+            (void*)&rx_buf,
+            "gps"
+        );
+    }
 }

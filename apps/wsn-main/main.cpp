@@ -9,6 +9,7 @@
 #endif
 
 // Project
+#include <gps.h>
 #include <wsn.h>
 #include "common.h"
 
@@ -21,6 +22,7 @@ int main(void)
     LOG_INFO("app=wsn-main board=%s mcu=%s", RIOT_BOARD, RIOT_MCU);
     LOG_INFO("basetime=%ld", (long) wsn_time_basetime());
 
+#if IS_USED(MODULE_GNRC)
     // Start thread that handles incoming packets
     kernel_pid_t pid = thread_recv_start();
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
@@ -34,11 +36,18 @@ int main(void)
         LOG_INFO(msg);
         ztimer_sleep(ZTIMER_MSEC, 10 * MS_PER_SEC);
     }
+#endif
+
+#if IS_USED(MODULE_GPS)
+    gps_start();
+#endif
 
     LED0_OFF;
 
+#if IS_USED(MODULE_GNRC)
     // Start other threads
     thread_sensors_start();
+#endif
 
     // Print threads information before we sleep
 #if IS_USED(MODULE_PS)

@@ -3,12 +3,15 @@ include ../Makefile.common
 # System modules
 USEMODULE += od
 USEMODULE += phydat
-#USEMODULE += shell
 USEMODULE += ztimer_msec
 USEPKG += nanocbor
 
 # Project modules
+USEMODULE += gps
 USEMODULE += wsn
+
+# Optional modules
+USEMODULE += ps
 
 ifdef BASETIME
     CFLAGS += -DBASETIME=$(BASETIME)

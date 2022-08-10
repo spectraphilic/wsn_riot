@@ -21,27 +21,17 @@
 #ifndef GPS_H
 #define GPS_H
 
-/* Add header includes here */
+#include <periph/uart.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void gps_start(void);
 int gps_on(uart_t uart);
 void gps_off(void);
 void gps_print_data(void);
-void gps_print_line(const char *prefix, const char *line);
-int gps_handle(const char *line);
-bool gps_handle_gga(const char *line);
-bool gps_handle_gll(const char *line);
-bool gps_handle_gsa(const char *line);
-bool gps_handle_gst(const char *line);
-bool gps_handle_gsv(const char *line);
-bool gps_handle_vtg(const char *line);
-bool gps_handle_zda(const char *line);
-bool gps_handle_rmc(const char *line);
 void gps_send_init_lla(uart_t uart);
-void *gps_task(void *arg);
 
 #ifdef __cplusplus
 }

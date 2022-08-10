@@ -1,3 +1,5 @@
+#ifdef MODULE_GNRC
+
 #include <stddef.h>
 
 // Riot
@@ -203,3 +205,5 @@ exit:
 
     return rc;
 }
+
+#endif
