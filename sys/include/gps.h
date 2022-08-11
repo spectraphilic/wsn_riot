@@ -27,11 +27,14 @@
 extern "C" {
 #endif
 
-void gps_start(void);
-int gps_on(uart_t uart);
+bool gps_done(void);
 void gps_off(void);
+int gps_on(uart_t uart);
 void gps_print_data(void);
 void gps_send_init_lla(uart_t uart);
+void gps_start_loop(uart_t uart);
+void gps_start_parser(void);
+void gps_wait(ztimer_now_t timeout);
 
 #ifdef __cplusplus
 }

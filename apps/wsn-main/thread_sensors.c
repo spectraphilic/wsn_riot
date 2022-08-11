@@ -88,7 +88,8 @@ static void *task_func(void *arg)
         while (sensor) {
             printf("%s:\n", sensor->name);
             while (sensor->read(sensor->dev, &res)) {
-                printf("%6ld unit=%-2s scale=%d\n", res.value, phydat_unit_to_str(res.unit), res.scale);
+                printf("%6ld unit=%-2s scale=%d\n",
+                       res.value, phydat_unit_to_str(res.unit), res.scale);
                 nanocbor_fmt_int(&enc, res.value);
             }
             sensor = sensor->next;
@@ -128,7 +129,7 @@ static void *task_func(void *arg)
     return NULL;
 }
 
-kernel_pid_t thread_sensors_start(void)
+kernel_pid_t sensors_start(void)
 {
     if (pid == KERNEL_PID_UNDEF) {
         pid = thread_create(

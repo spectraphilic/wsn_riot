@@ -1,2 +1,4 @@
 USEMODULE += fmt
+USEMODULE += ztimer_usec
+
 USEPKG += minmea

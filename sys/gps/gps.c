@@ -28,24 +28,20 @@
 #include <minmea.h>
 #include <periph/gpio.h>
 #include <ringbuffer.h>
+#include <timex.h>
+#include <ztimer.h>
 
 #include <log.h>
 #include "gps.h"
 
 
-static bool __valid;
-static struct minmea_time __time;
-static struct minmea_float __latitude;
-static struct minmea_float __longitude;
-static struct minmea_float __speed;
-static struct minmea_date __date;
+static bool done;
+static struct minmea_sentence_rmc rmc;
 
 static char rx_mem[128];
 static ringbuffer_t rx_buf;
 
-#define GPS_TASK_PRIO        (THREAD_PRIORITY_MAIN - 1)
-static kernel_pid_t gps_task_pid = 0;
-static char gps_task_stack[THREAD_STACKSIZE_MAIN];
+static kernel_pid_t gps_parser_pid = 0;
 
 
 static void rx_cb(void *arg, uint8_t data)
@@ -55,13 +51,21 @@ static void rx_cb(void *arg, uint8_t data)
 
     if (data == '\n') {
         msg_t msg;
-        msg_send(&msg, gps_task_pid);
+        msg_send(&msg, gps_parser_pid);
     }
+}
+
+
+bool gps_done(void)
+{
+    return done;
 }
 
 int gps_on(uart_t uart)
 {
     int err;
+
+    done = false;
 
 #ifdef CPU_ATMEGA1281
     // Select GPS
@@ -80,7 +84,7 @@ int gps_on(uart_t uart)
     ringbuffer_init(&rx_buf, rx_mem, sizeof(rx_mem));
 
     // Start the GPS thread
-    gps_start();
+    gps_start_parser();
 
     // Init UART
     err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
@@ -107,9 +111,9 @@ void gps_print_data(void)
 {
     printf(
         "GPS lat=%f long=%f speed=%f\n",
-        minmea_tocoord(&__latitude),
-        minmea_tocoord(&__longitude),
-        minmea_tofloat(&__speed)
+        minmea_tocoord(&rmc.latitude),
+        minmea_tocoord(&rmc.longitude),
+        minmea_tofloat(&rmc.speed)
     );
 }
 
@@ -248,14 +252,6 @@ static int handle_gsv(const char *line)
     struct minmea_sentence_gsv frame;
     int ok = minmea_parse_gsv(&frame, line);
     if (ok) {
-        printf("GSV: message %d of %d\n", frame.msg_nr, frame.total_msgs);
-        printf("GSV: satellites in view: %d\n", frame.total_sats);
-        for (int i = 0; i < 4; i++)
-            printf("GSV: sat nr %d, elevation: %d, azimuth: %d, snr: %d dbm\n",
-                frame.sats[i].nr,
-                frame.sats[i].elevation,
-                frame.sats[i].azimuth,
-                frame.sats[i].snr);
     }
 
     return ok;
@@ -268,12 +264,8 @@ static int handle_rmc(const char *line)
     int ok = minmea_parse_rmc(&frame, line);
     if (ok) {
         if (frame.valid) {
-            __valid = true;
-            __date = frame.date;
-            __time = frame.time;
-            __latitude = frame.latitude;
-            __longitude = frame.longitude;
-            __speed = frame.speed;
+            rmc = frame;
+            done = true;
         }
         else {
             DEBUG("[gps] Invalid RMC frame\n");
@@ -373,7 +365,7 @@ static unsigned ringbuffer_get_line(ringbuffer_t *rb, char *buf, unsigned bufsiz
     return i;
 }
 
-void *gps_task(void *arg)
+static void *gps_parser_task(void *arg)
 {
     msg_t msg;
     msg_t msg_queue[8];
@@ -388,21 +380,87 @@ void *gps_task(void *arg)
         handle_sentence(line);
     }
 
-    // This should never be reached
     return NULL;
 }
 
-void gps_start(void)
+static char gps_parser_stack[THREAD_STACKSIZE_MAIN];
+void gps_start_parser(void)
 {
-    if (gps_task_pid == 0) {
-        gps_task_pid = thread_create(
-            gps_task_stack,
-            sizeof(gps_task_stack),
-            GPS_TASK_PRIO,
+    if (gps_parser_pid == 0) {
+        gps_parser_pid = thread_create(
+            gps_parser_stack,
+            sizeof(gps_parser_stack),
+            THREAD_PRIORITY_MAIN - 2,
             0,
-            gps_task,
+            gps_parser_task,
             (void*)&rx_buf,
-            "gps"
+            "gps_parser"
         );
     }
+}
+
+
+void gps_wait(ztimer_now_t timeout)
+{
+    bool done = false;
+    ztimer_now_t now = ztimer_now(ZTIMER_USEC);
+    while ((ztimer_now(ZTIMER_USEC) - now) < timeout) {
+        done = gps_done();
+        if (done) {
+            break;
+        }
+
+        ztimer_sleep(ZTIMER_USEC, 2 * US_PER_SEC);
+    }
+}
+
+
+static void *gps_loop_task(void *arg)
+{
+    // Switch on
+    uart_t uart = *(uart_t*)arg;
+
+    while (1) {
+        int err = gps_on(uart);
+        if (err != 0) {
+            LOG_ERROR("GPS error initializing\n");
+            return NULL;
+        }
+
+        // Initialize
+        ztimer_sleep(ZTIMER_USEC, 1000 * US_PER_MS);
+        gps_send_init_lla(uart);
+
+        // Wait
+        gps_wait(600 * US_PER_SEC);
+
+        // Switch off
+        gps_off();
+
+        if (done) {
+            LOG_DEBUG("GPS ok");
+            gps_print_data();
+        }
+        else {
+            LOG_WARNING("GPS timeout\n");
+        }
+
+        ztimer_sleep(ZTIMER_USEC, 300 * US_PER_SEC);
+    }
+
+    return NULL;
+}
+
+static char gps_loop_stack[THREAD_STACKSIZE_MAIN];
+void gps_start_loop(uart_t uart)
+{
+    thread_create(
+        gps_loop_stack,
+        sizeof(gps_loop_stack),
+        THREAD_PRIORITY_MAIN - 1,
+        0,
+        gps_loop_task,
+        (void*)&uart,
+        "gps_loop"
+    );
 }

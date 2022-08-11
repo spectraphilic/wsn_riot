@@ -259,7 +259,7 @@ static void *_eventloop(void *arg)
     return NULL;
 }
 
-kernel_pid_t thread_recv_start(void)
+kernel_pid_t recv_start(void)
 {
     if (gnrc_pktdump_pid == KERNEL_PID_UNDEF) {
         gnrc_pktdump_pid = thread_create(

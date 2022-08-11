@@ -2,6 +2,7 @@
 #include <board.h>
 #include <log.h>
 #include <net/gnrc.h>
+#include <periph/uart.h>
 #include <ztimer.h>
 
 #if IS_USED(MODULE_PS)
@@ -24,7 +25,7 @@ int main(void)
 
 #if IS_USED(MODULE_GNRC)
     // Start thread that handles incoming packets
-    kernel_pid_t pid = thread_recv_start();
+    kernel_pid_t pid = recv_start();
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
@@ -39,14 +40,15 @@ int main(void)
 #endif
 
 #if IS_USED(MODULE_GPS)
-    gps_start();
+    uart_t uart = UART_DEV(1);
+    gps_start_loop(uart);
 #endif
 
     LED0_OFF;
 
 #if IS_USED(MODULE_GNRC)
     // Start other threads
-    thread_sensors_start();
+    sensors_start();
 #endif
 
     // Print threads information before we sleep

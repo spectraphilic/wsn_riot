@@ -22,6 +22,7 @@
 
 #include <minmea.h>
 #include <periph/uart.h>
+#include <ps.h>
 #include <ringbuffer.h>
 #include <timex.h>
 #include <ztimer.h>
@@ -31,20 +32,13 @@
 
 int main(void)
 {
-    int ret = 0;
-
     puts("Test GPS...");
 
     uart_t uart = UART_DEV(1);
-    int err = gps_on(uart);
-    if (err == 0) {
-        ztimer_sleep(ZTIMER_USEC, 1 * US_PER_SEC);
-        gps_send_init_lla(uart);
+    gps_start_loop(uart);
 
-        ztimer_sleep(ZTIMER_USEC, 5 * US_PER_SEC);
-    }
+    ps();
+    thread_sleep(); // Sleep main thread
 
-    gps_off();
-
-    return ret;
+    return 0;
 }
