@@ -1,5 +1,5 @@
-Howto LittleFS
-==============
+LittleFS
+========
 
 To read an SD card with a LittleFS filesystem you need fuse, including headers.
 On Debian systems:
