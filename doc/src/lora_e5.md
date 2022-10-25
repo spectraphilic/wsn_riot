@@ -181,3 +181,69 @@ the programmable buttons (press a button to see the data line switch to 1):
     2022-10-25 09:35:07,910 #
     2022-10-25 09:35:07,911 # ##########################
     [...]
+
+### SHT31
+
+- Temperature & humidity
+- Address 0x44
+- RIOT module sht3x
+
+With the `tests/periph_i2c` we can confirm the I2C address is 0x44:
+
+    > i2c_scan 0
+    2022-10-25 13:01:03,393 # i2c_scan 0
+    2022-10-25 13:01:03,394 # Scanning I2C device 0...
+    2022-10-25 13:01:03,399 # addr not ack'ed = "-", addr ack'ed = "X", addr reserved = "R", error = "E"
+    2022-10-25 13:01:03,406 #      0 1 2 3 4 5 6 7 8 9 a b c d e f
+    2022-10-25 13:01:03,407 # 0x00 R R R R R R R R R R R R R R - -
+    2022-10-25 13:01:03,412 # 0x10 - - - - - - - - - - - - - - - -
+    2022-10-25 13:01:03,417 # 0x20 - - - - - - - - - - - - - - - -
+    2022-10-25 13:01:03,424 # 0x30 - - - - - - - - - - - - - - - -
+    2022-10-25 13:01:03,429 # 0x40 - - - - X - - - X - - - - - - -
+    2022-10-25 13:01:03,436 # 0x50 - - - - - - - - - - - - - - - -
+    2022-10-25 13:01:03,444 # 0x60 - - - - - - - - - - - - - - - -
+    2022-10-25 13:01:03,446 # 0x70 - - - - - - - - R R R R R R R R
+
+Now we can test the sensor:
+
+    $ CFLAGS="-DSHT3X_PARAM_I2C_ADDR=0x44" BOARD=lora-e5-dev make -C tests/driver_sht3x all flash term
+    [...]
+    2022-10-25 13:31:12,123 # +------------Initializing------------+
+    2022-10-25 13:31:12,137 # Initialization successful
+    2022-10-25 13:31:12,137 #
+    2022-10-25 13:31:12,137 #
+    2022-10-25 13:31:12,138 # +--------Starting Measurements--------+
+    2022-10-25 13:31:12,154 # Temperature [°C]: 26.26
+    2022-10-25 13:31:12,155 # Relative Humidity [%]: 54.55
+    2022-10-25 13:31:12,158 # +-------------------------------------+
+    2022-10-25 13:31:13,164 # Temperature [°C]: 26.23
+    2022-10-25 13:31:13,164 # Relative Humidity [%]: 54.52
+    2022-10-25 13:31:13,169 # +-------------------------------------+
+    [...]
+
+> **Note**
+> By default the address used by the RIOT `sht3x` module is `0x45`, so we have to tell it
+> to use `0x44`
+
+We can as well try the SAUL test program:
+
+    $ CFLAGS="-DSHT3X_PARAM_I2C_ADDR=0x44" USEMODULE=sht3x BOARD=lora-e5-dev make -C tests/saul all flash term
+    [...]
+    2022-10-25 13:37:04,443 # Dev: LED(red)	Type: ACT_SWITCH
+    2022-10-25 13:37:04,444 # Data:	              0
+    2022-10-25 13:37:04,444 #
+    2022-10-25 13:37:04,449 # Dev: Button(B1 Boot)	Type: SENSE_BTN
+    2022-10-25 13:37:04,449 # Data:	              0
+    2022-10-25 13:37:04,449 #
+    2022-10-25 13:37:04,455 # Dev: Button(B2 D0)	Type: SENSE_BTN
+    2022-10-25 13:37:04,455 # Data:	              0
+    2022-10-25 13:37:04,455 #
+    2022-10-25 13:37:04,461 # Dev: lm75	Type: SENSE_TEMP
+    2022-10-25 13:37:04,462 # Data:	          26.00 °C
+    2022-10-25 13:37:04,462 #
+    2022-10-25 13:37:04,468 # Dev: sht3x1	Type: SENSE_TEMP
+    2022-10-25 13:37:04,468 # Data:	          26.26 °C
+    2022-10-25 13:37:04,468 #
+    2022-10-25 13:37:04,469 # Dev: sht3x1	Type: SENSE_HUM
+    2022-10-25 13:37:04,474 # Data:	          54.64 %
+    [...]
