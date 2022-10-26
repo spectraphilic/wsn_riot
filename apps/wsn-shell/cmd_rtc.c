@@ -1,4 +1,4 @@
-#ifdef MODULE_DS3231
+#if defined(MODULE_DS1307) || defined(MODULE_DS3231)
 
 // Standard library
 #include <stdio.h>
@@ -115,6 +115,5 @@ int cmd_rtc_time(int argc, char **argv)
 
     return 0;
 }
-
 
 #endif

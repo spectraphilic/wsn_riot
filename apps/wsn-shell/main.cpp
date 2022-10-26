@@ -30,6 +30,8 @@ const shell_command_t shell_commands[] = {
 #endif
 #ifdef MODULE_DS3231
     {"rtc_temp", "get temperature", cmd_rtc_temp},
+#endif
+#if defined(MODULE_DS1307) || defined(MODULE_DS3231)
     {"rtc_time", "get/set time", cmd_rtc_time},
 #endif
 #ifdef MODULE_SHT3X

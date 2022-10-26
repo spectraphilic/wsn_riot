@@ -11,6 +11,7 @@ USEMODULE += settings
 USEMODULE += triage
 
 # Drivers
+USEMODULE += ds1307
 #USEMODULE += ds3231
 #USEMODULE += sx127x
 
