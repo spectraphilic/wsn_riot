@@ -182,6 +182,13 @@ the programmable buttons (press a button to see the data line switch to 1):
     2022-10-25 09:35:07,911 # ##########################
     [...]
 
+## External modules
+
+These are some modules we are trying.
+
+> **Warninig**
+> This sections is still very much in progress!
+
 ### SHT31
 
 - Temperature & humidity
@@ -246,4 +253,116 @@ We can as well try the SAUL test program:
     2022-10-25 13:37:04,468 #
     2022-10-25 13:37:04,469 # Dev: sht3x1	Type: SENSE_HUM
     2022-10-25 13:37:04,474 # Data:	          54.64 %
+    [...]
+
+
+### The DS1307 RTC
+
+> **Warning**
+> I ordered the wrong clock from SeeedStudio, a PCF85063TP which is close to the DS1307
+> but not enough.
+
+- Button battery CR1225
+- Address 0x51
+- RIOT module ds1307 (with address 0x68)
+
+With the `tests/periph_i2c` we can confirm the I2C address is 0x51:
+
+    > i2c_scan 0
+    2022-10-26 09:31:44,457 # i2c_scan 0
+    2022-10-26 09:31:44,457 # Scanning I2C device 0...
+    2022-10-26 09:31:44,463 # addr not ack'ed = "-", addr ack'ed = "X", addr reserved = "R", error = "E"
+    2022-10-26 09:31:44,470 #      0 1 2 3 4 5 6 7 8 9 a b c d e f
+    2022-10-26 09:31:44,470 # 0x00 R R R R R R R R R R R R R R - -
+    2022-10-26 09:31:44,475 # 0x10 - - - - - - - - - - - - - - - -
+    2022-10-26 09:31:44,481 # 0x20 - - - - - - - - - - - - - - - -
+    2022-10-26 09:31:44,488 # 0x30 - - - - - - - - - - - - - - - -
+    2022-10-26 09:31:44,493 # 0x40 - - - - X - - - X - - - - - - -
+    2022-10-26 09:31:44,499 # 0x50 - X - - - - - - - - - - - - - -
+    2022-10-26 09:31:44,508 # 0x60 - - - - - - - - - - - - - - - -
+    2022-10-26 09:31:44,509 # 0x70 - - - - - - - - R R R R R R R R
+
+In RIOT the device address is hardcoded to 0x68, so the RIOT's source file
+`drivers/include/ds1307.h` must be edited to change the address to 0x51:
+
+    #define DS1307_I2C_ADDRESS      (0x51)
+
+
+### GPS (Grove - GPS Air530)
+
+TODO
+
+
+### SD card reader
+
+> **Warning**
+> This doesn't work yet.
+
+Links:
+
+- https://circuitstate.com/tutorials/interfacing-catalex-micro-sd-card-module-with-arduino/
+- https://github.com/RIOT-OS/RIOT/pull/6031#issuecomment-267985966
+
+Wiring:
+
+- VCC   Red
+- GND   Black
+- CLK   Yellow
+- MOSI  Green
+- MISO  Blue
+- CS    Orange
+
+Test:
+
+    $ BOARD=lora-e5-dev make -C tests/driver_sdcard_spi all flash term
+    [...]
+    > init
+    2022-10-31 12:18:18,562 # init
+    2022-10-31 12:18:18,563 # Initializing SD-card at SPI_0...SD_INIT_START
+    2022-10-31 12:18:18,566 # gpio_init(): [OK]
+    2022-10-31 12:18:18,566 # SD_INIT_SPI_POWER_SEQ
+    2022-10-31 12:18:18,574 # SD_INIT_SEND_CMD0
+    2022-10-31 12:18:18,581 # sdcard_spi_send_cmd: CMD00 (0x00000000) (remaining retry time 88 usec)
+    2022-10-31 12:18:18,581 # _wait_for_not_busy: [OK]
+    2022-10-31 12:18:18,588 # CMD00 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+    2022-10-31 12:18:18,593 # _wait_for_r1: r1=0xff
+    2022-10-31 12:18:18,594 # _wait_for_r1: r1=0x01
+    2022-10-31 12:18:18,594 # _wait_for_r1: R1_VALID
+    2022-10-31 12:18:18,594 # CMD0: [OK]
+    2022-10-31 12:18:18,599 # SD_INIT_ENABLE_CRC
+    2022-10-31 12:18:18,605 # sdcard_spi_send_cmd: CMD59 (0x00000001) (remaining retry time 249988 usec)
+    2022-10-31 12:18:18,606 # _wait_for_not_busy: [OK]
+    2022-10-31 12:18:18,611 # CMD59 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+    2022-10-31 12:18:18,611 # _wait_for_r1: r1=0xff
+    2022-10-31 12:18:18,617 # _wait_for_r1: r1=0xff
+    [...]
+    2022-10-31 12:18:18,949 # _wait_for_r1: r1=0xff
+    2022-10-31 12:18:18,949 # _wait_for_r1: [TIMEOUT]
+    2022-10-31 12:18:18,954 # sdcard_spi_send_cmd: R1_TIMEOUT (0xff)
+    2022-10-31 12:18:18,955 # SD_INIT_CARD_UNKNOWN
+    2022-10-31 12:18:18,955 # [FAILED]
+
+With the remote-revb:
+
+    > init
+    2022-10-31 12:34:16,081 # init
+    2022-10-31 12:34:16,082 # Initializing SD-card at SPI_1...SD_INIT_START
+    2022-10-31 12:34:16,082 # gpio_init(): [OK]
+    2022-10-31 12:34:16,082 # SD_INIT_SPI_POWER_SEQ
+    2022-10-31 12:34:16,094 # SD_INIT_SEND_CMD0
+    2022-10-31 12:34:16,100 # sdcard_spi_send_cmd: CMD00 (0x00000000) (remaining retry time 69 usec)
+    2022-10-31 12:34:16,103 # _wait_for_not_busy: [OK]
+    2022-10-31 12:34:16,115 # CMD00 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+    2022-10-31 12:34:16,116 # _wait_for_r1: r1=0xff
+    2022-10-31 12:34:16,124 # _wait_for_r1: r1=0x01
+    2022-10-31 12:34:16,124 # _wait_for_r1: R1_VALID
+    2022-10-31 12:34:16,125 # CMD0: [OK]
+    2022-10-31 12:34:16,125 # SD_INIT_ENABLE_CRC
+    2022-10-31 12:34:16,134 # sdcard_spi_send_cmd: CMD59 (0x00000001) (remaining retry time 249969 usec)
+    2022-10-31 12:34:16,134 # _wait_for_not_busy: [OK]
+    2022-10-31 12:34:16,146 # CMD59 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+    2022-10-31 12:34:16,146 # _wait_for_r1: r1=0xff
+    2022-10-31 12:34:16,146 # _wait_for_r1: r1=0x01
+    2022-10-31 12:34:16,146 # _wait_for_r1: R1_VALID
+    2022-10-31 12:34:16,147 # CMD59: [OK]
     [...]
