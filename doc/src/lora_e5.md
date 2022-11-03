@@ -287,6 +287,37 @@ In RIOT the device address is hardcoded to 0x68, so the RIOT's source file
 
     #define DS1307_I2C_ADDRESS      (0x51)
 
+### The DS3231 RTC
+
+Testing with the Adafruit FeatherWing DS3231 Precision RTC, see
+https://learn.adafruit.com/ds3231-precision-rtc-featherwing
+
+Wiring:
+
+- GND       Black
+- VCC 3V3   Red
+- SCL       Yellow
+- SDA       Blue (or Green)
+
+I2C address: 0x68
+
+Test:
+
+    $ BOARD=lora-e5-dev make -C tests/periph_i2c all flash term
+    [...]
+    > 2022-11-03 11:37:29,883 # i2c_scan 0
+    2022-11-03 11:37:29,884 # Scanning I2C device 0...
+    2022-11-03 11:37:29,888 # addr not ack'ed = "-", addr ack'ed = "X", addr reserved = "R", error = "E"
+    2022-11-03 11:37:29,895 #      0 1 2 3 4 5 6 7 8 9 a b c d e f
+    2022-11-03 11:37:29,896 # 0x00 R R R R R R R R R R R R R R - -
+    2022-11-03 11:37:29,902 # 0x10 - - - - - - - - - - - - - - - -
+    2022-11-03 11:37:29,911 # 0x20 - - - - - - - - - - - - - - - -
+    2022-11-03 11:37:29,913 # 0x30 - - - - - - - - - - - - - - - -
+    2022-11-03 11:37:29,920 # 0x40 - - - - - - - - X - - - - - - -
+    2022-11-03 11:37:29,925 # 0x50 - - - - - - - - - - - - - - - -
+    2022-11-03 11:37:29,933 # 0x60 - - - - - - - - X - - - - - - -
+    2022-11-03 11:37:29,936 # 0x70 - - - - - - - - R R R R R R R R
+
 
 ### GPS (Grove - GPS Air530)
 
@@ -305,8 +336,8 @@ Links:
 
 Wiring:
 
-- VCC   Red
 - GND   Black
+- VCC   Red
 - CLK   Yellow
 - MOSI  Green
 - MISO  Blue
