@@ -11,10 +11,16 @@ SeedStudio. Links:
 - [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
 - In French: [Examples](https://stm32python.gitlab.io/fr-version-lora/lora-e5-mini.html)
 
+> ARM Cortex-M4 core and Semtech SX126X LoRa chip, supports both LoRaWAN and LoRa protocol
+> on the worldwide frequency and (G)FSK, BPSK, (G)MSK, and LoRa modulations.
+
 ## Verify the hardware
 
-Before starting it's probably good to verify the board is okay. As explained in
-the official documentation from SeeedStudio
+The board comes with a firmware preinstalled that answers to AT commands. Before we
+override this firmware forever, use it to verify the board is okay, and get some info that
+*may* be needed later for LoRaWAN.
+
+As explained in the official documentation from SeeedStudio
 ([here](https://wiki.seeedstudio.com/LoRa_E5_mini/#getting-started)):
 
 1. Plug the board to the computer with a USB cable
@@ -29,6 +35,9 @@ the official documentation from SeeedStudio
        +ID: DevAddr, 42:00:7E:D2
        +ID: DevEui, 2C:F7:F1:20:42:00:7E:D2
        +ID: AppEui, 80:00:00:00:00:00:00:06
+
+In LoRaWAN networks, for OTAA activation, the device EUI (Extended Unique Identifier),
+application EUI (aka JoinEUI), and application key are needed.
 
 ## The ST-Link programmer
 
@@ -182,11 +191,121 @@ the programmable buttons (press a button to see the data line switch to 1):
     2022-10-25 09:35:07,911 # ##########################
     [...]
 
+## LoRa
+
+The chip has a SX126X module, so we can first test the sx126x driver:
+
+    $ LORA_DRIVER=sx126x_stm32wl BOARD=lora-e5-dev make -C tests/driver_sx126x all flash term
+    [...]
+    > sx126x
+    2022-11-04 10:18:53,948 # sx126x
+    2022-11-04 10:18:53,949 # Usage: sx126x <get|set|rx|tx>
+    [...]
+    > sx126x get type
+    2022-11-04 13:08:38,601 # sx126x get type
+    2022-11-04 13:08:38,601 # Device type: lora
+    > sx126x set freq 865200000
+    > sx126x set bw 125
+    > sx126x set cr 1
+    > sx126x set sf 12
+    > sx126x rx start
+    [...]
+    > sx126x rx stop
+    > sx126x tx "Hello"
+
+> **Warning**
+> The type must be `lora` not `fsk`. For this you must pass the
+> `LORA_DRIVER=sx126x_stm32wl` option.
+
+For pint-to-point communication we can mix a lora-e5 (SX126X) with a waspmote (SX1272),
+the feather-m0 has as well a LoRa shield (SX1276):
+
+    Mode 1
+    BW 125
+    CR 4/5
+    SF 12
+
+When sending "ping" command in the waspmote, I get this in the lora-e5:
+
+    2022-11-04 13:06:47,702 # Received: "" (9 bytes) - [RSSI: -63, SNR: 6, TOA: 992ms]
+
+### LoRaWAN
+
+With `tests/gnrc_lorawan`:
+
+    $ BOARD=lora-e5-dev make -C tests/gnrc_lorawan all flash term
+    [...]
+    2022-11-04 09:52:01,246 # - gnrc_lorawan_tests
+    2022-11-04 09:52:01,248 # 1) OK test_gnrc_lorawan__validate_mic
+    2022-11-04 09:52:01,252 # 2) OK test_gnrc_lorawan__wrong_mic
+    2022-11-04 09:52:01,264 # 3) OK test_gnrc_lorawan__build_hdr
+    2022-11-04 09:52:01,266 # 4) OK test_gnrc_lorawan_fopts__mlme_link_check_req
+    2022-11-04 09:52:01,268 # 5) OK test_gnrc_lorawan_fopts__perform
+    2022-11-04 09:52:01,270 # 6) OK test_gnrc_lorawan_fopts__perform_wrong
+    2022-11-04 09:52:01,271 #
+    2022-11-04 09:52:01,271 # OK (6 tests)
+    2022-11-04 09:52:01,274 # { "threads": [{ "name": "main", "stack_size": 1536, "stack_used": 852 }]}
+
+With `tests/gnrc_lorawan_11`:
+
+    $ BOARD=lora-e5-dev make -C tests/gnrc_lorawan_11 all flash term
+    [...]
+    2022-11-04 09:55:21,426 # - gnrc_lorawan_tests
+    2022-11-04 09:55:21,428 # 1) OK test_gnrc_lorawan__validate_mic
+    2022-11-04 09:55:21,432 # 2) OK test_gnrc_lorawan__wrong_mic
+    2022-11-04 09:55:21,437 # 3) OK test_gnrc_lorawan__build_hdr
+    2022-11-04 09:55:21,439 # 4) OK test_gnrc_lorawan_fopts__mlme_link_check_req
+    2022-11-04 09:55:21,444 # 5) OK test_gnrc_lorawan_fopts__perform
+    2022-11-04 09:55:21,449 # 6) OK test_gnrc_lorawan_fopts__perform_wrong
+    2022-11-04 09:55:21,449 #
+    2022-11-04 09:55:21,450 # OK (6 tests)
+    2022-11-04 09:55:21,454 # { "threads": [{ "name": "main", "stack_size": 1536, "stack_used": 900 }]}
+
+To test LoRaWAN we can register to TTN (The Things Network), create a new application,
+register our device
+
+The use the `tests/pkg_semtech-loramac` program:
+
+    $ LORA_DRIVER=sx126x_stm32wl BOARD=lora-e5-dev make -C tests/pkg_semtech-loramac all flash term
+    [...]
+    > loramac set deveui 2CF7F12042007ED2
+    2022-11-04 12:47:32,365 # loramac set deveui 2CF7F12042007ED2
+    > loramac set appeui 8000000000000006
+    2022-11-04 12:48:02,040 # loramac set appeui 8000000000000006
+    > loramac set appkey 7B20478B27A026A6CD384C1CFA259DCA
+    2022-11-04 12:48:18,444 # loramac set appkey 7B20478B27A026A6CD384C1CFA259DCA
+    > loramac join otaa
+    2022-11-04 12:48:30,055 # loramac join otaa
+    2022-11-04 12:48:38,061 # Join procedure failed!
+
+Or the `examples/gnrc_lorawan` program:
+
+    $ BOARD=lora-e5-dev make -C examples/gnrc_lorawan all flash term
+    [...]
+    > ifconfig
+    2022-11-04 11:02:13,565 # ifconfig
+    2022-11-04 11:02:13,571 # Iface  3  HWaddr: 00:00:00:00  Frequency: 868300000Hz  RSSI: -128  BW: 125kHz  SF: 7  CR: 4/5  Link: down
+    2022-11-04 11:02:13,577 #            State: STANDBY  Demod margin.: 0  Num gateways.: 0
+    2022-11-04 11:02:13,580 #           OTAA
+    2022-11-04 11:02:13,580 #
+    > ifconfig 3 set deveui 2CF7F12042007ED2
+    > ifconfig 3 set appeui 8000000000000006
+    > ifconfig 3 set appkey 7B20478B27A026A6CD384C1CFA259DCA
+    > ifconfig 3 up
+
+> **Note**
+> This did not work for me yet.
+
+Links:
+
+- <https://wiki.seeedstudio.com/Grove_LoRa_E5/#ttn-console-configuration-setup>
+- https://github.com/RIOT-OS/RIOT/issues/17059
+
 ## External modules
 
 These are some modules we are trying.
 
-> **Warninig**
+> **Warning**
 > This sections is still very much in progress!
 
 ### SHT31
