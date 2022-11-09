@@ -516,3 +516,32 @@ With the remote-revb:
     2022-10-31 12:34:16,146 # _wait_for_r1: R1_VALID
     2022-10-31 12:34:16,147 # CMD59: [OK]
     [...]
+
+
+### SDI-12
+
+Tested RIOT's `tests/pkg_arduino_sdi_12` program with the Decagon CTD-10 sensor, which
+uses 5V power.  Only needed to change the pin in the `main.c` file, to use pin 21 instead
+of 13.
+
+> **Warning**
+> The board is not compatible with Arduino, but support for Arduino in RIOT was added to
+> it. This means that the pin numbers do not match those of Arduino. The exact definition
+> of the Arduino pin numbers for the lora-e5-dev board can be found in
+> `boards/lora-e5-dev/include/arduino_pinmap.h`. Here we use pin 21 which in the board is
+> labelled as **D9**.
+
+This is the proram's output:
+
+    $ BOARD=lora-e5-dev make -C tests/pkg_arduino_sdi_12 all flash term
+    [...]
+    2022-11-09 13:30:46,086 # Testing the Arduino-SDI-12 package
+    2022-11-09 13:30:46,086 #
+    2022-11-09 13:30:46,087 # Send: ?!
+    2022-11-09 13:30:46,087 # Recv: 0
+    2022-11-09 13:30:46,088 # Send: 0I!
+    2022-11-09 13:30:46,330 # Recv: 013DECAGON CTD-103991059303507
+    2022-11-09 13:30:46,330 # Send: 0M!
+    2022-11-09 13:30:48,676 # Recv: 00013
+    2022-11-09 13:30:49,677 # Send: 0D0!
+    2022-11-09 13:30:50,034 # Recv: 0+35+23.1+0
