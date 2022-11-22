@@ -64,10 +64,13 @@ bool gps_done(void)
 int gps_on(uart_t uart)
 {
     int err;
+    uint32_t baudrate;
 
     done = false;
 
 #ifdef CPU_ATMEGA1281
+    baudrate = 4800;
+
     // Select GPS
     SET_MUX_GPS;
 
@@ -78,6 +81,9 @@ int gps_on(uart_t uart)
         return -1;
     }
     gpio_set(GPS_PW);
+#else
+    // Grove - GPS (Air530) works at 9600 bauds by default
+    baudrate = 9600;
 #endif
 
     // Initialize ringbuffer
@@ -86,8 +92,9 @@ int gps_on(uart_t uart)
     // Start the GPS thread
     gps_start_parser();
 
-    // Init UART
-    err = uart_init(uart, 4800, rx_cb, NULL); // 4800 bauds
+    // Init UART XXX
+    err = uart_init(uart, baudrate, rx_cb, NULL);
+    LOG_INFO("UART %d initialized bauds=%lu err=%d\n", uart, baudrate, err);
     if (err != UART_OK) {
         LOG_ERROR("GPS uart_init failed err=%d\n", err);
         gps_off();
