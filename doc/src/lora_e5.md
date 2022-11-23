@@ -412,16 +412,20 @@ In RIOT the device address is hardcoded to 0x68, so the RIOT's source file
 
 ### The DS3231 RTC
 
-Testing with the Adafruit FeatherWing DS3231 Precision RTC, see
-https://learn.adafruit.com/ds3231-precision-rtc-featherwing
+The Adafruit FeatherWing DS3231 Precision RTC includes:
+
+- RTC DS3231
+- CR1220 button battery
+
+See https://learn.adafruit.com/ds3231-precision-rtc-featherwing
 
 Wiring:
 
-- GND                   Black
-- VCC 3V3               Red
-- SCL                   Yellow
-- SDA                   Blue (or Green)
-- SQW/INT (optional)    ?                   `DS3231_PARAM_INT_PIN`
+    GND                   Black
+    VCC 3V3               Red
+    SCL                   Yellow
+    SDA                   Blue (or Green)
+    SQW/INT (optional)    ?                 DS3231_PARAM_INT_PIN
 
 I2C address: 0x68
 
@@ -443,61 +447,24 @@ Test:
     2022-11-03 11:37:29,936 # 0x70 - - - - - - - - R R R R R R R R
 
 
-### GPS (Grove - GPS Air530)
-
-- Air530Z chip
-- Button battery CR1220
-
-> **Warning**
-> The Grove connetor does not work because it's plugged to USART1, which is used for
-> serial communication with the computer through USB-C. So we have to plug it to USART2.
-> Though maybe when deployed USART1 could be used, since the board won't be plugged to the
-> computer.
-
-Test UART communication:
-
-    $ BOARD=lora-e5-dev make -C tests/periph_uart all flash term
-    [...]
-    > init 1 9600
-    2022-11-22 13:09:44,186 # init 1 9600
-    2022-11-22 13:09:44,187 # Success: Initialized UART_DEV(1) at BAUD 9600
-    2022-11-22 13:09:44,440 # UARD_DEV(1): test uart_poweron() and uart_poweroff()  ->  [OK]
-    > 2022-11-22 13:09:44,868 # Success: UART_DEV(1) RX: [$GNGGA,,,,,,0,00,25.5,,,,,,*640x0d]\n
-    2022-11-22 13:09:44,889 # Success: UART_DEV(1) RX: [$GNGLL,,,,,,V,N*7A0x0d]\n
-    2022-11-22 13:09:44,936 # Success: UART_DEV(1) RX: [$GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,1*010x0d]\n
-    2022-11-22 13:09:44,982 # Success: UART_DEV(1) RX: [$GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,4*040x0d]\n
-    2022-11-22 13:09:45,002 # Success: UART_DEV(1) RX: [$GPGSV,1,1,00,0*650x0d]\n
-    [...]
-
-Or with our shell application:
-
-    $ make -C apps/wsn-shell all flash term
-    [...]
-    > gps
-    2022-11-22 13:25:49,351 # gps
-    2022-11-22 13:25:49,358 # time=6.879 level=info thread=main UART 1 initialized bauds=9600 err=0
-    2022-11-22 13:25:49,359 # time=6.886 level=info thread=main GPS on
-    2022-11-22 13:25:49,699 # RX $GNGGA,,,,,,0,00,25.5,,,,,,*64\r\n
-    2022-11-22 13:25:49,718 # RX $GNGLL,,,,,,V,N*7A\r\n
-    2022-11-22 13:25:49,767 # RX $GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,1*01\r\n
-    [...]
-
-Links:
-
-- <https://www.seeedstudio.com/Grove-GPS-Air530-p-4584.html>
-- <https://wiki.seeedstudio.com/Grove-GPS-Air530/>
-- <https://github.com/sivaelid/Heltec_AB02S_Mods>
-
-
 ### SD card reader
 
+The Adalogger FeatherWing includes:
+
+- SD card reader
+- RTC PCF8523 (I2C address 0x68)
+- CR1220 button battery
+
+See https://learn.adafruit.com/adafruit-adalogger-featherwing
+
 > **Warning**
-> This doesn't work yet.
+> The I2C address 0x68 is the same used by the DS3231 and DS1307.
 
-Links:
-
-- https://circuitstate.com/tutorials/interfacing-catalex-micro-sd-card-module-with-arduino/
-- https://github.com/RIOT-OS/RIOT/pull/6031#issuecomment-267985966
+> **Note**
+> I tried with this module as well
+> https://circuitstate.com/tutorials/interfacing-catalex-micro-sd-card-module-with-arduino/
+> but it didn't work. Apparently the pins value are at 5V, designed for Arduino, so it
+> does not work with 3V3 MCUs.
 
 Wiring:
 
@@ -562,6 +529,52 @@ With the remote-revb:
     2022-10-31 12:34:16,146 # _wait_for_r1: R1_VALID
     2022-10-31 12:34:16,147 # CMD59: [OK]
     [...]
+
+
+### GPS (Grove - GPS Air530)
+
+- Air530Z chip
+- Button battery CR1220
+
+> **Warning**
+> The Grove connetor does not work because it's plugged to USART1, which is used for
+> serial communication with the computer through USB-C. So we have to plug it to USART2.
+> Though maybe when deployed USART1 could be used, since the board won't be plugged to the
+> computer.
+
+Test UART communication:
+
+    $ BOARD=lora-e5-dev make -C tests/periph_uart all flash term
+    [...]
+    > init 1 9600
+    2022-11-22 13:09:44,186 # init 1 9600
+    2022-11-22 13:09:44,187 # Success: Initialized UART_DEV(1) at BAUD 9600
+    2022-11-22 13:09:44,440 # UARD_DEV(1): test uart_poweron() and uart_poweroff()  ->  [OK]
+    > 2022-11-22 13:09:44,868 # Success: UART_DEV(1) RX: [$GNGGA,,,,,,0,00,25.5,,,,,,*640x0d]\n
+    2022-11-22 13:09:44,889 # Success: UART_DEV(1) RX: [$GNGLL,,,,,,V,N*7A0x0d]\n
+    2022-11-22 13:09:44,936 # Success: UART_DEV(1) RX: [$GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,1*010x0d]\n
+    2022-11-22 13:09:44,982 # Success: UART_DEV(1) RX: [$GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,4*040x0d]\n
+    2022-11-22 13:09:45,002 # Success: UART_DEV(1) RX: [$GPGSV,1,1,00,0*650x0d]\n
+    [...]
+
+Or with our shell application:
+
+    $ make -C apps/wsn-shell all flash term
+    [...]
+    > gps
+    2022-11-22 13:25:49,351 # gps
+    2022-11-22 13:25:49,358 # time=6.879 level=info thread=main UART 1 initialized bauds=9600 err=0
+    2022-11-22 13:25:49,359 # time=6.886 level=info thread=main GPS on
+    2022-11-22 13:25:49,699 # RX $GNGGA,,,,,,0,00,25.5,,,,,,*64\r\n
+    2022-11-22 13:25:49,718 # RX $GNGLL,,,,,,V,N*7A\r\n
+    2022-11-22 13:25:49,767 # RX $GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,1*01\r\n
+    [...]
+
+Links:
+
+- <https://www.seeedstudio.com/Grove-GPS-Air530-p-4584.html>
+- <https://wiki.seeedstudio.com/Grove-GPS-Air530/>
+- <https://github.com/sivaelid/Heltec_AB02S_Mods>
 
 
 ### SDI-12
