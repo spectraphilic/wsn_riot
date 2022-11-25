@@ -7,11 +7,11 @@ FEATURES_REQUIRED += cpp
 USEMODULE += saul_default
 
 # Shell
-USEMODULE += i2c_scan
 USEMODULE += gnrc_txtsnd
 USEMODULE += ps
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
+USEMODULE += shell_cmd_i2c_scan
 
 # Project modules
 USEMODULE += gps

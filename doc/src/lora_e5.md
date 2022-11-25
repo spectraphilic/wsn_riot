@@ -449,6 +449,10 @@ Test:
 
 ### SD card reader
 
+The Adafruit MicroSD SPI or SDIO card breakout:
+
+- https://learn.adafruit.com/adafruit-microsd-spi-sdio
+
 The Adalogger FeatherWing includes:
 
 - SD card reader

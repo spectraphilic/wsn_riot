@@ -1,15 +1,13 @@
 App wsn-shell
 =============
 
-This test program shows how to use the shell module. By default no commands
-are available.
+This test program shows how to use the shell module. By default no commands are available.
 
-The `shell_commands` module provides a list of commands. By default only
-`reboot` and `version`, but if other modules are used then extra commands will
-be available.
+The `shell_cmds_default` module provides a list of commands. By default only `reboot` and
+`version`, but if other modules are used then extra commands will be available.
 
-For example if, in addition to `shell_commands` the `i2c_scan` module is used,
-then the `i2c_scan` command will be available.
+For example if, in addition to `shell_cmd_i2c_scan` the `shell_cmd_i2c_scan` module is
+used, then the `i2c_scan` command will be available.
 
 You can as well add your own commands, see `main.c`.
 
