@@ -540,11 +540,23 @@ With the remote-revb:
 - Air530Z chip
 - Button battery CR1220
 
+Links:
+
+- <https://www.seeedstudio.com/Grove-GPS-Air530-p-4584.html>
+- <https://wiki.seeedstudio.com/Grove-GPS-Air530/>
+
+Wiring:
+
+    GND     black   GND
+    3V3     red     VIN
+    TX      green   RX2
+    RX      yellow  TX2
+    D0      blue    ON_OFF
+
 > **Warning**
-> The Grove connetor does not work because it's plugged to USART1, which is used for
-> serial communication with the computer through USB-C. So we have to plug it to USART2.
-> Though maybe when deployed USART1 could be used, since the board won't be plugged to the
-> computer.
+> The Grove connector in the development board does not work because it's plugged to
+> USART1, which is used for serial communication with the computer through USB-C. So the
+> GPS module must be plugged to USART2.
 
 Test UART communication:
 
@@ -574,11 +586,11 @@ Or with our shell application:
     2022-11-22 13:25:49,767 # RX $GNGSA,A,1,,,,,,,,,,,,,25.5,25.5,25.5,1*01\r\n
     [...]
 
-Links:
+To switch on/off the GPS module use the D0 pin:
 
-- <https://www.seeedstudio.com/Grove-GPS-Air530-p-4584.html>
-- <https://wiki.seeedstudio.com/Grove-GPS-Air530/>
-- <https://github.com/sivaelid/Heltec_AB02S_Mods>
+    > gpio init_out 0 0     # D0
+    > gpio clear 0 0        # off
+    > gpio set 0 0          # on
 
 
 ### SDI-12
