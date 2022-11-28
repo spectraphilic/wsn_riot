@@ -25,6 +25,7 @@ const shell_command_t shell_commands[] = {
     {"catx", "print contents of given filename in hexadecimal", cmd_catx},
     {"format", "format the SD card", cmd_format},
 #endif
+    {"gpio", "handle digital pins", cmd_gpio},
 #ifdef MODULE_GPS
     {"gps", "print data from GPS", cmd_gps},
 #endif

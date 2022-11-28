@@ -34,11 +34,13 @@ int cmd_var(int argc, char **argv) {
         for (size_t i=0; i < settings_len; i++) {
             printf("%s %s\n", settings_name(i), help[i]);
         }
-    } else if (argc == 2) {
+    }
+    else if (argc == 2) {
         // Get
         int idx = settings_index(argv[1]);
         error = get(idx);
-    } else if (argc == 3) {
+    }
+    else if (argc == 3) {
         // Set
         error = settings_set(argv[1], argv[2]);
         if (error) {
@@ -48,7 +50,8 @@ int cmd_var(int argc, char **argv) {
         if (error) {
             return error;
         }
-    } else {
+    }
+    else {
         LOG_WARNING("Unexpected number of arguments: %d", argc);
         return -1;
     }
