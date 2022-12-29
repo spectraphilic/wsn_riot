@@ -90,6 +90,11 @@ int wsn_rtc_time_get(struct tm *time);
 int wsn_rtc_time_set(struct tm *time);
 
 /**
+ * @brief Trigger alarm after the given delay (in seconds)
+ */
+int wsn_rtc_alarm_set(int delay);
+
+/**
  * @brief Returns the basetime
  *
  * The basetime is an internal variable, useful to calculate the system time.

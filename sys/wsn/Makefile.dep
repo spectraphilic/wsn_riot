@@ -13,6 +13,7 @@ USEMODULE += triage
 # Drivers
 #USEMODULE += ds1307
 USEMODULE += ds3231
+USEMODULE += ds3231_int
 #USEMODULE += sx127x
 
 # Networking

@@ -18,6 +18,7 @@
 static kernel_pid_t pid = KERNEL_PID_UNDEF;
 static char stack[THREAD_STACKSIZE_MAIN];
 
+#if IS_USED(MODULE_FRAMES)
 int send_frame(void)
 {
     uint8_t buffer[150];
@@ -36,6 +37,7 @@ int send_frame(void)
     LOG_INFO("Frame sent (%d left)", n);
     return n;
 }
+#endif
 
 static void *task_func(void *arg)
 {
@@ -45,7 +47,9 @@ static void *task_func(void *arg)
 
     uint8_t buffer[150];
     nanocbor_encoder_t enc;
+#if IS_USED(MODULE_QTPY)
     phyval_t res;
+#endif
 
     for (unsigned int loop=0; ; loop++) {
         LED0_ON;
@@ -83,6 +87,7 @@ static void *task_func(void *arg)
         nanocbor_fmt_uint(&enc, 123);
         nanocbor_fmt_uint(&enc, time);
 
+#if IS_USED(MODULE_QTPY)
         // Sensors
         sensor_t *sensor = sensors_list;
         while (sensor) {
@@ -94,6 +99,7 @@ static void *task_func(void *arg)
             }
             sensor = sensor->next;
         }
+#endif
 
         nanocbor_fmt_end_indefinite(&enc);
         size_t len = nanocbor_encoded_len(&enc);
@@ -103,15 +109,17 @@ static void *task_func(void *arg)
 
         // For debugging purposes, print CBOR data
         if (len < 30) {
-            char message[80] = "CBOR=";
+            char message[90];
+            sprintf(message, "loop=%d CBOR=", loop);
             for (size_t k=0; k < len; k++) {
                 sprintf(message + strlen(message), "%02x", buffer[k]);
             }
             LOG_INFO("%s", message);
         } else {
-            LOG_INFO("CBOR size=%d", len);
+            LOG_INFO("loop=%d CBOR size=%d", loop, len);
         }
 
+#if IS_USED(MODULE_FRAMES)
         // Save the frame
         frames_save(time, buffer, len);
 
@@ -119,10 +127,15 @@ static void *task_func(void *arg)
         if (loop % SEND_LOOPS == 0) {
             send_frame();
         }
+#endif
 
         // Done
         LED0_OFF;
+#if IS_USED(MODULE_DS3231_INT)
+        wsn_rtc_alarm_set(LOOP_SECONDS);
+#else
         ztimer_sleep(ZTIMER_MSEC, LOOP_SECONDS * MS_PER_SEC);
+#endif
     }
 
     // Never reached

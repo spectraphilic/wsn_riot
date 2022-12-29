@@ -421,15 +421,15 @@ See https://learn.adafruit.com/ds3231-precision-rtc-featherwing
 
 Wiring:
 
-    GND                   Black
-    VCC 3V3               Red
-    SCL                   Yellow
-    SDA                   Blue (or Green)
-    SQW/INT (optional)    ?                 DS3231_PARAM_INT_PIN
+    GND         Black
+    VCC 3V3     Red
+    SCL         Yellow
+    SDA         Blue
+    SQW/INT     Green       D0 (PB5)    DS3231_PARAM_INT_PIN
 
 I2C address: 0x68
 
-Test:
+Verify I2C address:
 
     $ BOARD=lora-e5-dev make -C tests/periph_i2c all flash term
     [...]
@@ -445,6 +445,27 @@ Test:
     2022-11-03 11:37:29,925 # 0x50 - - - - - - - - - - - - - - - -
     2022-11-03 11:37:29,933 # 0x60 - - - - - - - - X - - - - - - -
     2022-11-03 11:37:29,936 # 0x70 - - - - - - - - R R R R R R R R
+
+To test the driver, including the alarm, first edit RIOT's `tests/driver_ds3231/Makefile`
+to enable the `ds3231_int` module and set `DS3231_PARAM_INT_PIN` to PB5:
+
+    USEMODULE += ds3231_int
+    CFLAGS +="-DDS3231_PARAM_INT_PIN=(GPIO_PIN(1, 5))"
+
+Then flash and test:
+
+    $ BOARD=lora-e5-dev make -C tests/driver_ds3231 all flash term
+    [...]
+    > help
+    [...]
+    > time_set [...]
+    [...]
+    > time_get
+    [...]
+    > test
+    2022-12-29 12:59:45,262 # test
+    2022-12-29 12:59:45,263 # testing device now
+    2022-12-29 12:59:49,266 # OK
 
 
 ### SD card reader

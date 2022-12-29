@@ -9,6 +9,7 @@
 
 // Project
 #include <frames.h>
+#include <wsn.h>
 #include "common.h"
 #include "config.h"
 
@@ -34,6 +35,7 @@ static int handle_cmd(const char *data, size_t len)
         return -1;
     }
 
+#if IS_USED(MODULE_FRAMES)
     // ack
     if (strcmp(data, "ack") == 0) {
         n = frames_drop();
@@ -41,6 +43,7 @@ static int handle_cmd(const char *data, size_t len)
             send_frame();
         }
     }
+#endif
 
     return 0;
 }
