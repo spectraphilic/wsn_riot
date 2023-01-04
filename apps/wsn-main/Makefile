@@ -3,6 +3,7 @@ include ../Makefile.common
 # System modules
 USEMODULE += od
 USEMODULE += phydat
+USEMODULE += rtc_utils
 USEMODULE += ztimer_msec
 USEPKG += nanocbor
 

@@ -43,7 +43,7 @@ static void *task_func(void *arg)
 {
     (void)arg;
 
-    LOG_INFO("Running sensors thread, loop every %d seconds.", LOOP_SECONDS);
+    LOG_INFO("Running sensors thread, loop every %d minutes.", LOOP_MINUTES);
 
     uint8_t buffer[150];
     nanocbor_encoder_t enc;
@@ -53,7 +53,7 @@ static void *task_func(void *arg)
 
     for (unsigned int loop=0; ; loop++) {
         LED0_ON;
-        ztimer_now_t time = wsn_time_get(NULL);
+        ztimer_now_t now = wsn_time_get(NULL);
 
         // Read sensors and fill buffer
         nanocbor_encoder_init(&enc, buffer, sizeof(buffer));
@@ -85,7 +85,7 @@ static void *task_func(void *arg)
 
         // Timestamp
         nanocbor_fmt_uint(&enc, 123);
-        nanocbor_fmt_uint(&enc, time);
+        nanocbor_fmt_uint(&enc, now);
 
 #if IS_USED(MODULE_QTPY)
         // Sensors
@@ -121,7 +121,7 @@ static void *task_func(void *arg)
 
 #if IS_USED(MODULE_FRAMES)
         // Save the frame
-        frames_save(time, buffer, len);
+        frames_save(now, buffer, len);
 
         // Send frames
         if (loop % SEND_LOOPS == 0) {
@@ -132,9 +132,13 @@ static void *task_func(void *arg)
         // Done
         LED0_OFF;
 #if IS_USED(MODULE_DS3231_INT)
-        wsn_rtc_alarm_set(LOOP_SECONDS);
+        struct tm time;
+        wsn_rtc_time_get(&time);
+        time.tm_min = ((time.tm_min / LOOP_MINUTES) + 1) * LOOP_MINUTES;
+        time.tm_sec = 0;
+        wsn_rtc_alarm_set(&time);
 #else
-        ztimer_sleep(ZTIMER_MSEC, LOOP_SECONDS * MS_PER_SEC);
+        ztimer_sleep(ZTIMER_MSEC, LOOP_MINUTES * 60  * MS_PER_SEC);
 #endif
     }
 

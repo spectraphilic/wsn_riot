@@ -3,6 +3,7 @@
 #include <ds3231.h>
 #include <ds3231_params.h>
 #include <log.h>
+#include <rtc_utils.h>
 
 static ds3231_t dev;
 
@@ -52,26 +53,17 @@ int wsn_rtc_time_set(struct tm *time)
     return 0;
 }
 
-int wsn_rtc_alarm_set(int delay) // TODO Change to exact time
+int wsn_rtc_alarm_set(struct tm *time)
 {
-    int err;
-    struct tm time;
+    rtc_tm_normalize(time);
 
-    err = ds3231_clear_alarm_1_flag(&dev);
+    int err = ds3231_clear_alarm_1_flag(&dev);
     if (err) {
         LOG_ERROR("DS3231 clear alarm flag failed err=%d", err);
         return -1;
     }
 
-    err = ds3231_get_time(&dev, &time);
-    if (err) {
-        LOG_ERROR("DS3231 get time failed err=%d", err);
-        return -1;
-    }
-
-    time.tm_sec += delay;
-    mktime(&time);
-    err = ds3231_set_alarm_1(&dev, &time, DS3231_AL1_TRIG_H_M_S);
+    err = ds3231_set_alarm_1(&dev, time, DS3231_AL1_TRIG_H_M_S);
     if (err) {
         LOG_ERROR("DS3231 set alarm failed err=%d", err);
         return -1;

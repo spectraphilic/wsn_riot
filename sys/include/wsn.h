@@ -92,7 +92,7 @@ int wsn_rtc_time_set(struct tm *time);
 /**
  * @brief Trigger alarm after the given delay (in seconds)
  */
-int wsn_rtc_alarm_set(int delay);
+int wsn_rtc_alarm_set(struct tm *time);
 
 /**
  * @brief Returns the basetime
