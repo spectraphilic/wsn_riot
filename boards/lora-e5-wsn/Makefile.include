@@ -1,0 +1,6 @@
+INCLUDES += -I$(RIOTBOARD)/lora-e5-dev/include
+
+# RTC DS3231 interrupt pin
+CFLAGS +="-DDS3231_PARAM_INT_PIN=(GPIO_PIN(1, 5))"
+
+include $(RIOTBOARD)/lora-e5-dev/Makefile.include

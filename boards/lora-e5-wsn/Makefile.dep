@@ -1,0 +1,7 @@
+USEMODULE += board_lora-e5-wsn
+
+include $(RIOTBOARD)/lora-e5-dev/Makefile.dep
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_sdcard
+endif
