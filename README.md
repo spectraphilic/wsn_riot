@@ -18,7 +18,7 @@ manually, just initialize and update the submodules:
     git submodule init
     git submodule update
 
-Try building our apps (for the `feather-m0` board by default):
+Try building our apps (for the `lora-e5-dev` board by default):
 
     make -C apps/wsn-shell
     make -C apps/wsn-main
@@ -33,20 +33,20 @@ Check the `apps` directory for the available programs.
 
 In RIOT programs are by default built for the native port (Linux process). But
 we have changed this, in `wsn_riot` programs are by default built for the
-`feather-m0` board. Anyway, our apps don't build for the native port, because
+`lora-e5-dev` board. Anyway, our apps don't build for the native port, because
 they require the arduino feature.
 
 If you wish to try building for a different board, you need to pass the
 appropriate build option:
 
-    BOARD=remote-revb make -C apps/wsn-shell
+    BOARD=feather-m0 make -C apps/wsn-shell
 
 # Build options
 
 The build can be modified passing some parameters, these may be useful:
 
-    # The board to build for, default is feather-m0
-    BOARD=remote-revb
+    # The board to build for, default is lora-e5-dev
+    BOARD=feather-m0
 
     # Port the mote is connected to, default is /dev/ttyACM0
     PORT=/dev/ttyUSB1

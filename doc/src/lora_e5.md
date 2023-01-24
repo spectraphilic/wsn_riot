@@ -530,31 +530,6 @@ Test:
     2022-10-31 12:18:18,955 # SD_INIT_CARD_UNKNOWN
     2022-10-31 12:18:18,955 # [FAILED]
 
-With the remote-revb:
-
-    > init
-    2022-10-31 12:34:16,081 # init
-    2022-10-31 12:34:16,082 # Initializing SD-card at SPI_1...SD_INIT_START
-    2022-10-31 12:34:16,082 # gpio_init(): [OK]
-    2022-10-31 12:34:16,082 # SD_INIT_SPI_POWER_SEQ
-    2022-10-31 12:34:16,094 # SD_INIT_SEND_CMD0
-    2022-10-31 12:34:16,100 # sdcard_spi_send_cmd: CMD00 (0x00000000) (remaining retry time 69 usec)
-    2022-10-31 12:34:16,103 # _wait_for_not_busy: [OK]
-    2022-10-31 12:34:16,115 # CMD00 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
-    2022-10-31 12:34:16,116 # _wait_for_r1: r1=0xff
-    2022-10-31 12:34:16,124 # _wait_for_r1: r1=0x01
-    2022-10-31 12:34:16,124 # _wait_for_r1: R1_VALID
-    2022-10-31 12:34:16,125 # CMD0: [OK]
-    2022-10-31 12:34:16,125 # SD_INIT_ENABLE_CRC
-    2022-10-31 12:34:16,134 # sdcard_spi_send_cmd: CMD59 (0x00000001) (remaining retry time 249969 usec)
-    2022-10-31 12:34:16,134 # _wait_for_not_busy: [OK]
-    2022-10-31 12:34:16,146 # CMD59 echo: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
-    2022-10-31 12:34:16,146 # _wait_for_r1: r1=0xff
-    2022-10-31 12:34:16,146 # _wait_for_r1: r1=0x01
-    2022-10-31 12:34:16,146 # _wait_for_r1: R1_VALID
-    2022-10-31 12:34:16,147 # CMD59: [OK]
-    [...]
-
 
 ### GPS (Grove - GPS Air530)
 

@@ -7,7 +7,8 @@
 /*
 NOTE: 
 - find out how to wire the sensor to the board, which pin to connect the data line. 
-- Also, there are two modes, one that require specific hardware specs which Re-mote or wasp might not allow see the doc and simply test.
+- Also, there are two modes, one that requires specific hardware specs which the board
+  might not allow, see the doc and simply test.
 
 int cmd_ds18b20(int argc, char **argv) {
     ds18_t dev;

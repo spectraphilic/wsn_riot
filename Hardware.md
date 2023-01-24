@@ -8,7 +8,6 @@ The table below summarizes the board we have and their main features:
     Waspmote v15          atmega1281    waspmote-pro
     Arduino Nano          atmega328p    arduino-nano
     Adafruit Feather M0   ?             feather-m0
-    Zolertia Re-mote M3   ?             remote-revb
 
 RTC
 =====================
@@ -18,7 +17,6 @@ RTC
     Waspmote v15          DS1337C     I2C
     Arduino Nano          ?
     Adafruit Feather M0   ?
-    Zolertia Re-mote M3   AB08XX      I2C   0xD2/D3
 
 Links:
 
@@ -33,7 +31,6 @@ Accelerometer
     Waspmote v15          LIS3331lDH       I2C   0x19
     Arduino Nano
     Adafruit Feather M0
-    Zolertia Re-mote M3
 
 Other
 =====================
@@ -44,4 +41,3 @@ Other:
     Waspmote v15
     Arduino Nano
     Adafruit Feather M0
-    Zolertia Re-mote M3   PIC16F1509-E/ML

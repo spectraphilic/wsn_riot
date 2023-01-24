@@ -44,7 +44,7 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   CFLAGS += -DCONFIG_SKIP_BOOT_MSG
 endif
 
-ifneq (,$(filter feather-m0 remote-revb,$(BOARD)))
+ifneq (,$(filter feather-m0,$(BOARD)))
   # Increase stack size, otherwise we get overflow errors, or the program
   # simply hangs. Default is 512 for cotexm_common.
   # TODO Do this for every cortexm cpu
