@@ -25,11 +25,12 @@
 // Riot
 #include <log.h>
 #include <timex.h>
+#include <tiny_strerror.h>
 #include <ztimer.h>
 
+// Project
 #include <coroutine.h>
 #include <sensors.h>
-#include <triage.h>
 
 #include "qtpy.h"
 #include "qtpy_constants.h"
@@ -328,7 +329,7 @@ void qtpy_init_auto(void)
             LOG_ERROR("[QTPY] Protocol error");
             return;
         default:
-            LOG_ERROR("[QTPY] Unexpected error %s", errno_string(error));
+            LOG_ERROR("[QTPY] Unexpected error %s", tiny_strerror(error));
             return;
     }
 

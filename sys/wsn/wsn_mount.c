@@ -6,6 +6,7 @@
 #include <log.h>
 #include <mtd.h>
 #include <panic.h>
+#include <tiny_strerror.h>
 #include <vfs.h>
 
 // Project
@@ -52,7 +53,7 @@ int wsn_mount(void)
 
     int error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("func=wsn_mount callee=vfs_mount errno=%s", errno_string(error));
+        LOG_ERROR("func=wsn_mount callee=vfs_mount errno=%s", tiny_strerror(error));
         //core_panic(PANIC_GENERAL_ERROR, "SD card is required");
         return error;
     }
@@ -71,13 +72,13 @@ int wsn_format(void)
 
     error = vfs_format(&mountp);
     if (error < 0) {
-        LOG_ERROR("Failed to format (%s)\n", errno_string(error));
+        LOG_ERROR("Failed to format (%s)\n", tiny_strerror(error));
         return error;
     }
 
     error = vfs_mount(&mountp);
     if (error < 0) {
-        LOG_ERROR("func=wsn_format callee=vfs_mount errno=%s", errno_string(error));
+        LOG_ERROR("func=wsn_format callee=vfs_mount errno=%s", tiny_strerror(error));
         return error;
     }
 

@@ -1,3 +1,4 @@
+USEMODULE += tiny_strerror
 USEMODULE += ztimer_msec
 USEPKG += arduino_sdi_12
 

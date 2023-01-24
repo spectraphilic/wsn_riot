@@ -5,6 +5,7 @@
 // RIOT
 #include <fmt.h>
 #include <log.h>
+#include <tiny_strerror.h>
 #include <vfs.h>
 
 // Project
@@ -27,7 +28,7 @@ int cmd_tail(int argc, char **argv)
     char *name = argv[2];
     int fd = vfs_open(name, O_RDONLY, 0);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)", name, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", name, tiny_strerror(fd));
         return -1;
     }
 

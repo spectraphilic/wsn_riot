@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 // Riot
+#include <tiny_strerror.h>
 #include <vfs.h>
 
 // Project
@@ -24,7 +25,7 @@ int cmd_cat(int argc, char **argv)
     // Open
     int fd = vfs_open(name, O_RDONLY, 0);
     if (fd < 0) {
-        printf("Failed to open %s (%s)\n", name, errno_string(fd));
+        printf("Failed to open %s (%s)\n", name, tiny_strerror(fd));
         return -1;
     }
 

@@ -8,11 +8,11 @@
 
 // Riot
 #include <log.h>
+#include <tiny_strerror.h>
 #include <vfs.h>
 
 // Project
 #include <frames.h>
-#include <triage.h>
 
 
 typedef struct {
@@ -37,7 +37,7 @@ static int write_header(int fd, queue_header_t *header)
     vfs_lseek(fd, 0, SEEK_SET);
     ssize_t size = vfs_write(fd, header, head_size);
     if (size < 0) {
-        LOG_ERROR("Failed to write header (%s)", errno_string(size));
+        LOG_ERROR("Failed to write header (%s)", tiny_strerror(size));
         return -1;
     }
     return 0;
@@ -60,7 +60,7 @@ static int queue_make(void)
         return 0;
     }
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)", queue_path, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", queue_path, tiny_strerror(fd));
         return fd;
     }
 
@@ -191,7 +191,7 @@ int frames_save(ztimer_now_t time, const void *data, uint8_t size)
     // Save frame
     int fd = vfs_open(filename, O_CREAT | O_WRONLY, 0);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", filename, tiny_strerror(fd));
         return fd;
     }
     off_t offset = vfs_lseek(fd, 0, SEEK_END);
@@ -225,7 +225,7 @@ int frames_load(uint8_t *data, uint8_t *size)
     get_data_filename(filename, item.year, item.month, item.day);
     int fd = vfs_open(filename, O_RDONLY, 0);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", filename, tiny_strerror(fd));
         return fd;
     }
     vfs_lseek(fd, item.offset, SEEK_SET);

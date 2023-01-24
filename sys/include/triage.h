@@ -20,23 +20,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Return short name for the given error number
- *
- * Where the error number is as defined in errno.h from the C standard
- * library.
- *
- * @note TODO We should use strerror instead, which is standard, but it doesn't
- *       seem to work as defined, at least with the remote-revb.
- *
- * @param[in]   errnum  the error number, see errno.h from libc
- *
- * @return      char*   string with the short name of the error number
- * @return      unknown for unexpected values of errnum
- */
-char* errno_string(int errnum);
-
-
-/**
  * @brief Print formatted string to file descriptor
  *
  * @note Like dprintf from POSIX.1-2008 but for vfs.

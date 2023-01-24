@@ -1,5 +1,6 @@
 // Riot
 #include <log.h>
+#include <tiny_strerror.h>
 #include <vfs.h>
 
 // Project
@@ -68,7 +69,7 @@ int settings_save(void)
 
     int fd = vfs_open(filename, O_CREAT | O_WRONLY, 0);
     if (fd < 0) {
-        LOG_ERROR("Failed to open %s (%s)", filename, errno_string(fd));
+        LOG_ERROR("Failed to open %s (%s)", filename, tiny_strerror(fd));
         return -1;
     }
 
@@ -89,7 +90,7 @@ int settings_load(void)
 
     int fd = vfs_open(filename, O_RDONLY, 0);
     if (fd < 0) {
-        LOG_WARNING("Failed to open %s (%s)", filename, errno_string(fd));
+        LOG_WARNING("Failed to open %s (%s)", filename, tiny_strerror(fd));
         return -1;
     }
 

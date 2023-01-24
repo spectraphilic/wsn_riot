@@ -5,6 +5,7 @@
 #include <log.h>
 #include <nanocbor/nanocbor.h>
 #include <thread.h>
+#include <tiny_strerror.h>
 #include <ztimer.h>
 
 // Project
@@ -160,7 +161,7 @@ kernel_pid_t sensors_start(void)
         );
 
         if (pid < 0) {
-            LOG_ERROR("Failed to create thread %s", errno_string(pid));
+            LOG_ERROR("Failed to create thread %s", tiny_strerror(pid));
             return pid;
         }
     }

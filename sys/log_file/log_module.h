@@ -19,6 +19,7 @@
 #include <fmt.h>
 #include <thread.h>
 #include <timex.h>
+#include <tiny_strerror.h>
 #include <ztimer.h>
 
 #ifdef MODULE_VFS
@@ -26,7 +27,6 @@
 #endif
 
 // Project
-#include <triage.h>
 #include <wsn.h>
 
 
@@ -96,7 +96,7 @@ static inline void log_write(unsigned level, const char *format, ...) {
         int len = strlen(buffer);
         ssize_t size = vfs_write(fd, buffer, len);
         if (size < 0) {
-            printf("Error callee=vfs_write args=%s errno=%s\n", filename, errno_string(size));
+            printf("Error callee=vfs_write args=%s errno=%s\n", filename, tiny_strerror(size));
         }
         else if (size != (ssize_t)len) {
             printf("Error callee=vfs_write args=%s wrote %d bytes should be %d\n", filename, size, len);

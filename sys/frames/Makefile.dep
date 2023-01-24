@@ -1,5 +1,2 @@
 USEMODULE += tiny_strerror
 USEMODULE += vfs
-
-# Project modules
-USEMODULE += triage
