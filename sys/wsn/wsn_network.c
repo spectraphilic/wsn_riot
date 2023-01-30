@@ -15,7 +15,6 @@ static gnrc_netif_t* get_gnrc_netif(void)
 
     // Get the first network interface (reliable if there's only one)
     // XXX Use netif_get_by_name, gnrc_netif_get_by_pid, something else?
-    // With feather-m0 board the netif id will be 3
     netif = gnrc_netif_iter(netif);
     if (netif == NULL) {
         LOG_ERROR("Network interface not found");

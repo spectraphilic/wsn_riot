@@ -82,8 +82,8 @@ Examples with CFLAGS:
     # Don't print the boot message "main(): This is RIOT! ..."
     CFLAGS="-DCONFIG_SKIP_BOOT_MSG"
 
-Curently our datalogger is based on the Feather M0 Adalogger board, with the
-LoRa and the RTC wings. So you should build with this configuration:
+Curently our datalogger is based on the LoRa-E5 mini board. So you should build with this
+configuration:
 
     USEMODULE="ds3231 sx1276" make -C apps/wsn-shell flash term
 
@@ -221,12 +221,12 @@ Now you don't need to pass ``NODE_ID`` in the command line:
 
 You can as well try some examples and tests from RIOT:
 
-    BOARD=feather-m0 make -C RIOT/examples/default flash term
+    BOARD=lora-e5-dev make -C RIOT/examples/default flash term
 
 Most RIOT tests have a test target, if the test doesn't end with a traceback
 then it was a success. For example:
 
-    BOARD=feather-m0 make -C RIOT/tests/periph_rtt flash test
+    BOARD=lora-e5-dev make -C RIOT/tests/periph_rtt flash test
 
 
 # Documentation

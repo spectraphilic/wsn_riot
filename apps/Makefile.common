@@ -22,29 +22,7 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/../../sys
 INCLUDES += -I$(CURDIR)/../../drivers/include
 INCLUDES += -I$(CURDIR)/../../sys/include
 
-#
-# Configuration used for the feather-m0 adalogger [1] with the RFM95W wing [2]
-# [1] https://www.adafruit.com/product/2796
-# [2] https://www.adafruit.com/product/3231
-#
-# The wiring is as follows:
-#   CS  -> B -> D10 (PA 18)
-#   RST -> A -> D11 (PA 16)
-#   IRQ -> D -> D6  (PA 20)
-#
-ifeq (feather-m0,$(BOARD))
-  CFLAGS += -DSX127X_PARAM_SPI_NSS="GPIO_PIN(PA, 18)"
-  CFLAGS += -DSX127X_PARAM_RESET="GPIO_PIN(PA, 16)"
-  CFLAGS += -DSX127X_PARAM_DIO0="GPIO_PIN(PA, 20)"
-endif
-
-ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-  # The feather-m0 uses stdio over USB, and that's slow to start. So don't
-  # print the boot message, it will arrive too late anyway.
-  CFLAGS += -DCONFIG_SKIP_BOOT_MSG
-endif
-
-ifneq (,$(filter feather-m0 lora-e5-dev lora-e5-wsn,$(BOARD)))
+ifneq (,$(filter lora-e5-dev lora-e5-wsn,$(BOARD)))
   # Increase stack size, otherwise we get overflow errors, or the program
   # simply hangs. Default is 512 for cotexm_common.
   # TODO Do this for every cortexm cpu

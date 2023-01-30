@@ -221,7 +221,7 @@ The chip has a SX126X module, so we can first test the sx126x driver:
 > The type must be `lora` not `fsk`. For this you must pass the
 > `LORA_DRIVER=sx126x_stm32wl` option.
 
-For pint-to-point communication we can mix a lora-e5 (SX126X) with a waspmote (SX1272),
+For point-to-point communication we can mix a lora-e5 (SX126X) with a waspmote (SX1272),
 the feather-m0 has as well a LoRa shield (SX1276):
 
     Mode 1

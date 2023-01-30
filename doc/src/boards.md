@@ -51,13 +51,6 @@ RIOT/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200"
 ```
 
 
-
-Up:
-
-- Available and affordable
-- Several combinations possible with different shields
-
-
 ## Arduino Zero (arduino-zero)
 
 To flash programs to the arduino-zero board install openocd, see
@@ -78,7 +71,7 @@ When flashing, if you get some error like:
 
 Try unplugging and plugging again the USB cable.
 
-## iM880B
+## iM880B (im880b)
 
 The PCB includes a iM880B package and some other modules:
 
