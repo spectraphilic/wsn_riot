@@ -10,12 +10,6 @@ USEMODULE += log_file
 USEMODULE += settings
 USEMODULE += triage
 
-# Drivers
-#USEMODULE += ds1307
-USEMODULE += ds3231
-USEMODULE += ds3231_int
-#USEMODULE += sx127x
-
 # Networking
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc

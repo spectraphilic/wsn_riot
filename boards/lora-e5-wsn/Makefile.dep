@@ -2,6 +2,11 @@ USEMODULE += board_lora-e5-wsn
 
 include $(RIOTBOARD)/lora-e5-dev/Makefile.dep
 
+# RTC DS3231
+USEMODULE += ds3231
+USEMODULE += ds3231_int
+
+# SD card
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_sdcard
 endif
