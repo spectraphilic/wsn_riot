@@ -1,11 +1,11 @@
-Howto Toolchains
-================
+# Toolchains
+
+@tableofcontents
 
 You need to install a cross toolchain for every target architecture.
 
 
-Native
-------------------------
+## Native
 
 This allows running a RIOT program as a native Linux process, may be useful for
 rapid development.
@@ -20,8 +20,7 @@ Test:
     $ make
 
 
-AVR
-------------------------
+## AVR
 
 Debian:
 
@@ -47,8 +46,7 @@ Links:
 - <https://github.com/RIOT-OS/RIOT/issues/7109#issuecomment-305089485>
 
 
-ARM
-------------------------
+## ARM
 
 Debian:
 
@@ -65,8 +63,7 @@ Test:
     $ BOARD=arduino-zero make -C RIOT/examples/default/
 
 
-ARM from upstream
-------------------------
+## ARM from upstream
 
 Alternatively you can install the ARM toolchain from upstream. This works
 regardless of the Linux distribution. And is also the path to follow for
@@ -92,8 +89,7 @@ Exit the terminal and open a new one, so this change takes effect. Then verify:
     [...]
 
 
-RISC-V
-------------------------
+## RISC-V
 
 Probably you don't need this, unless you have to send a PR to RIOT.
 

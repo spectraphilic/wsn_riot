@@ -1,5 +1,30 @@
 # Boards
 
+@tableofcontents
+
+Our new generation datalogger is based on the lora-e5 board, but before we tried several
+other boards:
+
+- Zolertia's remote-revb board is fine, but has been out of stock for a long time. Also
+  it has a 802.15.4 radio, not LoRa.
+
+- Adafruit Feather-M0 has proven to be fragile and unrelible.
+
+- The Arduino Zero was useful to test RIOT support for Arduino code. It has the same MCU
+  as the Feather-M0.
+
+- Waspmote and other AVR boards. We have a stock of waspmotes that would be nice to reuse.
+  The main problem with AVR boards is they have too little memory.
+
+- iM880B is an old board, we have used it only to debug a problem with the SPI bus. It has
+  a LoRa module.
+
+
+## LoRa-E5
+
+See [LoRa E5](lora_e5.md) page.
+
+
 ## Adafruit Feather M0 (feather-m0)
 
 Specifically we have these boards and these shields:
@@ -52,3 +77,33 @@ When flashing, if you get some error like:
     avrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x31
 
 Try unplugging and plugging again the USB cable.
+
+## iM880B
+
+The PCB includes a iM880B package and some other modules:
+
+    MCU     : STM32L151CxU6Axx
+    LoRa    : SX1272
+    +Sensor : DS75LX
+    +USB    : CH340G (requires USB_SERIAL_CH341 linux module)
+
+Test:
+
+    $ PORT=/dev/ttyUSB0 BOARD=im880b make -C tests/periph_spi term
+    > init 1 0 0
+    2023-01-18 11:41:57,394 # init 1 0 0
+    2023-01-18 11:41:57,400 # SPI_DEV(1) initialized: mode: 0, clk: 0, cs_port: 0, cs_pin: 0
+
+How to switch to programming mode and flash:
+
+- Hold the reset button
+- Connect the resistor loose pin to the the middle header (Vcc indicated by an arrow on
+  the board)
+- Release the reset button
+- Flash:
+
+    $ PROGRAMMER=stm32flash PORT=/dev/ttyUSB0 BOARD=im880b make -C tests/periph_spi flash
+
+- Release the resistor loose pin
+- Push the reboot button
+- Enter the terminal

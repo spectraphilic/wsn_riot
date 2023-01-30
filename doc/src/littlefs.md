@@ -1,5 +1,4 @@
-LittleFS
-========
+# LittleFS
 
 To read an SD card with a LittleFS filesystem you need fuse, including headers.
 On Debian systems:
@@ -30,8 +29,7 @@ When finished unmount:
     $ umount mount
 
 
-Troubleshooting
----------------
+## Troubleshooting
 
 - ``error: Permission denied``
 
@@ -39,7 +37,6 @@ Troubleshooting
   had to add my user to the ``disk`` group.
 
 
-Links
------
+## Links
 
 - https://github.com/littlefs-project/littlefs-fuse

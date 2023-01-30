@@ -1,5 +1,4 @@
-App wsn-shell
-=============
+# App wsn-shell
 
 This test program shows how to use the shell module. By default no commands are available.
 
